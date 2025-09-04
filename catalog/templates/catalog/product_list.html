@@ -1,0 +1,491 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products - {{ site_name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-agro-dark to-agro-green text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-6">
+                <i class="fas fa-seedling mr-4"></i>
+                Our Product Catalog
+            </h1>
+            <p class="text-xl text-green-100 max-w-2xl mx-auto leading-relaxed">
+                Discover our comprehensive range of agricultural products designed to enhance 
+                your farming operations and improve yields.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Advanced Search and Filters Section -->
+<section class="py-8 bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'catalog:product_list' %}" class="mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <!-- Search Input -->
+                <div class="lg:col-span-2">
+                    <div class="relative">
+                        <input type="text" 
+                               name="q"
+                               value="{{ query }}"
+                               placeholder="Search products, SKUs, or categories..." 
+                               class="form-input pl-12 w-full text-lg">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <div>
+                    <select name="category" class="form-input w-full">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.slug }}" {% if category_filter == category.slug %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Sort Options -->
+                <div>
+                    <select name="sort" class="form-input w-full">
+                        <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name A-Z</option>
+                        <option value="name_desc" {% if sort_by == "name_desc" %}selected{% endif %}>Name Z-A</option>
+                        <option value="price" {% if sort_by == "price" %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if sort_by == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+                        <option value="stock" {% if sort_by == "stock" %}selected{% endif %}>Stock Level</option>
+                        <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest First</option>
+                        <option value="featured" {% if sort_by == "featured" %}selected{% endif %}>Featured First</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Advanced Filters -->
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Price Range -->
+                <div class="flex gap-2">
+                    <input type="number" 
+                           name="price_min" 
+                           value="{{ price_min }}"
+                           placeholder="Min Price" 
+                           class="form-input flex-1">
+                    <input type="number" 
+                           name="price_max" 
+                           value="{{ price_max }}"
+                           placeholder="Max Price" 
+                           class="form-input flex-1">
+                </div>
+                
+                <!-- Stock Filter -->
+                <div>
+                    <select name="stock" class="form-input w-full">
+                        <option value="">All Stock</option>
+                        <option value="in_stock" {% if stock_filter == "in_stock" %}selected{% endif %}>In Stock</option>
+                        <option value="low_stock" {% if stock_filter == "low_stock" %}selected{% endif %}>Low Stock</option>
+                        <option value="out_of_stock" {% if stock_filter == "out_of_stock" %}selected{% endif %}>Out of Stock</option>
+                    </select>
+                </div>
+                
+                <!-- Search Button -->
+                <div class="md:col-span-2">
+                    <button type="submit" class="btn-primary w-full">
+                        <i class="fas fa-search mr-2"></i>Search Products
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Results Summary -->
+        {% if filters_applied %}
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-filter text-green-600 mr-2"></i>
+                    <span class="text-green-800">
+                        Found {{ total_products }} product{{ total_products|pluralize }} 
+                        {% if query %}matching "{{ query }}"{% endif %}
+                    </span>
+                </div>
+                <a href="{% url 'catalog:product_list' %}" class="text-green-600 hover:text-green-800 text-sm">
+                    <i class="fas fa-times mr-1"></i>Clear Filters
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Products Grid -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden">
+            <div class="text-center py-12">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading products...</p>
+            </div>
+        </div>
+        
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for product in products %}
+            <div class="product-card stagger-item animate-on-scroll" data-category="{{ product.category.id }}">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                    <!-- Product Image -->
+                    <div class="relative h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center overflow-hidden">
+                        {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" 
+                                 alt="{{ product.name }}"
+                                 class="w-full h-full object-cover transition-transform duration-500">
+                        {% else %}
+                            <i class="fas fa-seedling text-4xl text-agro-green"></i>
+                        {% endif %}
+                        
+                        <!-- Stock Status Badge -->
+                        <div class="absolute top-3 right-3">
+                            {% if product.stock_quantity > 0 %}
+                                {% if product.is_low_stock %}
+                                    <span class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                        Low Stock
+                                    </span>
+                                {% else %}
+                                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                        In Stock
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                    Out of Stock
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Quick View Button -->
+                        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                            <button class="quick-view-btn opacity-0 hover:opacity-100 bg-white text-agro-green px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105"
+                                    data-product-id="{{ product.id }}">
+                                <i class="fas fa-eye mr-2"></i>Quick View
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="p-6 flex-1 flex flex-col">
+                        <div class="mb-4">
+                            <h3 class="font-semibold text-gray-800 text-lg mb-2 hover:text-agro-green transition-colors">
+                                <a href="{% url 'catalog:product_detail' product.slug %}">{{ product.name }}</a>
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ product.description|truncatewords:15 }}</p>
+                            
+                            <!-- Category Badge -->
+                            <div class="mb-3">
+                                <span class="inline-block bg-green-100 text-agro-green text-xs px-2 py-1 rounded-full font-medium">
+                                    {{ product.category.name }}
+                                </span>
+                            </div>
+                            
+                            <!-- SKU -->
+                            <p class="text-xs text-gray-500">SKU: {{ product.sku }}</p>
+                        </div>
+                        
+                        <!-- Price and Actions -->
+                        <div class="mt-auto">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-2xl font-bold text-agro-green">KSh {{ product.price }}</span>
+                                <span class="text-sm text-gray-500">{{ product.stock_quantity }} available</span>
+                            </div>
+                            
+                                 <div class="flex space-x-2">
+                                 {% if product.stock_quantity > 0 %}
+                                     <button onclick="window.cart.addItem({{ product.id }}, '{{ product.name|escapejs }}', {{ product.price }})" 
+                                             class="flex-1 bg-agro-green text-white py-3 px-4 rounded-lg hover:bg-agro-dark transition-colors transform hover:scale-105 font-medium">
+                                         <i class="fas fa-plus mr-2"></i>Add to Cart
+                                     </button>
+                                 {% else %}
+                                     <button class="flex-1 bg-gray-300 text-gray-500 py-3 px-4 rounded-lg cursor-not-allowed font-medium">
+                                         <i class="fas fa-times mr-2"></i>Out of Stock
+                                     </button>
+                                 {% endif %}
+                                
+                                <button class="w-12 h-12 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg flex items-center justify-center transition-colors transform hover:scale-105"
+                                        title="Add to Wishlist">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Empty State -->
+            <div class="col-span-full text-center py-16">
+                <div class="animate-on-load stagger-item">
+                    <i class="fas fa-seedling text-6xl text-gray-300 mb-6"></i>
+                    <h3 class="text-2xl font-semibold text-gray-600 mb-4">No Products Found</h3>
+                    <p class="text-gray-500 mb-6">We couldn't find any products matching your criteria.</p>
+                    <button onclick="resetFilters()" class="btn-primary">
+                        <i class="fas fa-refresh mr-2"></i>Reset Filters
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if products.has_other_pages %}
+        <div class="mt-12 flex justify-center">
+            <nav class="flex items-center space-x-2">
+                {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}" 
+                       class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                {% endif %}
+                
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <span class="px-4 py-2 bg-agro-green text-white rounded-lg">{{ num }}</span>
+                    {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                        <a href="?page={{ num }}" 
+                           class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}" 
+                       class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Quick View Modal -->
+<div id="quick-view-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-2xl">
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-2xl font-bold text-gray-800">Product Details</h3>
+                <button onclick="closeQuickView()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="quick-view-content">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced JavaScript for interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category filter functionality
+    const categoryFilters = document.querySelectorAll('.category-filter');
+    const products = document.querySelectorAll('.product-card');
+    
+    categoryFilters.forEach(filter => {
+        filter.addEventListener('click', function() {
+            // Update active state
+            categoryFilters.forEach(f => f.classList.remove('active', 'bg-agro-green', 'text-white'));
+            categoryFilters.forEach(f => f.classList.add('bg-gray-100', 'text-gray-700'));
+            this.classList.add('active', 'bg-agro-green', 'text-white');
+            this.classList.remove('bg-gray-100', 'text-gray-700');
+            
+            const selectedCategory = this.dataset.category;
+            
+            // Filter products with animation
+            products.forEach(product => {
+                if (selectedCategory === 'all' || product.dataset.category === selectedCategory) {
+                    product.style.display = 'block';
+                    setTimeout(() => {
+                        product.classList.add('animate-in');
+                    }, 100);
+                } else {
+                    product.classList.remove('animate-in');
+                    setTimeout(() => {
+                        product.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+    
+    // Search functionality
+    const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', debounce(function() {
+        const query = this.value.toLowerCase();
+        filterProducts(query);
+    }, 300));
+    
+    // Sort functionality
+    const sortSelect = document.getElementById('sort-select');
+    sortSelect.addEventListener('change', function() {
+        sortProducts(this.value);
+    });
+    
+    // Quick view functionality
+    const quickViewBtns = document.querySelectorAll('.quick-view-btn');
+    quickViewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            openQuickView(productId);
+        });
+    });
+});
+
+// Utility functions
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function filterProducts(query) {
+    const products = document.querySelectorAll('.product-card');
+    products.forEach(product => {
+        const name = product.querySelector('h3').textContent.toLowerCase();
+        const description = product.querySelector('p').textContent.toLowerCase();
+        
+        if (name.includes(query) || description.includes(query)) {
+            product.style.display = 'block';
+            product.classList.add('animate-in');
+        } else {
+            product.classList.remove('animate-in');
+            setTimeout(() => {
+                product.style.display = 'none';
+            }, 300);
+        }
+    });
+}
+
+function sortProducts(sortBy) {
+    const productsGrid = document.getElementById('products-grid');
+    const products = Array.from(productsGrid.children);
+    
+    products.sort((a, b) => {
+        const nameA = a.querySelector('h3').textContent;
+        const nameB = b.querySelector('h3').textContent;
+        const priceA = parseFloat(a.querySelector('.text-2xl').textContent.replace('$', ''));
+        const priceB = parseFloat(b.querySelector('.text-2xl').textContent.replace('$', ''));
+        
+        switch(sortBy) {
+            case 'name':
+                return nameA.localeCompare(nameB);
+            case 'price-low':
+                return priceA - priceB;
+            case 'price-high':
+                return priceB - priceA;
+            default:
+                return 0;
+        }
+    });
+    
+    // Reorder products with animation
+    products.forEach((product, index) => {
+        product.style.order = index;
+        product.classList.add('animate-in');
+    });
+}
+
+function openQuickView(productId) {
+    // This would typically fetch product details via AJAX
+    const modal = document.getElementById('quick-view-modal');
+    const content = document.getElementById('quick-view-content');
+    
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p>Loading product details...</p>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Simulate loading (replace with actual AJAX call)
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
+                    <i class="fas fa-seedling text-4xl text-agro-green"></i>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Product Name</h4>
+                    <p class="text-gray-600 mb-4">Product description goes here...</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Price:</span>
+                            <span class="font-bold text-agro-green">KSh 24.99</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">SKU:</span>
+                            <span class="font-mono">SKU001</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Stock:</span>
+                            <span class="text-green-600">In Stock</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+function closeQuickView() {
+    const modal = document.getElementById('quick-view-modal');
+    modal.classList.add('hidden');
+}
+
+function resetFilters() {
+    // Reset category filter
+    document.querySelector('.category-filter[data-category="all"]').click();
+    
+    // Reset search
+    document.getElementById('search-input').value = '';
+    
+    // Reset sort
+    document.getElementById('sort-select').value = 'name';
+    
+    // Show all products
+    document.querySelectorAll('.product-card').forEach(product => {
+        product.style.display = 'block';
+        product.classList.add('animate-in');
+    });
+}
+</script>
+
+<!-- Custom CSS for line clamping -->
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.modal-overlay {
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+</style>
+{% endblock %}

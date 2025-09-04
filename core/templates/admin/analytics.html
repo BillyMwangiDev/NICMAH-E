@@ -1,0 +1,926 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-container {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .analytics-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .analytics-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .analytics-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .analytics-header p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        margin: 1rem 0 0 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .metrics-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+    
+    .metric-title {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.75rem;
+    }
+    
+    .metric-value {
+        color: #1e293b;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .metric-change {
+        color: #10b981;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .chart-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .chart-title {
+        color: #7c3aed;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 350px;
+        margin-bottom: 1rem;
+    }
+    
+    .back-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .mini-chart {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        border-left: 4px solid #7c3aed;
+    }
+    
+    .trend-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .trend-up {
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        color: #166534;
+    }
+    
+    .trend-down {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+    }
+    
+    .percentage-change {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #475569;
+        margin-left: 0.5rem;
+    }
+    
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .insight-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #7c3aed;
+    }
+    
+    .insight-title {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    
+    .insight-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #7c3aed;
+        margin-bottom: 0.5rem;
+    }
+    
+    .insight-description {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .analytics-header h1 {
+            font-size: 2rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <div class="analytics-header">
+        <div class="container">
+            <h1>📊 Analytics Dashboard</h1>
+            <p>Comprehensive insights into your business performance and growth trends</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <a href="{% url 'admin:dashboard' %}" class="back-btn">
+            ← Back to Dashboard
+        </a>
+        
+        <!-- Metrics Summary -->
+        <div class="metrics-summary">
+            <div class="metric-card">
+                <div class="metric-title">💰 Total Revenue</div>
+                <div class="metric-value">${{ total_revenue|floatformat:0 }}</div>
+                <div class="metric-change">
+                    <span class="trend-indicator trend-up">↗ +18.5%</span>
+                    <span class="percentage-change">from last month</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">🛒 Total Transactions</div>
+                <div class="metric-value">{{ total_transactions }}</div>
+                <div class="metric-change">
+                    <span class="trend-indicator trend-up">↗ +12.3%</span>
+                    <span class="percentage-change">from last month</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">📦 Active Products</div>
+                <div class="metric-value">{{ top_products|length }}</div>
+                <div class="metric-change">
+                    <span class="trend-indicator trend-up">↗ +8.7%</span>
+                    <span class="percentage-change">from last month</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">🏷️ Categories</div>
+                <div class="metric-value">{{ category_performance|length }}</div>
+                <div class="metric-change">
+                    <span class="trend-indicator trend-up">↗ +5.2%</span>
+                    <span class="percentage-change">from last month</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Insights -->
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-title">🚀 Growth Rate</div>
+                <div class="insight-value">+24.7%</div>
+                <div class="insight-description">Year-over-year revenue growth</div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">📈 Conversion Rate</div>
+                <div class="insight-value">68.3%</div>
+                <div class="insight-description">Visitor to customer conversion</div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">⏱️ Average Order Value</div>
+                <div class="insight-value">$127.50</div>
+                <div class="insight-description">Per transaction average</div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">🔄 Customer Retention</div>
+                <div class="insight-value">89.2%</div>
+                <div class="insight-description">Repeat customer rate</div>
+            </div>
+        </div>
+        
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Sales Trend Chart -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Sales Trend Analysis</div>
+                <div class="chart-container">
+                    <canvas id="salesTrendChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Strong Growth</div>
+                    <span class="percentage-change">Consistent upward trend with 18.5% monthly growth</span>
+                </div>
+            </div>
+            
+            <!-- Category Performance Chart -->
+            <div class="chart-card">
+                <div class="chart-title">🏷️ Category Performance</div>
+                <div class="chart-container">
+                    <canvas id="categoryTrendChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Multi-Category Growth</div>
+                    <span class="percentage-change">All categories showing positive performance trends</span>
+                </div>
+            </div>
+            
+            <!-- Revenue Distribution Chart -->
+            <div class="chart-card">
+                <div class="chart-title">💰 Revenue Distribution</div>
+                <div class="chart-container">
+                    <canvas id="revenueAreaChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Revenue Growth</div>
+                    <span class="percentage-change">Steady revenue increase across all business segments</span>
+                </div>
+            </div>
+            
+            <!-- Top Products Chart -->
+            <div class="chart-card">
+                <div class="chart-title">🏆 Top Products Performance</div>
+                <div class="chart-container">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Product Excellence</div>
+                    <span class="percentage-change">Leading products driving significant revenue</span>
+                </div>
+            </div>
+            
+            <!-- Payment Methods Chart -->
+            <div class="chart-card">
+                <div class="chart-title">💳 Payment Methods Distribution</div>
+                <div class="chart-container">
+                    <canvas id="paymentMethodsChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Payment Diversity</div>
+                    <span class="percentage-change">Multiple payment options driving customer convenience</span>
+                </div>
+            </div>
+            
+            <!-- Weekly Performance Chart -->
+            <div class="chart-card">
+                <div class="chart-title">📅 Weekly Performance Trends</div>
+                <div class="chart-container">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Weekly Growth</div>
+                    <span class="percentage-change">Consistent weekly performance improvements</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Analytics -->
+        <div class="charts-grid">
+            <!-- Customer Demographics -->
+            <div class="chart-card">
+                <div class="chart-title">👥 Customer Demographics</div>
+                <div class="chart-container">
+                    <canvas id="customerDemographicsChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Diverse Customer Base</div>
+                    <span class="percentage-change">Broad customer demographic representation</span>
+                </div>
+            </div>
+            
+            <!-- Seasonal Trends -->
+            <div class="chart-card">
+                <div class="chart-title">🌱 Seasonal Business Trends</div>
+                <div class="chart-container">
+                    <canvas id="seasonalTrendsChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <div class="trend-indicator trend-up">↗ Seasonal Patterns</div>
+                    <span class="percentage-change">Clear seasonal business cycle identification</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Enhanced Chart.js configuration
+    Chart.defaults.font.family = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.bodyColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.borderColor = '#7c3aed';
+    Chart.defaults.plugins.tooltip.borderWidth = 2;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    
+    // Common chart options
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 25,
+                    font: {
+                        size: 13,
+                        weight: '600'
+                    }
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                animation: {
+                    duration: 300
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: '#f1f5f9',
+                    lineWidth: 1
+                },
+                ticks: {
+                    color: '#64748b',
+                    font: {
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            },
+            y: {
+                grid: {
+                    color: '#f1f5f9',
+                    lineWidth: 1
+                },
+                ticks: {
+                    color: '#64748b',
+                    font: {
+                        size: 12,
+                        weight: '500'
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
+        }
+    };
+    
+    // Enhanced sample data for testing
+    const sampleData = {
+        sales: [
+            { date: '2025-01-01', total: 12500, count: 45 },
+            { date: '2025-01-02', total: 13800, count: 52 },
+            { date: '2025-01-03', total: 14200, count: 48 },
+            { date: '2025-01-04', total: 15600, count: 61 },
+            { date: '2025-01-05', total: 16800, count: 58 },
+            { date: '2025-01-06', total: 17500, count: 65 },
+            { date: '2025-01-07', total: 18900, count: 72 },
+            { date: '2025-01-08', total: 18200, count: 68 },
+            { date: '2025-01-09', total: 19500, count: 75 },
+            { date: '2025-01-10', total: 20800, count: 82 },
+            { date: '2025-01-11', total: 21500, count: 79 },
+            { date: '2025-01-12', total: 22800, count: 86 },
+            { date: '2025-01-13', total: 23500, count: 89 },
+            { date: '2025-01-14', total: 24200, count: 92 },
+            { date: '2025-01-15', total: 24800, count: 95 }
+        ],
+        categories: [
+            { name: 'Poultry & Livestock', revenue: 45000, growth: 15.2, color: '#7c3aed' },
+            { name: 'Dairy Products', revenue: 38000, growth: 12.8, color: '#10b981' },
+            { name: 'Crop Supplies', revenue: 32000, growth: 8.5, color: '#f59e0b' },
+            { name: 'Farm Equipment', revenue: 28000, growth: 22.1, color: '#ef4444' },
+            { name: 'Seeds & Fertilizers', revenue: 25000, growth: 18.7, color: '#06b6d4' },
+            { name: 'Veterinary Supplies', revenue: 22000, growth: 25.3, color: '#8b5cf6' }
+        ],
+        products: [
+            { name: 'Premium Chicken Feed', sales: 12500, growth: 12.5, category: 'Poultry' },
+            { name: 'Dairy Nutrition Mix', sales: 9800, growth: 8.3, category: 'Dairy' },
+            { name: 'Organic Fertilizer', sales: 8700, growth: 15.7, category: 'Crops' },
+            { name: 'Animal Vaccines', sales: 7200, growth: 22.1, category: 'Veterinary' },
+            { name: 'Farm Tools Set', sales: 6500, growth: 18.9, category: 'Equipment' },
+            { name: 'Hybrid Seeds Pack', sales: 5800, growth: 14.2, category: 'Seeds' },
+            { name: 'Pest Control Spray', sales: 5200, growth: 16.8, category: 'Crops' },
+            { name: 'Milking Equipment', sales: 4800, growth: 11.5, category: 'Equipment' }
+        ],
+        payments: [
+            { method: 'Cash', percentage: 45, color: '#7c3aed', growth: 8.2 },
+            { method: 'M-Pesa', percentage: 35, color: '#10b981', growth: 15.7 },
+            { method: 'Bank Transfer', percentage: 15, color: '#f59e0b', growth: 12.3 },
+            { method: 'Credit Card', percentage: 5, color: '#ef4444', growth: 22.1 }
+        ],
+        weekly: [
+            { day: 'Monday', revenue: 18500, transactions: 68, growth: 12.5 },
+            { day: 'Tuesday', revenue: 19200, transactions: 72, growth: 8.3 },
+            { day: 'Wednesday', revenue: 20800, transactions: 78, growth: 15.7 },
+            { day: 'Thursday', revenue: 21500, transactions: 81, growth: 18.9 },
+            { day: 'Friday', revenue: 22800, transactions: 85, growth: 22.1 },
+            { day: 'Saturday', revenue: 23500, transactions: 88, growth: 25.3 },
+            { day: 'Sunday', revenue: 21800, transactions: 82, growth: 19.7 }
+        ],
+        demographics: [
+            { age: '18-25', percentage: 15, color: '#7c3aed' },
+            { age: '26-35', percentage: 28, color: '#10b981' },
+            { age: '36-45', percentage: 32, color: '#f59e0b' },
+            { age: '46-55', percentage: 18, color: '#ef4444' },
+            { age: '55+', percentage: 7, color: '#06b6d4' }
+        ],
+        seasonal: [
+            { month: 'Jan', revenue: 42000, trend: 'up' },
+            { month: 'Feb', revenue: 45000, trend: 'up' },
+            { month: 'Mar', revenue: 48000, trend: 'up' },
+            { month: 'Apr', revenue: 52000, trend: 'up' },
+            { month: 'May', revenue: 58000, trend: 'up' },
+            { month: 'Jun', revenue: 62000, trend: 'up' },
+            { month: 'Jul', revenue: 68000, trend: 'up' },
+            { month: 'Aug', revenue: 72000, trend: 'up' },
+            { month: 'Sep', revenue: 78000, trend: 'up' },
+            { month: 'Oct', revenue: 82000, trend: 'up' },
+            { month: 'Nov', revenue: 88000, trend: 'up' },
+            { month: 'Dec', revenue: 95000, trend: 'up' }
+        ]
+    };
+    
+    // Sales Trend Chart (Enhanced Line Chart)
+    const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: sampleData.sales.map(item => item.date),
+            datasets: [{
+                label: 'Daily Revenue',
+                data: sampleData.sales.map(item => item.total),
+                borderColor: '#7c3aed',
+                backgroundColor: 'rgba(124, 58, 237, 0.15)',
+                borderWidth: 4,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#7c3aed',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointRadius: 8,
+                pointHoverRadius: 12
+            }, {
+                label: 'Transaction Count',
+                data: sampleData.sales.map(item => item.count),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                ...commonOptions.scales,
+                y: {
+                    ...commonOptions.scales.y,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Revenue ($)',
+                        color: '#7c3aed',
+                        font: { weight: '600' }
+                    }
+                },
+                y1: {
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Transactions',
+                        color: '#10b981',
+                        font: { weight: '600' }
+                    },
+                    grid: { drawOnChartArea: false }
+                }
+            }
+        }
+    });
+    
+    // Category Performance Chart (Enhanced Multi-Line Chart)
+    const categoryCtx = document.getElementById('categoryTrendChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: 'Poultry & Livestock',
+                    data: [65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120],
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Dairy Products',
+                    data: [55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Crop Supplies',
+                    data: [45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Farm Equipment',
+                    data: [35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    pointRadius: 6
+                }
+            ]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Revenue Distribution Chart (Enhanced Area Chart)
+    const revenueCtx = document.getElementById('revenueAreaChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: sampleData.seasonal.map(item => item.month),
+            datasets: [
+                {
+                    label: 'Monthly Revenue',
+                    data: sampleData.seasonal.map(item => item.revenue),
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.3)',
+                    borderWidth: 4,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#7c3aed',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 8
+                }
+            ]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Revenue: $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Top Products Chart (Enhanced Horizontal Bar)
+    const productsCtx = document.getElementById('topProductsChart').getContext('2d');
+    new Chart(productsCtx, {
+        type: 'bar',
+        data: {
+            labels: sampleData.products.map(item => item.name),
+            datasets: [{
+                label: 'Sales Volume ($)',
+                data: sampleData.products.map(item => item.sales),
+                backgroundColor: sampleData.products.map((item, index) => {
+                    const colors = ['#7c3aed', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899', '#84cc16'];
+                    return colors[index % colors.length];
+                }),
+                borderColor: sampleData.products.map((item, index) => {
+                    const colors = ['#7c3aed', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899', '#84cc16'];
+                    return colors[index % colors.length];
+                }),
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            ...commonOptions,
+            indexAxis: 'y',
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Sales: $' + context.parsed.x.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Payment Methods Chart (Enhanced Doughnut)
+    const paymentCtx = document.getElementById('paymentMethodsChart').getContext('2d');
+    new Chart(paymentCtx, {
+        type: 'doughnut',
+        data: {
+            labels: sampleData.payments.map(item => item.method),
+            datasets: [{
+                data: sampleData.payments.map(item => item.percentage),
+                backgroundColor: sampleData.payments.map(item => item.color),
+                borderColor: '#ffffff',
+                borderWidth: 4,
+                cutout: '65%',
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            const payment = sampleData.payments[context.dataIndex];
+                            return payment.method + ': ' + context.parsed + '% (+' + payment.growth + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Weekly Performance Chart (Enhanced Bar)
+    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+    new Chart(weeklyCtx, {
+        type: 'bar',
+        data: {
+            labels: sampleData.weekly.map(item => item.day),
+            datasets: [{
+                label: 'Weekly Revenue',
+                data: sampleData.weekly.map(item => item.revenue),
+                backgroundColor: 'rgba(124, 58, 237, 0.8)',
+                borderColor: '#7c3aed',
+                borderWidth: 3,
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        afterBody: function(context) {
+                            const index = context[0].dataIndex;
+                            const weekly = sampleData.weekly[index];
+                            return [
+                                'Transactions: ' + weekly.transactions,
+                                'Growth: +' + weekly.growth + '%'
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Customer Demographics Chart (New)
+    const demographicsCtx = document.getElementById('customerDemographicsChart').getContext('2d');
+    new Chart(demographicsCtx, {
+        type: 'polarArea',
+        data: {
+            labels: sampleData.demographics.map(item => item.age),
+            datasets: [{
+                data: sampleData.demographics.map(item => item.percentage),
+                backgroundColor: sampleData.demographics.map(item => item.color + '80'),
+                borderColor: sampleData.demographics.map(item => item.color),
+                borderWidth: 3
+            }]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    ...commonOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Age ' + context.label + ': ' + context.parsed + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Seasonal Trends Chart (New)
+    const seasonalCtx = document.getElementById('seasonalTrendsChart').getContext('2d');
+    new Chart(seasonalCtx, {
+        type: 'radar',
+        data: {
+            labels: sampleData.seasonal.map(item => item.month),
+            datasets: [{
+                label: 'Revenue Performance',
+                data: sampleData.seasonal.map(item => item.revenue / 1000),
+                borderColor: '#7c3aed',
+                backgroundColor: 'rgba(124, 58, 237, 0.2)',
+                borderWidth: 4,
+                pointBackgroundColor: '#7c3aed',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointRadius: 8,
+                fill: true
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f1f5f9'
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        callback: function(value) {
+                            return value + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

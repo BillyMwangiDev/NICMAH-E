@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logo and Header -->
+        <div class="text-center animate-on-load stagger-item">
+            <div class="mx-auto mb-6">
+                <img src="{% static 'images/logo.png' %}" alt="{{ site_name }} Logo" class="h-24 w-auto mx-auto">
+            </div>
+            <h2 class="text-3xl font-display font-bold text-agro-dark mb-2">
+                Welcome Back
+            </h2>
+            <p class="text-gray-600">
+                Sign in to your {{ site_name }} account
+            </p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 animate-on-load stagger-item">
+            <form class="space-y-6" method="post">
+                {% csrf_token %}
+                
+                <!-- Username/Email Field -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-agro-green"></i>
+                        Username or Email
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="mt-1 text-red-600 text-sm">
+                            {% for error in form.username.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-agro-green"></i>
+                        Password
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="mt-1 text-red-600 text-sm">
+                            {% for error in form.password.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Remember Me and Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" 
+                               class="h-4 w-4 text-agro-green focus:ring-agro-green border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-agro-green hover:text-agro-dark transition-colors">
+                            Forgot password?
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-agro-green to-agro-dark hover:from-agro-dark hover:to-agro-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-agro-green transition-all duration-300 transform hover:scale-105">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-sign-in-alt text-agro-light group-hover:text-white transition-colors"></i>
+                        </span>
+                        Sign In
+                    </button>
+                </div>
+
+                <!-- Demo Credentials Info -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">Demo Account</h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <p><strong>Username:</strong> admin</p>
+                                <p><strong>Password:</strong> admin123</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">New to {{ site_name }}?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="mt-6 text-center">
+                <a href="{% url 'users:signup' %}" 
+                   class="font-medium text-agro-green hover:text-agro-dark transition-colors">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Create an account
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="text-center text-sm text-gray-600 animate-on-load stagger-item">
+            <p>
+                By signing in, you agree to our 
+                <a href="#" class="text-agro-green hover:text-agro-dark transition-colors">Terms of Service</a>
+                and
+                <a href="#" class="text-agro-green hover:text-agro-dark transition-colors">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Background Elements -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-20 left-10 animate-float" style="animation-delay: 0s;">
+        <i class="fas fa-leaf text-4xl text-green-300/30"></i>
+    </div>
+    <div class="absolute top-40 right-20 animate-float" style="animation-delay: 1s;">
+        <i class="fas fa-seedling text-3xl text-emerald-300/30"></i>
+    </div>
+    <div class="absolute bottom-40 left-20 animate-float" style="animation-delay: 2s;">
+        <i class="fas fa-tractor text-4xl text-teal-300/30"></i>
+    </div>
+</div>
+
+<!-- Custom CSS for animations -->
+<style>
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .stagger-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: staggerIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-item:nth-child(2) { animation-delay: 0.3s; }
+    .stagger-item:nth-child(3) { animation-delay: 0.5s; }
+    
+    @keyframes staggerIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Form input focus effects */
+    .form-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1);
+    }
+    
+    /* Button hover effects */
+    button[type="submit"]:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(22, 163, 74, 0.2);
+    }
+</style>
+
+<!-- Enhanced JavaScript for form interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form input animations
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('scale-105');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('scale-105');
+        });
+    });
+    
+    // Form submission animation
+    const form = document.querySelector('form');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+        // Add loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing In...';
+        submitBtn.disabled = true;
+        
+        // Simulate loading delay (remove in production)
+        setTimeout(() => {
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Success!';
+            submitBtn.classList.add('bg-green-600');
+        }, 1000);
+    });
+    
+    // Auto-focus first input
+    if (inputs.length > 0) {
+        inputs[0].focus();
+    }
+});
+</script>
+{% endblock %}

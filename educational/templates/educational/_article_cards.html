@@ -1,0 +1,24 @@
+{% comment %}Reusable card grid for article list and infinite scroll{% endcomment %}
+<div class="row g-4">
+  {% for a in articles %}
+  <div class="col-md-6">
+    <article class="card h-100 shadow-sm border-0 article-card">
+      {% if a.image %}
+      <img class="card-img-top" src="{{ a.image.url }}" alt="{{ a.title }}">
+      {% endif %}
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ a.title }}</h5>
+        <p class="card-text text-muted small mb-2">
+          {{ a.published_at|date:'M d, Y' }} · {{ a.reading_minutes|default:3 }} min read
+          {% if a.category %} · <span class="badge bg-light text-success border">{{ a.category }}</span>{% endif %}
+        </p>
+        <p class="card-text">{{ a.excerpt|default:a.content|striptags|truncatechars:130 }}</p>
+        <div class="mt-auto">
+          <a href="{% url 'educational:article_detail' a.slug %}" class="btn btn-success btn-sm">Read more</a>
+        </div>
+      </div>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+

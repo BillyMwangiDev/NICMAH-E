@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Enhanced POS Dashboard - Nichmah Agrovet{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cash-register me-2"></i>
+                        Enhanced POS Dashboard
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Session Info -->
+                    {% if active_session %}
+                    <div class="alert alert-info">
+                        <strong>Active Session:</strong> {{ active_session.session_id }} 
+                        (Started: {{ active_session.opened_at|date:"M d, Y H:i" }})
+                        <a href="{% url 'pos:session_close' active_session.id %}" class="btn btn-sm btn-outline-danger float-end">
+                            Close Session
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Metrics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h3>${{ today_total|floatformat:2 }}</h3>
+                                    <small>Today's Sales</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h3>{{ today_transactions }}</h3>
+                                    <small>Transactions</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h3>${{ today_tax|floatformat:2 }}</h3>
+                                    <small>Tax Collected</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-secondary text-white">
+                                <div class="card-body text-center">
+                                    <h3>${{ today_discounts|floatformat:2 }}</h3>
+                                    <small>Discounts Given</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <a href="{% url 'pos:sale_create' %}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i>New Sale
+                                        </a>
+                                        <a href="{% url 'pos:sales_list' %}" class="btn btn-info">
+                                            <i class="fas fa-list me-2"></i>View Sales
+                                        </a>
+                                        <a href="{% url 'pos:analytics' %}" class="btn btn-success">
+                                            <i class="fas fa-chart-bar me-2"></i>Analytics
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barcode Scanner -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-barcode me-2"></i>
+                                        Barcode Scanner
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="input-group">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="barcodeInput" 
+                                               placeholder="Scan barcode or enter product SKU...">
+                                        <button class="btn btn-primary" onclick="scanBarcode()">
+                                            <i class="fas fa-search me-2"></i>Scan
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="clearScanner()">
+                                            <i class="fas fa-times me-2"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Results -->
+                    <div class="row mb-4" id="productResults" style="display: none;">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Search Results</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="productList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentCart = [];
+
+function scanBarcode() {
+    const barcodeInput = document.getElementById('barcodeInput');
+    const barcode = barcodeInput.value.trim();
+    
+    if (!barcode) {
+        alert('Please enter a barcode or SKU');
+        return;
+    }
+    
+    searchProducts(barcode);
+}
+
+function searchProducts(query) {
+    fetch(`{% url 'pos:product_search' %}?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            displayProducts(data.products);
+        })
+        .catch(error => {
+            console.error('Error searching products:', error);
+            alert('Error searching products');
+        });
+}
+
+function displayProducts(products) {
+    const productList = document.getElementById('productList');
+    const productResults = document.getElementById('productResults');
+    
+    if (products.length === 0) {
+        productList.innerHTML = '<p class="text-muted text-center py-3">No products found.</p>';
+    } else {
+        productList.innerHTML = products.map(product => `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-1">${product.name}</h6>
+                            <small class="text-muted">
+                                SKU: ${product.sku} | Stock: ${product.stock_quantity} | 
+                                Category: ${product.category}
+                            </small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="h5 text-primary mb-2">$${product.price}</div>
+                            <button class="btn btn-success btn-sm" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">
+                                <i class="fas fa-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    productResults.style.display = 'block';
+}
+
+function addToCart(productId, productName, price) {
+    const existingItem = currentCart.find(item => item.productId === productId);
+    
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        currentCart.push({
+            productId: productId,
+            name: productName,
+            price: price,
+            quantity: 1
+        });
+    }
+    
+    alert(`${productName} added to cart`);
+    clearScanner();
+}
+
+function clearScanner() {
+    document.getElementById('barcodeInput').value = '';
+    document.getElementById('productResults').style.display = 'none';
+}
+
+// Enter key support for barcode scanner
+document.getElementById('barcodeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        scanBarcode();
+    }
+});
+
+// Auto-focus on barcode input
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('barcodeInput').focus();
+});
+</script>
+{% endblock %}

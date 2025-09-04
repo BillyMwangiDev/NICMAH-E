@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<!-- Customer Dashboard Header -->
+<section class="bg-gradient-to-r from-agro-dark to-agro-green text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
+                <i class="fas fa-user mr-4"></i>
+                My Dashboard
+            </h1>
+            <p class="text-xl text-green-100 max-w-2xl mx-auto">
+                Welcome back, {{ user.first_name|default:user.username }}! 
+                Manage your orders, view your profile, and explore our products.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-display font-bold text-agro-dark mb-8 text-center">
+            Quick Actions
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Browse Products -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-green to-agro-emerald rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-seedling text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-2">Browse Products</h3>
+                    <p class="text-gray-600 mb-4">Explore our agricultural products and add them to your cart</p>
+                    <a href="{% url 'catalog:product_list' %}" 
+                       class="inline-block bg-agro-green text-white px-6 py-3 rounded-lg hover:bg-agro-dark transition-colors transform hover:scale-105">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Shop Now
+                    </a>
+                </div>
+            </div>
+
+            <!-- View Cart -->
+            <div class="bg-gradient-to-br from-blue-50 to-sky-50 p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-sky to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shopping-cart text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-2">Shopping Cart</h3>
+                    <p class="text-gray-600 mb-4">Review your cart and proceed to checkout</p>
+
+                </div>
+            </div>
+
+            <!-- Educational Hub -->
+            <div class="bg-gradient-to-br from-orange-50 to-amber-50 p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-gold to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-book-open text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-2">Learn More</h3>
+                    <p class="text-gray-600 mb-4">Access our educational articles and farming guides</p>
+                    <a href="{% url 'educational:article_list' %}" 
+                       class="inline-block bg-agro-gold text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors transform hover:scale-105">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Explore Articles
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Settings -->
+            <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-cog text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-2">Profile Settings</h3>
+                    <p class="text-gray-600 mb-4">Update your personal information and preferences</p>
+                    <a href="{% url 'users:profile' %}" 
+                       class="inline-block bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors transform hover:scale-105">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="bg-gradient-to-br from-teal-50 to-cyan-50 p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-2">Get Help</h3>
+                    <p class="text-gray-600 mb-4">Contact our support team for assistance</p>
+                    <a href="{% url 'core:contact' %}" 
+                       class="inline-block bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-colors transform hover:scale-105">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+
+            <!-- WhatsApp Support -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-whatsapp text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-2">WhatsApp Support</h3>
+                    <p class="text-gray-600 mb-4">Get instant help via WhatsApp</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Activity -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-display font-bold text-agro-dark mb-8 text-center">
+            Recent Activity
+        </h2>
+        
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">Your Recent Orders</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                <div class="p-6 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-shopping-bag text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">Welcome to {{ site_name }}!</p>
+                                <p class="text-sm text-gray-500">Start shopping to see your order history here</p>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">Just now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Account Information -->
+<section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-display font-bold text-agro-dark mb-8 text-center">
+            Account Information
+        </h2>
+        
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-agro-dark mb-4">Personal Details</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Name:</span>
+                            <span class="font-medium">{{ user.get_full_name|default:"Not provided" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Email:</span>
+                            <span class="font-medium">{{ user.email }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Phone:</span>
+                            <span class="font-medium">{{ user.phone_number|default:"Not provided" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Role:</span>
+                            <span class="font-medium capitalize">{{ user.role }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold text-agro-dark mb-4">Account Status</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Member Since:</span>
+                            <span class="font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Last Login:</span>
+                            <span class="font-medium">{{ user.last_login|date:"M d, Y"|default:"Never" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Account Status:</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <a href="{% url 'users:profile' %}" 
+                   class="inline-block bg-agro-green text-white px-8 py-3 rounded-lg hover:bg-agro-dark transition-colors transform hover:scale-105">
+                    <i class="fas fa-edit mr-2"></i>
+                    Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Custom CSS for animations -->
+<style>
+    .stagger-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: staggerIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-item:nth-child(2) { animation-delay: 0.3s; }
+    .stagger-item:nth-child(3) { animation-delay: 0.5s; }
+    
+    @keyframes staggerIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}

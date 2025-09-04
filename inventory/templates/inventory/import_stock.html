@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import Stock Data - {{ site_name }}{% endblock %}
+
+{% block content %}
+<!-- Import Stock Header -->
+<section class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
+                <i class="fas fa-upload mr-4"></i>
+                Import Stock Data
+            </h1>
+            <p class="text-xl text-blue-100 max-w-2xl mx-auto">
+                Bulk import your inventory data from Excel spreadsheets
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Import Form -->
+<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Upload Excel File</h2>
+            
+            <form method="post" enctype="multipart/form-data" class="space-y-6" id="import-form" action="">
+                {% csrf_token %}
+                
+                <!-- File Upload -->
+                <div class="space-y-2">
+                    <label for="excel_file" class="block text-sm font-medium text-gray-700">
+                        Select Excel File (.xlsx, .xls)
+                    </label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors">
+                        <div class="space-y-1 text-center">
+                            <i class="fas fa-file-excel text-4xl text-gray-400 mb-4"></i>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="excel_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                    <span>Upload a file</span>
+                                    <input id="excel_file" name="excel_file" type="file" accept=".xlsx,.xls" required>
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">Excel files only</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Simple File Input (for testing) -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <label for="simple_excel_file" class="block text-sm font-medium text-gray-700 mb-2">
+                        Alternative Upload (if above doesn't work):
+                    </label>
+                    <input id="simple_excel_file" name="excel_file" type="file" accept=".xlsx,.xls" required class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+
+                <!-- Template Download -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400 text-lg"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">Required Format</h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <p>Your Excel file must contain these columns:</p>
+                                <ul class="list-disc list-inside mt-1 space-y-1">
+                                    <li><strong>Product Name</strong> - The name of the product</li>
+                                    <li><strong>SKU</strong> - Unique product identifier</li>
+                                    <li><strong>Current Stock</strong> - Current quantity in stock</li>
+                                    <li><strong>Unit Price</strong> - Price per unit</li>
+                                </ul>
+                                <p class="mt-2">Optional columns: Category, Description, Minimum Stock</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg font-semibold">
+                        <i class="fas fa-upload mr-2"></i>
+                        Import Stock Data
+                    </button>
+                </div>
+            </form>
+
+            <script>
+            // Form submission debugging
+            document.getElementById('import-form').addEventListener('submit', function(e) {
+                const fileInput = document.getElementById('excel_file');
+                console.log('Form submitted');
+                console.log('File input files:', fileInput.files);
+                console.log('File input value:', fileInput.value);
+                // Don't prevent submission - let it go through
+            });
+            </script>
+
+            <!-- Instructions -->
+            <div class="mt-8 border-t border-gray-200 pt-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">How to Use</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-download text-blue-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-2">1. Prepare Your Data</h4>
+                        <p class="text-sm text-gray-600">Organize your product data in Excel with the required columns</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-upload text-green-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-2">2. Upload File</h4>
+                        <p class="text-sm text-gray-600">Select your Excel file and click import</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-purple-600 text-xl"></i>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-2">3. Review Results</h4>
+                        <p class="text-sm text-gray-600">Check the import results and resolve any errors</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-lightbulb text-yellow-400 text-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800">Pro Tips</h3>
+                        <div class="mt-2 text-sm text-yellow-700">
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Ensure SKUs are unique for each product</li>
+                                <li>Use consistent formatting for prices and quantities</li>
+                                <li>Remove any empty rows before importing</li>
+                                <li>Backup your data before bulk imports</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Other Inventory Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="{% url 'inventory:dashboard' %}" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl text-center hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-tachometer-alt text-3xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Inventory Dashboard</h3>
+                <p class="text-green-100">View stock overview and alerts</p>
+            </a>
+            
+            <a href="{% url 'inventory:export_stock_data' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl text-center hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-download text-3xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Export Stock</h3>
+                <p class="text-blue-100">Download current inventory data</p>
+            </a>
+            
+            <a href="{% url 'inventory:stock_movements' %}" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl text-center hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-exchange-alt text-3xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Stock Movements</h3>
+                <p class="text-purple-100">Track inventory changes</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+// File upload preview
+document.getElementById('excel_file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    console.log('File selected:', file);
+    if (file) {
+        const fileName = file.name;
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        
+        // Update the upload area to show file info
+        const uploadArea = document.querySelector('.border-dashed');
+        uploadArea.innerHTML = `
+            <div class="space-y-1 text-center">
+                <i class="fas fa-file-excel text-4xl text-green-400 mb-4"></i>
+                <p class="text-sm text-gray-600 font-medium">${fileName}</p>
+                <p class="text-xs text-gray-500">${fileSize} MB</p>
+                <p class="text-xs text-green-600">File selected successfully!</p>
+            </div>
+        `;
+    }
+});
+
+// Drag and drop functionality
+const uploadArea = document.querySelector('.border-dashed');
+
+uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('border-blue-400', 'bg-blue-50');
+});
+
+uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('border-blue-400', 'bg-blue-50');
+});
+
+uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('border-blue-400', 'bg-blue-50');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        if (file.type.includes('spreadsheet') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+            document.getElementById('excel_file').files = files;
+            
+            // Trigger change event
+            const event = new Event('change');
+            document.getElementById('excel_file').dispatchEvent(event);
+        } else {
+            alert('Please select an Excel file (.xlsx or .xls)');
+        }
+    }
+});
+</script>
+{% endblock %}

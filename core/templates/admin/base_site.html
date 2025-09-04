@@ -1,0 +1,520 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Nicmah Agrovet Admin') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --primary-color: #16a34a;
+        --primary-dark: #14532d;
+        --secondary-color: #0ea5e9;
+        --accent-color: #f59e0b;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f9fafb;
+        --border-color: #e5e7eb;
+    }
+
+    /* Completely remove any theme toggle elements */
+    .theme-toggle,
+    [data-theme-toggle],
+    .theme-switcher,
+    .theme-toggle-container,
+    .theme-controls,
+    .theme-selector,
+    .theme-options,
+    .theme-panel,
+    .theme-section,
+    .theme-control,
+    .theme-switch,
+    .theme-button,
+    .theme-dropdown,
+    .theme-menu,
+    .theme-list,
+    .theme-item,
+    .theme-label,
+    .theme-text,
+    .theme-current,
+    .theme-auto,
+    .theme-light,
+    .theme-dark,
+    .theme-default,
+    .theme-custom,
+    .theme-wrapper,
+    .theme-container,
+    .theme-box,
+    .theme-area,
+    .theme-block,
+    .theme-div,
+    .theme-span,
+    .theme-p,
+    .theme-h1,
+    .theme-h2,
+    .theme-h3,
+    .theme-h4,
+    .theme-h5,
+    .theme-h6 {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: none !important;
+        color: transparent !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        z-index: -9999 !important;
+        pointer-events: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+    }
+
+    /* Remove any gray boxes that might contain theme toggles */
+    .theme-container,
+    .theme-wrapper,
+    .theme-box,
+    .theme-area,
+    .theme-block,
+    .theme-section,
+    .theme-panel {
+        display: none !important;
+    }
+
+    /* Header Styling */
+    #header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    #header #branding h1 {
+        color: white;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    #header #branding h1:before {
+        content: "🌱 ";
+        margin-right: 8px;
+    }
+
+    /* Navigation */
+    #nav-sidebar {
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-color);
+    }
+
+    #nav-sidebar .module h2 {
+        background: var(--primary-color);
+        color: white;
+        border-radius: 8px 8px 0 0;
+        padding: 12px 16px;
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    #nav-sidebar .module {
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    #nav-sidebar .module ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    #nav-sidebar .module li {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    #nav-sidebar .module li:last-child {
+        border-bottom: none;
+    }
+
+    #nav-sidebar .module a {
+        padding: 12px 16px;
+        color: var(--text-primary);
+        text-decoration: none;
+        display: block;
+        transition: all 0.2s ease;
+    }
+
+    #nav-sidebar .module a:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateX(4px);
+    }
+
+    #nav-sidebar .module a.active {
+        background: var(--primary-color);
+        color: white;
+        font-weight: 600;
+    }
+
+    /* Content Area */
+    #content {
+        background: var(--bg-primary);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background: var(--bg-secondary);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .breadcrumbs a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .breadcrumbs a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    /* Tables */
+    .results {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+    }
+
+    .results thead th {
+        background: var(--primary-color);
+        color: white;
+        padding: 16px;
+        font-weight: 600;
+        border: none;
+    }
+
+    .results tbody tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+
+    .results tbody tr:hover {
+        background: var(--bg-secondary);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .results tbody td {
+        padding: 16px;
+        border: none;
+    }
+
+    /* Buttons */
+    .button, input[type="submit"], input[type="button"], .btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .button:hover, input[type="submit"]:hover, input[type="button"]:hover, .btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .button.default {
+        background: var(--success-color);
+    }
+
+    .button.default:hover {
+        background: #059669;
+    }
+
+    .deletelink {
+        background: var(--danger-color);
+        color: white;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-block;
+    }
+
+    .deletelink:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Forms */
+    .form-row {
+        margin-bottom: 20px;
+    }
+
+    .form-row label {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Submit Row */
+    .submit-row {
+        background: var(--bg-secondary);
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .submit-row input {
+        margin: 0 10px;
+    }
+
+    /* Object Tools */
+    .object-tools {
+        margin-bottom: 20px;
+    }
+
+    .object-tools a {
+        background: var(--primary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .object-tools a:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Pagination */
+    .paginator {
+        background: var(--bg-secondary);
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 20px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .paginator a {
+        color: var(--primary-color);
+        text-decoration: none;
+        padding: 8px 12px;
+        margin: 0 4px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .paginator a:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .paginator .this-page {
+        background: var(--primary-color);
+        color: white;
+        padding: 8px 12px;
+        margin: 0 4px;
+        border-radius: 4px;
+    }
+
+    /* Filters */
+    .filtered {
+        background: var(--bg-secondary);
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .filtered h2 {
+        color: var(--text-primary);
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .filtered ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .filtered li {
+        margin-bottom: 8px;
+    }
+
+    .filtered a {
+        color: var(--danger-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .filtered a:hover {
+        text-decoration: underline;
+    }
+
+    /* Search */
+    .search {
+        background: var(--bg-secondary);
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .search h2 {
+        color: var(--text-primary);
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .search input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .search input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+
+    /* Messages */
+    .messagelist {
+        margin-bottom: 20px;
+    }
+
+    .messagelist li {
+        background: var(--success-color);
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border: none;
+        list-style: none;
+    }
+
+    .messagelist li.error {
+        background: var(--danger-color);
+    }
+
+    .messagelist li.warning {
+        background: var(--warning-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        #content {
+            margin: 10px;
+            padding: 15px;
+        }
+
+        .submit-row input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .object-tools a {
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🌱 {{ site_header|default:_('Nicmah Agrovet Administration') }}
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}
+<div id="footer">
+    <div class="footer-content">
+        <p>&copy; 2025 Nicmah Agrovet. All rights reserved.</p>
+        <p>Professional Business Management System</p>
+    </div>
+</div>
+<style>
+    #footer {
+        background: var(--bg-secondary);
+        padding: 20px;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        margin-top: 40px;
+    }
+    
+    .footer-content p {
+        margin: 5px 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

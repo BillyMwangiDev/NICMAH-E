@@ -1,0 +1,71 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nichmah_agrovet}
+      POSTGRES_USER: ${DB_USER:-nichmah_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-your_secure_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      - DEBUG=False
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=${DB_NAME:-nichmah_agrovet}
+      - DB_USER=${DB_USER:-nichmah_user}
+      - DB_PASSWORD=${DB_PASSWORD:-your_secure_password}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+      - logs_data:/app/logs
+    depends_on:
+      - db
+    networks:
+      - backend
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    depends_on:
+      - web
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  media_data:
+  static_data:
+  logs_data:
+
+networks:
+  frontend:
+  backend:

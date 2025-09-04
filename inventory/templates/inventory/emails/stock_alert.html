@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Alert - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #16a34a;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #16a34a;
+            margin-bottom: 10px;
+        }
+        .alert-badge {
+            display: inline-block;
+            background-color: #dc2626;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .product-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .stock-details {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        .stock-item {
+            text-align: center;
+            flex: 1;
+        }
+        .stock-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .stock-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .critical {
+            color: #dc2626;
+        }
+        .warning {
+            color: #f59e0b;
+        }
+        .message {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .actions {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #16a34a;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .btn:hover {
+            background-color: #15803d;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .priority-high {
+            border-left-color: #dc2626;
+        }
+        .priority-medium {
+            border-left-color: #f59e0b;
+        }
+        .priority-low {
+            border-left-color: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">{{ site_name }}</div>
+            <div class="alert-badge">STOCK ALERT</div>
+        </div>
+        
+        <h2>Hello {{ user.first_name|default:user.username }},</h2>
+        
+        <p>A stock alert has been triggered for one of your products. Please review the details below and take appropriate action.</p>
+        
+        <div class="product-info priority-{{ stock_alert.priority }}">
+            <div class="product-name">{{ stock_alert.product.name }}</div>
+            <div class="stock-details">
+                <div class="stock-item">
+                    <div class="stock-label">Current Stock</div>
+                    <div class="stock-value {% if stock_alert.current_value == 0 %}critical{% elif stock_alert.current_value <= stock_alert.threshold_value %}warning{% endif %}">
+                        {{ stock_alert.current_value }}
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-label">Threshold</div>
+                    <div class="stock-value">{{ stock_alert.threshold_value }}</div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-label">Alert Type</div>
+                    <div class="stock-value">{{ stock_alert.get_alert_type_display }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="message">
+            <strong>Alert Message:</strong><br>
+            {{ stock_alert.message }}
+        </div>
+        
+        <div class="actions">
+            <a href="{{ site_url }}{% url 'inventory:product_detail' stock_alert.product.id %}" class="btn">View Product</a>
+            <a href="{{ site_url }}{% url 'inventory:stock_alerts' %}" class="btn">View All Alerts</a>
+        </div>
+        
+        <p><strong>Alert Details:</strong></p>
+        <ul>
+            <li><strong>Product:</strong> {{ stock_alert.product.name }}</li>
+            <li><strong>SKU:</strong> {{ stock_alert.product.sku }}</li>
+            <li><strong>Category:</strong> {{ stock_alert.product.category.name }}</li>
+            <li><strong>Priority:</strong> {{ stock_alert.get_priority_display }}</li>
+            <li><strong>Alert Date:</strong> {{ alert_date }}</li>
+        </ul>
+        
+        <p><strong>Recommended Actions:</strong></p>
+        <ul>
+            {% if stock_alert.alert_type == 'low_stock' or stock_alert.alert_type == 'out_of_stock' %}
+                <li>Check current inventory levels</li>
+                <li>Place purchase order with supplier</li>
+                <li>Consider alternative products</li>
+                <li>Update stock thresholds if needed</li>
+            {% elif stock_alert.alert_type == 'expiring_soon' %}
+                <li>Check expiration dates</li>
+                <li>Implement first-in-first-out (FIFO) rotation</li>
+                <li>Consider promotional pricing</li>
+                <li>Contact supplier for possible returns</li>
+            {% elif stock_alert.alert_type == 'overstock' %}
+                <li>Review sales forecasts</li>
+                <li>Implement promotional strategies</li>
+                <li>Consider supplier returns</li>
+                <li>Adjust reorder quantities</li>
+            {% endif %}
+        </ul>
+        
+        <div class="footer">
+            <p>This is an automated notification from {{ site_name }}.</p>
+            <p>If you have any questions, please contact your system administrator.</p>
+            <p>Generated on {{ alert_date }}</p>
+        </div>
+    </div>
+</body>
+</html>

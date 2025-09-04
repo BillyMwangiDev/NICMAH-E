@@ -1,0 +1,513 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Analytics Dashboard - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin: 20px 0;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-card.green {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stats-card.blue {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stats-card.purple {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card.orange {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        color: #333;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .chart-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .top-products-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .top-products-table thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        font-weight: 600;
+        border: none;
+    }
+    
+    .top-products-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s ease;
+    }
+    
+    .top-products-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .top-products-table tbody td {
+        padding: 15px;
+        border: none;
+    }
+    
+    .growth-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .growth-positive {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    
+    .growth-negative {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .growth-neutral {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Analytics Dashboard Header -->
+<section class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
+                <i class="fas fa-chart-line mr-4"></i>
+                Analytics Dashboard
+            </h1>
+            <p class="text-xl text-blue-100 max-w-2xl mx-auto">
+                Comprehensive business insights and performance metrics
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Summary Statistics -->
+<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Revenue -->
+            <div class="stats-card green">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Revenue</p>
+                        <p class="text-3xl font-bold">KSh {{ total_revenue|floatformat:2|intcomma }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Transactions -->
+            <div class="stats-card blue">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Transactions</p>
+                        <p class="text-3xl font-bold">{{ total_transactions|intcomma }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Transaction Value -->
+            <div class="stats-card purple">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Avg Transaction</p>
+                        <p class="text-3xl font-bold">KSh {{ avg_transaction_value|floatformat:2|intcomma }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Growth -->
+            <div class="stats-card orange">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-700 text-sm font-medium">Weekly Growth</p>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-3xl font-bold">{{ weekly_growth|floatformat:1 }}%</p>
+                            <span class="growth-indicator {% if weekly_growth > 0 %}growth-positive{% elif weekly_growth < 0 %}growth-negative{% else %}growth-neutral{% endif %}">
+                                {% if weekly_growth > 0 %}
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                {% elif weekly_growth < 0 %}
+                                    <i class="fas fa-arrow-down mr-1"></i>
+                                {% else %}
+                                    <i class="fas fa-minus mr-1"></i>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
+                        <i class="fas fa-trending-up text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sales Charts -->
+<section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Daily Sales Chart -->
+            <div class="chart-card">
+                <h2 class="chart-title">Daily Sales (Last 30 Days)</h2>
+                <div class="chart-container">
+                    <canvas id="dailySalesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Weekly Sales Chart -->
+            <div class="chart-card">
+                <h2 class="chart-title">Weekly Sales (Last 12 Weeks)</h2>
+                <div class="chart-container">
+                    <canvas id="weeklySalesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sales by Category -->
+            <div class="chart-card">
+                <h2 class="chart-title">Sales by Category</h2>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="chart-card">
+                <h2 class="chart-title">Payment Methods Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="paymentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Sales Chart -->
+            <div class="chart-card">
+                <h2 class="chart-title">Monthly Sales (Last 12 Months)</h2>
+                <div class="chart-container">
+                    <canvas id="monthlySalesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sales by Weekday -->
+            <div class="chart-card">
+                <h2 class="chart-title">Sales by Weekday</h2>
+                <div class="chart-container">
+                    <canvas id="weekdayChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Top Products and Sellers -->
+<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Top Products -->
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Top Selling Products</h2>
+                <div class="top-products-table">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products %}
+                            <tr>
+                                <td class="font-medium">{{ product.product__name }}</td>
+                                <td>{{ product.total_quantity|intcomma }}</td>
+                                <td class="font-semibold text-green-600">KSh {{ product.total_revenue|floatformat:2|intcomma }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-gray-500 py-8">No sales data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Low Stock Products -->
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Low Stock Products</h2>
+                <div class="top-products-table">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Stock</th>
+                                <th>Min</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in low_stock_products %}
+                            <tr>
+                                <td class="font-medium">{{ p.name }}</td>
+                                <td>{{ p.stock_quantity }}</td>
+                                <td>{{ p.min_stock_level }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-gray-500 py-8">No low stock items 🎉</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="{% url 'analytics:sales_report' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl text-center hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-file-alt text-3xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Sales Report</h3>
+                <p class="text-blue-100">Detailed sales analysis and filtering</p>
+            </a>
+            
+            <a href="{% url 'analytics:export_sales_data' %}" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl text-center hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-download text-3xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Export Data</h3>
+                <p class="text-green-100">Download sales data to Excel</p>
+            </a>
+            
+            <a href="{% url 'inventory:export_stock_data' %}" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl text-center hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-boxes text-3xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Stock Export</h3>
+                <p class="text-purple-100">Export inventory data to Excel</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Parse chart data from Django context
+const dailyChartData = JSON.parse('{{ daily_chart_data|safe }}');
+const weeklyChartData = JSON.parse('{{ weekly_chart_data|safe }}');
+const monthlyChartData = JSON.parse('{{ monthly_chart_data|safe }}');
+const categoryChartData = JSON.parse('{{ category_chart_data|safe }}');
+const paymentChartData = JSON.parse('{{ payment_chart_data|safe }}');
+const weekdayChartData = JSON.parse('{{ weekday_chart_data|safe }}');
+
+// Chart.js configuration
+const chartConfig = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: 'top',
+        },
+        tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+                label: function(ctx) {
+                    const label = ctx.dataset.label ? ctx.dataset.label + ': ' : '';
+                    const v = ctx.parsed.y !== undefined ? ctx.parsed.y : ctx.parsed;
+                    return label + 'KSh ' + (v || 0).toLocaleString();
+                }
+            }
+        }
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+                callback: function(value) {
+                    return 'KSh ' + value.toLocaleString();
+                }
+            }
+        }
+    }
+};
+
+// Initialize charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Daily Sales Chart
+    new Chart(document.getElementById('dailySalesChart'), {
+        type: 'line',
+        data: dailyChartData,
+        options: {
+            ...chartConfig,
+            plugins: {
+                ...chartConfig.plugins,
+                title: {
+                    display: true,
+                    text: 'Daily Sales Trend'
+                }
+            }
+        }
+    });
+
+    // Weekly Sales Chart
+    new Chart(document.getElementById('weeklySalesChart'), {
+        type: 'line',
+        data: weeklyChartData,
+        options: {
+            ...chartConfig,
+            plugins: {
+                ...chartConfig.plugins,
+                title: {
+                    display: true,
+                    text: 'Weekly Sales Trend'
+                }
+            }
+        }
+    });
+
+    // Monthly Sales Chart
+    new Chart(document.getElementById('monthlySalesChart'), {
+        type: 'line',
+        data: monthlyChartData,
+        options: {
+            ...chartConfig,
+            plugins: {
+                ...chartConfig.plugins,
+                title: {
+                    display: true,
+                    text: 'Monthly Sales Trend'
+                }
+            }
+        }
+    });
+
+    // Category Chart
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: categoryChartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Sales Distribution by Category'
+                }
+            }
+        }
+    });
+
+    // Payment Methods Chart
+    new Chart(document.getElementById('paymentChart'), {
+        type: 'doughnut',
+        data: paymentChartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Payment Methods Distribution'
+                }
+            }
+        }
+    });
+
+    // Sales by Weekday Chart
+    new Chart(document.getElementById('weekdayChart'), {
+        type: 'bar',
+        data: weekdayChartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Sales by Weekday' },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx){
+                            const v = ctx.parsed.y || 0;
+                            return 'KSh ' + v.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return 'KSh ' + value.toLocaleString(); }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

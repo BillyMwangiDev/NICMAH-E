@@ -1,0 +1,600 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to {{ site_name }} - Your Trusted Agrovet Partner{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Parallax -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Background with parallax effect -->
+    <div class="absolute inset-0 bg-gradient-to-br from-green-900/20 via-emerald-800/30 to-teal-900/20"></div>
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2316a34a" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div class="animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl lg:text-7xl font-display font-bold text-white mb-6 leading-tight">
+                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-agro-light to-white mb-8 pb-2">
+                    {{ site_name }}
+                </span>
+                <span class="block text-2xl sm:text-3xl lg:text-4xl font-medium text-green-100 mt-8">
+                    Farmers Focused Business for Over {{ years_in_business }} Years
+                </span>
+            </h1>
+            
+            <p class="text-lg sm:text-xl text-green-100 mb-8 max-w-4xl mx-auto leading-relaxed">
+                {{ business_description|default:"We focus on the best practices when it comes to animal farming, the new technologies like AI(artificial insemination) and the best livestock breeding practices. We just don't sell products but rather we walk the journey alongside farmers helping them achieve their goals." }}
+            </p>
+            
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{% url 'catalog:product_list' %}" 
+                   class="btn-primary animate-on-load stagger-item">
+                    <i class="fas fa-seedling mr-3"></i>
+                    Explore Products
+                </a>
+                <a href="{% url 'educational:article_list' %}" 
+                   class="btn-secondary animate-on-load stagger-item">
+                    <i class="fas fa-book-open mr-3"></i>
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 animate-float" style="animation-delay: 0s;">
+        <i class="fas fa-leaf text-4xl text-green-300/50"></i>
+    </div>
+    <div class="absolute top-40 right-20 animate-float" style="animation-delay: 1s;">
+        <i class="fas fa-seedling text-3xl text-emerald-300/50"></i>
+    </div>
+    <div class="absolute bottom-40 left-20 animate-float" style="animation-delay: 2s;">
+        <i class="fas fa-tractor text-4xl text-teal-300/50"></i>
+    </div>
+</section>
+
+<!-- Mission & Vision Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="animate-on-load">
+                <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-6">
+                    Our Mission & Vision
+                </h2>
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-agro-green">
+                        <h3 class="text-xl font-semibold text-agro-dark mb-3">
+                            <i class="fas fa-bullseye text-agro-green mr-3"></i>
+                            Mission
+                        </h3>
+                        <p class="text-gray-700">{{ mission_statement|default:"Our mission is to ensure quality, hardy and resistant herds are maintained and passed on through breeding." }}</p>
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-50 to-sky-50 p-6 rounded-xl border-l-4 border-agro-sky">
+                        <h3 class="text-xl font-semibold text-agro-dark mb-3">
+                            <i class="fas fa-eye text-agro-sky mr-3"></i>
+                            Vision
+                        </h3>
+                        <p class="text-gray-700">{{ vision_statement|default:"Our goal is to help farmers achieve their goals and educating them to ensure their prosperity." }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="animate-on-load stagger-item">
+                <div class="bg-gradient-to-br from-green-100 to-emerald-100 p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-agro-dark mb-6 text-center">Our Impact</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                        <div class="bg-white p-4 rounded-xl">
+                            <div class="text-3xl font-bold text-agro-green mb-2">{{ years_in_business }}+</div>
+                            <div class="text-sm text-gray-600">Years Experience</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl">
+                            <div class="text-3xl font-bold text-agro-green mb-2">{{ cattle_ai_count }}+</div>
+                            <div class="text-sm text-gray-600">Cattle Served</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl">
+                            <div class="text-3xl font-bold text-agro-green mb-2">{{ farmers_served }}+</div>
+                            <div class="text-sm text-gray-600">Farmers Supported</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-on-load">
+            <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-4">
+                Our Specialized Services
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                We offer comprehensive solutions for both livestock farming and crop farming, 
+                combining traditional wisdom with modern technology.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Livestock Services -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 animate-on-scroll">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-green to-emerald-600 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-cow text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-agro-dark">Livestock Farming Solutions</h3>
+                </div>
+                <div class="space-y-4 text-gray-700">
+                    {% if livestock_services %}
+                        {{ livestock_services|linebreaks }}
+                    {% else %}
+                        <p>• AI (Artificial Insemination) services</p>
+                        <p>• Best livestock breeding practices</p>
+                        <p>• Quality semen from local and international breeders</p>
+                        <p>• Animal disease solutions</p>
+                        <p>• Nutrition and health management</p>
+                        <p>• Vaccines, medicine, dewormers, acaricides</p>
+                        <p>• Supplements and quality feeds</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Crop Services -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 animate-on-scroll">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-gold to-orange-600 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-seedling text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-agro-dark">Crop Farming Solutions</h3>
+                </div>
+                <div class="space-y-4 text-gray-700">
+                    {% if crop_services %}
+                        {{ crop_services|linebreaks }}
+                    {% else %}
+                        <p>• Quality seeds</p>
+                        <p>• Foliar applications</p>
+                        <p>• Pest control products</p>
+                        <p>• Crop management solutions</p>
+                        <p>• Maximum yield optimization</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-on-load">
+            <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-4">
+                Why Choose {{ site_name }}?
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                We combine traditional farming wisdom with modern agricultural technology 
+                to provide the best solutions for your needs.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="feature-card stagger-item animate-on-scroll">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-2xl text-center h-full card-hover">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-green to-agro-emerald rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-leaf text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-4">Quality Products</h3>
+                    <p class="text-gray-600">
+                        Premium agricultural supplies sourced from trusted manufacturers 
+                        and suppliers, ensuring the best results for your farm.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="feature-card stagger-item animate-on-scroll">
+                <div class="bg-gradient-to-br from-blue-50 to-sky-50 p-8 rounded-2xl text-center h-full card-hover">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-sky to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-graduation-cap text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-4">Expert Knowledge</h3>
+                    <p class="text-gray-600">
+                        Access to agricultural expertise, best practices, and educational 
+                        resources to help you make informed decisions.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="feature-card stagger-item animate-on-scroll">
+                <div class="bg-gradient-to-br from-orange-50 to-amber-50 p-8 rounded-2xl text-center h-full card-hover">
+                    <div class="w-16 h-16 bg-gradient-to-r from-agro-gold to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-headset text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-agro-dark mb-4">24/7 Support</h3>
+                    <p class="text-gray-600">
+                        Round-the-clock customer support and WhatsApp integration 
+                        for instant assistance with your agricultural needs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Preview Section -->
+<section class="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-on-load">
+            <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-4">
+                Best Selling Products
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover our most popular products with stock available, 
+                carefully selected based on recent sales performance.
+            </p>
+        </div>
+
+        <!-- Moved Search Bar: now near products -->
+        <div class="w-full max-w-2xl mx-auto mb-10 animate-on-load">
+            <form action="{% url 'catalog:quick_search' %}" method="GET" class="relative">
+                <div class="relative">
+                    <input type="text" 
+                           name="q" 
+                           placeholder="Search for products, SKUs, or categories..."
+                           class="w-full px-6 py-4 text-lg bg-white/90 backdrop-blur-sm border-2 border-green-200 rounded-full focus:border-agro-green focus:outline-none shadow-lg"
+                           id="homepage-search">
+                    <button type="submit" 
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-agro-green text-white px-6 py-2 rounded-full hover:bg-agro-dark transition-colors">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <!-- Search Suggestions Dropdown -->
+                <div id="search-suggestions" class="absolute w-full bg-white rounded-lg shadow-xl border border-gray-200 mt-2 z-50 hidden">
+                    <div class="p-4">
+                        <div id="suggestions-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% if featured_products %}
+                {% for product in featured_products %}
+                <div class="product-card stagger-item animate-on-scroll">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center relative">
+                            {% if product.main_image %}
+                                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <i class="fas fa-seedling text-4xl text-agro-green"></i>
+                            {% endif %}
+                            {% if product.total_quantity %}
+                                <div class="absolute top-2 right-2 bg-agro-green text-white text-xs px-2 py-1 rounded-full">
+                                    <i class="fas fa-fire mr-1"></i>Hot Seller
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-gray-800 mb-2">{{ product.name|truncatechars:30 }}</h3>
+                            <p class="text-sm text-gray-600 mb-2">{{ product.category.name }}</p>
+                            <p class="text-xs text-gray-500 mb-4">Stock: {{ product.stock_quantity }} units</p>
+                            {% if product.total_quantity %}
+                                <p class="text-xs text-agro-green mb-2">
+                                    <i class="fas fa-chart-line mr-1"></i>{{ product.total_quantity }} sold recently
+                                </p>
+                            {% endif %}
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-agro-green">KSh {{ product.price|floatformat:0 }}</span>
+                                <button onclick="window.cart.addItem('{{ product.sku }}', '{{ product.name }}', {{ product.price }})" 
+                                        class="bg-agro-green text-white px-3 py-1 rounded-lg hover:bg-agro-dark transition-colors text-sm">
+                                    <i class="fas fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback placeholder cards when no products are available -->
+                <div class="product-card stagger-item animate-on-scroll">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                            <i class="fas fa-seedling text-4xl text-agro-green"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-gray-800 mb-2">Premium Seeds</h3>
+                            <p class="text-sm text-gray-600 mb-4">High-quality seeds for optimal crop yield</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-agro-green">KSh 2,499</span>
+                                <button onclick="window.cart.addItem('premium-seeds', 'Premium Seeds', 2499)" 
+                                        class="bg-agro-green text-white px-3 py-1 rounded-lg hover:bg-agro-dark transition-colors text-sm">
+                                    <i class="fas fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card stagger-item animate-on-scroll">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-blue-100 to-sky-100 flex items-center justify-center">
+                            <i class="fas fa-tint text-4xl text-agro-sky"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-gray-800 mb-2">Organic Fertilizer</h3>
+                            <p class="text-sm text-gray-600 mb-4">Natural nutrients for healthy soil</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-agro-green">KSh 3,999</span>
+                                <button onclick="window.cart.addItem('organic-fertilizer', 'Organic Fertilizer', 3999)" 
+                                        class="bg-agro-green text-white px-3 py-1 rounded-lg hover:bg-agro-dark transition-colors text-sm">
+                                    <i class="fas fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card stagger-item animate-on-scroll">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                            <i class="fas fa-tools text-4xl text-agro-gold"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-gray-800 mb-2">Farming Tools</h3>
+                            <p class="text-sm text-gray-600 mb-4">Essential equipment for modern farming</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-agro-green">KSh 1,599</span>
+                                <button onclick="window.cart.addItem('farming-tools', 'Farming Tools', 1599)" 
+                                        class="bg-agro-green text-white px-3 py-1 rounded-lg hover:bg-agro-dark transition-colors text-sm">
+                                    <i class="fas fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card stagger-item animate-on-scroll">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                            <i class="fas fa-pills text-4xl text-purple-500"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-gray-800 mb-2">Animal Health</h3>
+                            <p class="text-sm text-gray-600 mb-4">Veterinary supplies and medications</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-agro-green">KSh 2,999</span>
+                                <button onclick="window.cart.addItem('animal-health', 'Animal Health', 2999)" 
+                                        class="bg-agro-green text-white px-3 py-1 rounded-lg hover:bg-agro-dark transition-colors text-sm">
+                                    <i class="fas fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="{% url 'catalog:product_list' %}" class="btn-outline animate-on-load">
+                <i class="fas fa-arrow-right mr-2"></i>
+                View All Products
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Education Hub Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="animate-on-load stagger-item">
+                <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-6">
+                    Knowledge is Power in Agriculture
+                </h2>
+                <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                    Stay ahead with our comprehensive educational resources. From farming techniques 
+                    to market trends, we provide the knowledge you need to succeed in modern agriculture.
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 bg-agro-green rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">Expert farming guides and tutorials</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 bg-agro-green rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">Seasonal farming tips and advice</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 bg-agro-green rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">Market analysis and trends</span>
+                    </div>
+                </div>
+                
+                <a href="{% url 'educational:article_list' %}" class="btn-primary mt-8 inline-block">
+                    <i class="fas fa-graduation-cap mr-3"></i>
+                    Explore Learning Hub
+                </a>
+            </div>
+            
+            <div class="animate-on-load stagger-item">
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl p-8 h-80 flex items-center justify-center">
+                        <i class="fas fa-book-open text-6xl text-agro-green"></i>
+                    </div>
+                    <div class="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-agro-green">50+</div>
+                            <div class="text-sm text-gray-600">Articles</div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-agro-green">24/7</div>
+                            <div class="text-sm text-gray-600">Access</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-agro-dark to-agro-green text-white">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <div class="animate-on-load stagger-item">
+            <h2 class="text-3xl sm:text-4xl font-display font-bold mb-6">
+                Ready to Transform Your Agricultural Business?
+            </h2>
+            <p class="text-xl text-green-100 mb-8 leading-relaxed">
+                Join thousands of farmers who trust Nicmah Agrovet for their agricultural needs. 
+                Get started today and experience the difference quality makes.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{% url 'catalog:product_list' %}" class="bg-white text-agro-green px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors transform hover:scale-105">
+                    <i class="fas fa-shopping-cart mr-3"></i>
+                    Shop Now
+                </a>
+                <a href="{% url 'core:contact' %}" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-agro-green transition-colors transform hover:scale-105">
+                    <i class="fas fa-phone mr-3"></i>
+                    Contact Us
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Custom CSS for animations -->
+<style>
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .feature-card, .product-card {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .feature-card.animate-in, .product-card.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .search-suggestion-item {
+        transition: all 0.2s ease;
+    }
+    
+    .search-suggestion-item:hover {
+        background-color: #f0f9ff;
+        transform: translateX(4px);
+    }
+</style>
+
+<!-- Search Functionality JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('homepage-search');
+    const suggestionsContainer = document.getElementById('search-suggestions');
+    const suggestionsList = document.getElementById('suggestions-list');
+    let searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                suggestionsContainer.classList.add('hidden');
+                return;
+            }
+            
+            // Debounce search requests
+            searchTimeout = setTimeout(() => {
+                fetchSearchSuggestions(query);
+            }, 300);
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.classList.add('hidden');
+            }
+        });
+        
+        // Show suggestions on focus if there's a query
+        searchInput.addEventListener('focus', function() {
+            const query = this.value.trim();
+            if (query.length >= 2) {
+                fetchSearchSuggestions(query);
+            }
+        });
+    }
+    
+    function fetchSearchSuggestions(query) {
+        fetch(`{% url 'catalog:search_suggestions' %}?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                displaySuggestions(data.suggestions);
+            })
+            .catch(error => {
+                console.error('Error fetching suggestions:', error);
+            });
+    }
+    
+    function displaySuggestions(suggestions) {
+        if (suggestions.length === 0) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+        
+        suggestionsList.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const item = document.createElement('div');
+            item.className = 'search-suggestion-item p-3 rounded-lg cursor-pointer border-b border-gray-100 last:border-b-0';
+            item.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800">${suggestion.name}</div>
+                        <div class="text-sm text-gray-500">SKU: ${suggestion.sku} | ${suggestion.category}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-semibold text-agro-green">KSh ${suggestion.price}</div>
+                        <div class="text-xs text-gray-400">Stock: ${suggestion.stock}</div>
+                    </div>
+                </div>
+            `;
+            
+            item.addEventListener('click', function() {
+                window.location.href = suggestion.url;
+            });
+            
+            suggestionsList.appendChild(item);
+        });
+        
+        suggestionsContainer.classList.remove('hidden');
+    }
+});
+</script>
+{% endblock %}
+

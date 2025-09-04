@@ -1,0 +1,528 @@
+/* Nichmah Agrovet - Enhanced CSS with Animations */
+
+/* Custom CSS Variables for Agro Theme */
+:root {
+    --agro-green: #16a34a;
+    --agro-dark: #14532d;
+    --agro-light: #bbf7d0;
+    --agro-brown: #92400e;
+    --agro-gold: #f59e0b;
+    --agro-sky: #0ea5e9;
+    --agro-emerald: #059669;
+    --agro-teal: #0d9488;
+}
+
+/* POS Page Specific Styles - Prevent Content Disappearing */
+.pos-dashboard {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+}
+
+.pos-dashboard * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+}
+
+.pos-dashboard .animate-on-load {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+.pos-dashboard .stagger-item {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Ensure POS page content is always visible */
+.pos-dashboard h1,
+.pos-dashboard h2,
+.pos-dashboard h3,
+.pos-dashboard p,
+.pos-dashboard .text-center,
+.pos-dashboard .bg-gradient-to-r,
+.pos-dashboard .bg-gradient-to-r * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Override any page transition effects for POS pages */
+body.pos-dashboard,
+body:has(.pos-dashboard) {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Prevent any fade effects on POS pages */
+.pos-dashboard .fade-in,
+.pos-dashboard .animate-in {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Override page transition classes for POS pages */
+body.page-enter .pos-dashboard,
+body.page-enter-active .pos-dashboard {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Ensure POS page content is never hidden by global styles */
+.pos-dashboard,
+.pos-dashboard *,
+.pos-dashboard .bg-gradient-to-r,
+.pos-dashboard .bg-gradient-to-r *,
+.pos-dashboard .text-white,
+.pos-dashboard .text-white * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Global Animations and Transitions */
+* {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Logo Styling for Seamless Integration */
+.logo-container img {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-container img:hover {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    transform: scale(1.05);
+}
+
+/* Ensure logo blends seamlessly with the grey aesthetic */
+.nav-logo {
+    background: linear-gradient(135deg, rgba(128, 128, 128, 0.05), rgba(64, 64, 64, 0.05));
+    border-radius: 12px;
+    padding: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Enhanced logo styling for better visibility */
+.nav-logo img {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-logo:hover img {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+    transform: scale(1.08);
+}
+
+/* Page Load Animations */
+.page-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Navigation Styles */
+.nav-link {
+    @apply text-gray-700 hover:text-agro-green font-medium py-2 px-3 rounded-lg transition-all duration-300 relative overflow-hidden;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--agro-green), var(--agro-emerald));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::before {
+    width: 100%;
+}
+
+.nav-link:hover {
+    @apply text-agro-green bg-green-50;
+    transform: translateY(-2px);
+}
+
+/* Mobile Navigation */
+.mobile-nav-link {
+    @apply block px-4 py-3 text-gray-700 hover:text-agro-green hover:bg-green-50 rounded-lg transition-all duration-300;
+}
+
+
+
+/* Alert Messages */
+.alert-message {
+    @apply relative p-4 rounded-xl shadow-lg border-l-4 transform transition-all duration-500;
+    animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.alert-success {
+    @apply bg-green-50 border-green-400 text-green-800;
+}
+
+.alert-warning {
+    @apply bg-yellow-50 border-yellow-400 text-yellow-800;
+}
+
+.alert-error {
+    @apply bg-red-50 border-red-400 text-red-800;
+}
+
+.alert-info {
+    @apply bg-blue-50 border-blue-400 text-blue-800;
+}
+
+.alert-close {
+    @apply absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 transition-colors;
+}
+
+/* Slide In Animations */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Card Hover Effects */
+.card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+/* Button Animations */
+.btn-primary {
+    @apply bg-agro-green hover:bg-agro-dark text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+}
+
+.btn-secondary {
+    @apply bg-white hover:bg-green-50 text-agro-green border-2 border-agro-green font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+}
+
+.btn-outline {
+    @apply bg-transparent hover:bg-agro-green text-agro-green hover:text-white border-2 border-agro-green font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+}
+
+/* Form Input Animations */
+.form-input {
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-agro-green focus:ring-2 focus:ring-agro-green/20 transition-all duration-300;
+}
+
+.form-input:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1);
+}
+
+/* Product Card Animations */
+.product-card {
+    @apply bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500;
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+    @apply transition-transform duration-500;
+}
+
+.product-card:hover img {
+    transform: scale(1.1);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    @apply inline-block w-6 h-6 border-2 border-gray-300 border-t-agro-green rounded-full animate-spin;
+}
+
+/* Skeleton Loading */
+.skeleton {
+    @apply bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-text {
+    @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-image {
+    @apply w-full h-48 bg-gray-200 rounded animate-pulse;
+}
+
+/* Floating Action Button */
+.fab {
+    @apply fixed bottom-6 right-6 w-14 h-14 bg-agro-green text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Progress Bar */
+.progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+}
+
+.progress-fill {
+    @apply h-full bg-gradient-to-r from-agro-green to-agro-emerald rounded-full transition-all duration-1000 ease-out;
+    animation: progressFill 2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes progressFill {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* Notification Badge */
+.notification-badge {
+    @apply absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Modal Animations */
+.modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    @apply bg-white rounded-xl shadow-2xl max-w-md w-full mx-4;
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tooltip */
+.tooltip {
+    @apply absolute z-10 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg opacity-0 invisible transition-all duration-300;
+    transform: translateY(10px);
+}
+
+.tooltip.show {
+    @apply opacity-100 visible;
+    transform: translateY(0);
+}
+
+/* Staggered Animation for Lists */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: staggerIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes staggerIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Parallax Effect */
+.parallax {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-agro-green rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-agro-dark;
+}
+
+/* Responsive Animations */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .dark-mode-toggle {
+        @apply bg-gray-800 text-white;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+
+
+
+
+/* Blog/Education styling */
+.blog-page {
+    background: linear-gradient(180deg, #f6f8fa 0%, #f2f5f7 60%, #eef2f4 100%);
+    min-height: 100vh;
+}
+
+.blog-hero {
+    background: linear-gradient(135deg, rgba(33, 150, 83, 0.08), rgba(25, 118, 60, 0.06));
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.article-card {
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+    background: #ffffffcc;
+    backdrop-filter: blur(3px);
+}
+
+.article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.article-card .card-img-top {
+    max-height: 180px;
+    object-fit: cover;
+    filter: saturate(0.9);
+}
+
+.article-card .card-body {
+    line-height: 1.6;
+}
+
+.article-detail-card {
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.blended-image {
+    mix-blend-mode: multiply;
+    opacity: .95;
+}
+
+.reading-container {
+    max-width: 760px;
+}
+
+.reading-container p {
+    font-size: 1.02rem;
+    color: #2a2f33;
+}

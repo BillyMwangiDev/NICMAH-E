@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Sales List - POS{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Sales History</h2>
+        <a href="{% url 'pos:sale_create' %}" class="btn btn-primary">New Sale</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="payment_method" class="form-select">
+                        <option value="">All Methods</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="mobile_money">Mobile Money</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="date_from" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="date_to" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="card">
+        <div class="card-body">
+            {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sale ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in page_obj %}
+                        <tr>
+                            <td>#{{ sale.id }}</td>
+                            <td>{{ sale.created_at|date:"M d, Y" }}</td>
+                            <td>{{ sale.customer_name|default:"Walk-in" }}</td>
+                            <td>KSh {{ sale.total_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge bg-{% if sale.status == 'completed' %}success{% elif sale.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ sale.status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'pos:sale_detail' sale.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">No sales found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

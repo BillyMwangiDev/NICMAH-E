@@ -1,0 +1,219 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .quick-image-upload {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .quick-image-upload h3 {
+        margin-top: 0;
+        color: #495057;
+    }
+    .image-upload-form {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .form-group label {
+        font-weight: bold;
+        color: #495057;
+    }
+    .form-group select,
+    .form-group input[type="file"] {
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .upload-btn {
+        background: #007cba;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .upload-btn:hover {
+        background: #005a87;
+    }
+    .upload-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+    .status-message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+    }
+    .status-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .status-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .image-preview {
+        max-width: 100px;
+        max-height: 100px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="quick-image-upload">
+    <h3>📸 Quick Image Upload</h3>
+    <p>Select a product and upload images quickly without going to the edit page.</p>
+    
+    <form class="image-upload-form" id="quickImageForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="product-select">Select Product:</label>
+            <select id="product-select" name="product_id" required>
+                <option value="">Choose a product...</option>
+                {% for product in cl.queryset %}
+                    <option value="{{ product.id }}">{{ product.name }} ({{ product.category.name }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="image-type">Image Type:</label>
+            <select id="image-type" name="image_type" required>
+                <option value="main">Main Image</option>
+                <option value="additional">Additional Image</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="image-file">Select Image:</label>
+            <input type="file" id="image-file" name="image" accept="image/*" required>
+        </div>
+        
+        <div class="form-group" id="alt-text-group" style="display: none;">
+            <label for="alt-text">Alt Text (for accessibility):</label>
+            <input type="text" id="alt-text" name="alt_text" placeholder="Describe the image...">
+        </div>
+        
+        <div class="form-group" id="order-group" style="display: none;">
+            <label for="order">Order:</label>
+            <input type="number" id="order" name="order" value="1" min="1">
+        </div>
+        
+        <button type="submit" class="upload-btn" id="uploadBtn">Upload Image</button>
+    </form>
+    
+    <div id="statusMessage" class="status-message"></div>
+    <div id="imagePreview"></div>
+</div>
+
+{{ block.super }}
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('quickImageForm');
+    const productSelect = document.getElementById('product-select');
+    const imageType = document.getElementById('image-type');
+    const imageFile = document.getElementById('image-file');
+    const altTextGroup = document.getElementById('alt-text-group');
+    const orderGroup = document.getElementById('order-group');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const statusMessage = document.getElementById('statusMessage');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Show/hide additional fields based on image type
+    imageType.addEventListener('change', function() {
+        if (this.value === 'additional') {
+            altTextGroup.style.display = 'flex';
+            orderGroup.style.display = 'flex';
+        } else {
+            altTextGroup.style.display = 'none';
+            orderGroup.style.display = 'none';
+        }
+    });
+    
+    // Preview image before upload
+    imageFile.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading...';
+        
+        fetch('{% url "admin_catalog:admin_quick_upload_image" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showStatus('Image uploaded successfully!', 'success');
+                form.reset();
+                imagePreview.innerHTML = '';
+                // Refresh the page to show updated image status
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showStatus('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            showStatus('Error uploading image: ' + error.message, 'error');
+        })
+        .finally(() => {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload Image';
+        });
+    });
+    
+    function showStatus(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message status-${type}`;
+        statusMessage.style.display = 'block';
+        
+        setTimeout(() => {
+            statusMessage.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

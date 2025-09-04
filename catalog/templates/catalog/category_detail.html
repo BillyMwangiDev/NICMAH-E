@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} - {{ site_name }}{% endblock %}
+{% block content %}
+<h2 class="mb-3">{{ category.name }}</h2>
+<div class="row">
+  {% for product in products %}
+  <div class="col-md-3 mb-3">
+    <div class="card product-card h-100">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ product.name }}</h5>
+        <p class="mt-auto"><strong>{{ product.formatted_price }}</strong></p>
+        <a class="btn btn-sm btn-secondary" href="{% url 'catalog:product_detail' product.slug %}">View</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12"><div class="alert alert-info">No products in this category.</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

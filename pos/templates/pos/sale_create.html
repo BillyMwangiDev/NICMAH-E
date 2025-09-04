@@ -1,0 +1,741 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Create New Sale - POS{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 pos-dashboard">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-cash-register me-2 text-primary"></i>
+                New POS Sale
+            </h2>
+            <p class="text-muted mb-0">Scan products and complete transactions</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'pos:sales_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-list me-2"></i>View Sales
+            </a>
+            <a href="{% url 'pos:dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Product Selection and Cart -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-gradient-primary text-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Product Selection
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Enhanced Barcode Scanner -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-gray-700">
+                            <i class="fas fa-barcode me-2 text-primary"></i>
+                            Scan Barcode or Search Products
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="barcodeInput" 
+                                   placeholder="Scan barcode, enter product name, or SKU..."
+                                   autocomplete="off">
+                            <button class="btn btn-primary px-4" onclick="scanBarcode()">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Press Enter to search or scan barcode automatically
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Product Search Results -->
+                    <div id="productResults" style="display: none;" class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-gray-700">
+                                <i class="fas fa-list me-2 text-success"></i>
+                                Search Results
+                            </h6>
+                            <span class="badge bg-primary" id="resultCount"></span>
+                        </div>
+                        <div id="productList" class="row g-3"></div>
+                    </div>
+
+                    <!-- Enhanced Current Cart -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-gray-700">
+                                <i class="fas fa-shopping-bag me-2 text-info"></i>
+                                Current Cart
+                            </h6>
+                            <span class="badge bg-info" id="cartItemCount">0 items</span>
+                        </div>
+                        <div id="cartItems" class="border rounded-3 p-3 bg-light">
+                            <div class="text-center py-4">
+                                <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">No items in cart</p>
+                                <small class="text-muted">Start scanning or searching for products</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sale Details and Checkout -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 2rem;">
+                <div class="card-header bg-gradient-success text-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calculator me-2"></i>
+                        Sale Summary
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Customer Information -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-gray-700 mb-3">
+                            <i class="fas fa-user me-2 text-primary"></i>
+                            Customer Information
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Customer Name</label>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="customerName" 
+                                   placeholder="Walk-in Customer">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Phone Number</label>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   id="customerPhone" 
+                                   placeholder="+1234567890">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Email Address</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="customerEmail" 
+                                   placeholder="customer@example.com">
+                        </div>
+                    </div>
+
+                    <!-- Tax Rate Selection -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-gray-700 mb-3">
+                            <i class="fas fa-percentage me-2 text-warning"></i>
+                            Tax Rate
+                        </h6>
+                        <select class="form-select form-select-lg" id="taxRate">
+                            <option value="">No Tax Applied</option>
+                            {% for tax_rate in tax_rates %}
+                            <option value="{{ tax_rate.id }}" data-rate="{{ tax_rate.rate }}">
+                                {{ tax_rate.name }} ({{ tax_rate.rate }}%)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Available Discounts -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-gray-700 mb-3">
+                            <i class="fas fa-tag me-2 text-info"></i>
+                            Available Discounts
+                        </h6>
+                        <div id="availableDiscounts">
+                            {% for discount in active_discounts %}
+                            <div class="form-check mb-3 p-3 border rounded-3 bg-light">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       value="{{ discount.id }}" 
+                                       id="discount{{ discount.id }}">
+                                <label class="form-check-label fw-bold" for="discount{{ discount.id }}">
+                                    {{ discount.name }}
+                                </label>
+                                <div class="text-muted small mt-1">
+                                    {{ discount.get_discount_type_display }}
+                                    {% if discount.percentage_rate %}({{ discount.percentage_rate }}%){% endif %}
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-tag fa-2x text-muted mb-2"></i>
+                                <p class="text-muted small mb-0">No active discounts available</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-gray-700 mb-3">
+                            <i class="fas fa-credit-card me-2 text-success"></i>
+                            Payment Method
+                        </h6>
+                        <select class="form-select form-select-lg" id="paymentMethod">
+                            <option value="cash">
+                                <i class="fas fa-money-bill-wave me-2"></i>Cash
+                            </option>
+                            <option value="card">
+                                <i class="fas fa-credit-card me-2"></i>Card
+                            </option>
+                            <option value="mobile_money">
+                                <i class="fas fa-mobile-alt me-2"></i>Mobile Money
+                            </option>
+                            <option value="bank_transfer">
+                                <i class="fas fa-university me-2"></i>Bank Transfer
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Amount Paid and Change -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-gray-700 mb-3">
+                            <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                            Payment Details
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Amount Paid</label>
+                            <input type="number" 
+                                   class="form-control form-control-lg" 
+                                   id="amountPaid" 
+                                   placeholder="0.00"
+                                   step="0.01"
+                                   min="0">
+                        </div>
+                        <div id="changeAmount" class="alert alert-success d-none" role="alert">
+                            <i class="fas fa-coins me-2"></i>
+                            <strong>Change Due:</strong> $<span id="changeValue">0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Sale Totals -->
+                    <div class="border-top pt-4 mb-4">
+                        <h6 class="fw-bold text-gray-700 mb-3">
+                            <i class="fas fa-calculator me-2 text-primary"></i>
+                            Sale Totals
+                        </h6>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Subtotal:</span>
+                            <span class="fw-bold" id="subtotal">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Tax:</span>
+                            <span class="fw-bold text-warning" id="taxAmount">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Discounts:</span>
+                            <span class="fw-bold text-info" id="discountAmount">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pt-3 border-top">
+                            <span class="h5 mb-0 text-gray-800">Total:</span>
+                            <span class="h4 mb-0 text-success fw-bold" id="totalAmount">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3">
+                        <button class="btn btn-success btn-lg py-3" onclick="completeSale()" id="completeBtn" disabled>
+                            <i class="fas fa-check me-2"></i>Complete Sale
+                        </button>
+                        <button class="btn btn-outline-secondary py-2" onclick="clearSale()">
+                            <i class="fas fa-times me-2"></i>Clear Sale
+                        </button>
+                        <button class="btn btn-outline-info py-2" onclick="holdSale()">
+                            <i class="fas fa-pause me-2"></i>Hold Sale
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.hover-lift {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 2rem;
+    z-index: 1020;
+}
+
+.card {
+    transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.input-group-lg .form-control,
+.input-group-lg .form-select {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-lg {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sticky-top {
+        position: static;
+    }
+    
+    .col-lg-4 {
+        margin-top: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JavaScript to ensure POS content stays visible -->
+<script>
+    // Immediate function to ensure POS content is visible
+    (function() {
+        // Force all POS elements to be visible
+        const posElements = document.querySelectorAll('.pos-dashboard, .pos-dashboard *');
+        posElements.forEach(element => {
+            element.style.opacity = '1';
+            element.style.visibility = 'visible';
+            element.style.transform = 'none';
+            element.style.animation = 'none';
+            element.style.transition = 'none';
+        });
+        
+        // Remove any problematic body classes
+        document.body.classList.remove('page-enter', 'page-enter-active');
+        
+        // Set up continuous monitoring
+        setInterval(() => {
+            const posElements = document.querySelectorAll('.pos-dashboard, .pos-dashboard *');
+            posElements.forEach(element => {
+                if (element.style.opacity === '0' || element.style.visibility === 'hidden') {
+                    element.style.opacity = '1';
+                    element.style.visibility = 'visible';
+                }
+            });
+        }, 500);
+    })();
+</script>
+
+<script>
+let currentCart = [];
+let selectedTaxRate = null;
+let selectedDiscounts = [];
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('barcodeInput').focus();
+    updateTotals();
+    
+    // Event listeners
+    document.getElementById('taxRate').addEventListener('change', updateTotals);
+    document.getElementById('amountPaid').addEventListener('input', calculateChange);
+    
+    // Discount checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateTotals);
+    });
+});
+
+function scanBarcode() {
+    const barcodeInput = document.getElementById('barcodeInput');
+    const barcode = barcodeInput.value.trim();
+    
+    if (!barcode) {
+        alert('Please enter a barcode or product name');
+        return;
+    }
+    
+    searchProducts(barcode);
+}
+
+function searchProducts(query) {
+    fetch(`{% url 'pos:product_search' %}?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            displayProducts(data.products);
+        })
+        .catch(error => {
+            console.error('Error searching products:', error);
+            alert('Error searching products');
+        });
+}
+
+function displayProducts(products) {
+    const productList = document.getElementById('productList');
+    const productResults = document.getElementById('productResults');
+    const resultCount = document.getElementById('resultCount');
+    
+    if (products.length === 0) {
+        productList.innerHTML = `
+            <div class="col-12">
+                <div class="text-center py-4">
+                    <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                    <h6 class="text-muted">No products found</h6>
+                    <p class="text-muted small">Try a different search term or SKU</p>
+                </div>
+            </div>
+        `;
+    } else {
+        productList.innerHTML = products.map(product => `
+            <div class="col-md-6 col-lg-12">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 me-3">
+                                <h6 class="mb-1 fw-bold text-gray-800">${product.name}</h6>
+                                <div class="small text-muted mb-2">
+                                    <span class="badge bg-light text-dark me-2">SKU: ${product.sku}</span>
+                                    <span class="badge bg-${product.stock_quantity > 0 ? 'success' : 'danger'}">Stock: ${product.stock_quantity}</span>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-tag me-1"></i>${product.category}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="h5 text-primary mb-2 fw-bold">$${parseFloat(product.price).toFixed(2)}</div>
+                                <button class="btn btn-success btn-sm" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">
+                                    <i class="fas fa-plus me-1"></i>Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    resultCount.textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
+    productResults.style.display = 'block';
+}
+
+function addToCart(productId, productName, price) {
+    const existingItem = currentCart.find(item => item.productId === productId);
+    
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        currentCart.push({
+            productId: productId,
+            name: productName,
+            price: parseFloat(price),
+            quantity: 1
+        });
+    }
+    
+    updateCartDisplay();
+    updateTotals();
+    clearScanner();
+}
+
+function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    const cartItemCount = document.getElementById('cartItemCount');
+    const completeBtn = document.getElementById('completeBtn');
+    
+    if (currentCart.length === 0) {
+        cartItems.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No items in cart</p>
+                <small class="text-muted">Start scanning or searching for products</small>
+            </div>
+        `;
+        cartItemCount.textContent = '0 items';
+        completeBtn.disabled = true;
+        return;
+    }
+    
+    cartItems.innerHTML = currentCart.map((item, index) => `
+        <div class="card mb-3 border-0 shadow-sm">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1 me-3">
+                        <h6 class="mb-1 fw-bold text-gray-800">${item.name}</h6>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <span class="text-muted">$${item.price.toFixed(2)}</span>
+                            <span class="text-muted">×</span>
+                            <div class="input-group input-group-sm" style="width: 80px;">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="updateQuantity(${index}, -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" class="form-control text-center" value="${item.quantity}" 
+                                       min="1" onchange="setQuantity(${index}, this.value)">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="updateQuantity(${index}, 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-tag me-1"></i>$${(item.price * item.quantity).toFixed(2)}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <div class="h6 text-success mb-2 fw-bold">$${(item.price * item.quantity).toFixed(2)}</div>
+                        <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    cartItemCount.textContent = `${currentCart.length} item${currentCart.length !== 1 ? 's' : ''}`;
+    completeBtn.disabled = false;
+}
+
+function removeFromCart(index) {
+    currentCart.splice(index, 1);
+    updateCartDisplay();
+    updateTotals();
+}
+
+function updateTotals() {
+    // Calculate subtotal
+    const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Calculate tax
+    const taxRateSelect = document.getElementById('taxRate');
+    const selectedOption = taxRateSelect.options[taxRateSelect.selectedIndex];
+    const taxRate = selectedOption ? parseFloat(selectedOption.dataset.rate) || 0 : 0;
+    const taxAmount = (subtotal * taxRate) / 100;
+    
+    // Calculate discounts
+    const selectedDiscounts = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.value);
+    const discountAmount = calculateDiscounts(subtotal, selectedDiscounts);
+    
+    // Calculate total
+    const total = subtotal + taxAmount - discountAmount;
+    
+    // Update display
+    document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('taxAmount').textContent = `$${taxAmount.toFixed(2)}`;
+    document.getElementById('discountAmount').textContent = `$${discountAmount.toFixed(2)}`;
+    document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+    
+    // Calculate change if amount paid is entered
+    calculateChange();
+}
+
+function calculateDiscounts(subtotal, discountIds) {
+    // This is a simplified calculation - in a real app, you'd fetch discount details
+    let totalDiscount = 0;
+    
+    discountIds.forEach(discountId => {
+        // For now, apply a simple 5% discount per selected discount
+        totalDiscount += subtotal * 0.05;
+    });
+    
+    return totalDiscount;
+}
+
+function calculateChange() {
+    const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+    const total = parseFloat(document.getElementById('totalAmount').textContent.replace('$', '')) || 0;
+    const change = amountPaid - total;
+    
+    if (amountPaid > 0) {
+        document.getElementById('changeValue').textContent = change.toFixed(2);
+        document.getElementById('changeAmount').style.display = 'block';
+        
+        if (change < 0) {
+            document.getElementById('changeAmount').className = 'text-danger fw-bold';
+        } else {
+            document.getElementById('changeAmount').className = 'text-success fw-bold';
+        }
+    } else {
+        document.getElementById('changeAmount').style.display = 'none';
+    }
+}
+
+function completeSale() {
+    if (currentCart.length === 0) {
+        alert('Please add items to cart before completing sale');
+        return;
+    }
+    
+    const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+    const total = parseFloat(document.getElementById('totalAmount').textContent.replace('$', '')) || 0;
+    
+    if (amountPaid < total) {
+        alert('Amount paid must be at least equal to total amount');
+        return;
+    }
+    
+    // Prepare sale data
+    const saleData = {
+        customer_name: document.getElementById('customerName').value,
+        customer_phone: document.getElementById('customerPhone').value,
+        customer_email: document.getElementById('customerEmail').value,
+        payment_method: document.getElementById('paymentMethod').value,
+        tax_rate_id: document.getElementById('taxRate').value || null,
+        amount_paid: amountPaid,
+        items: currentCart.map(item => ({
+            product_id: item.productId,
+            quantity: item.quantity,
+            unit_price: item.price
+        })),
+        sale_discounts: Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+            .map(checkbox => checkbox.value)
+    };
+    
+    // Send sale data to server
+    fetch('{% url "pos:sale_create" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(saleData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Sale completed successfully! Sale Number: ${data.sale_number}`);
+            clearSale();
+            // Redirect to sale detail page
+            window.location.href = `/pos/sale/${data.sale_id}/`;
+        } else {
+            alert(`Error: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error completing sale:', error);
+        alert('Error completing sale. Please try again.');
+    });
+}
+
+function clearSale() {
+    currentCart = [];
+    updateCartDisplay();
+    updateTotals();
+    
+    // Clear form fields
+    document.getElementById('customerName').value = '';
+    document.getElementById('customerPhone').value = '';
+    document.getElementById('customerEmail').value = '';
+    document.getElementById('taxRate').selectedIndex = 0;
+    document.getElementById('paymentMethod').selectedIndex = 0;
+    document.getElementById('amountPaid').value = '';
+    document.getElementById('changeAmount').classList.add('d-none');
+    
+    // Uncheck all discounts
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    clearScanner();
+}
+
+function updateQuantity(index, change) {
+    const newQuantity = currentCart[index].quantity + change;
+    if (newQuantity > 0) {
+        currentCart[index].quantity = newQuantity;
+        updateCartDisplay();
+        updateTotals();
+    }
+}
+
+function setQuantity(index, newQuantity) {
+    const quantity = parseInt(newQuantity);
+    if (quantity > 0) {
+        currentCart[index].quantity = quantity;
+        updateCartDisplay();
+        updateTotals();
+    }
+}
+
+function holdSale() {
+    if (currentCart.length === 0) {
+        alert('No items in cart to hold');
+        return;
+    }
+    
+    if (confirm('Hold this sale for later?')) {
+        // Implementation for holding sale
+        alert('Sale hold functionality will be implemented here');
+    }
+}
+
+function clearScanner() {
+    document.getElementById('barcodeInput').value = '';
+    document.getElementById('productResults').style.display = 'none';
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Enter key support for barcode scanner
+document.getElementById('barcodeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        scanBarcode();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - {{ site_name }}{% endblock %}
+
+{% block content %}
+<!-- Cart Header -->
+<section class="bg-gradient-to-r from-agro-dark to-agro-green text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl sm:text-5xl font-display font-bold mb-6">
+            <i class="fas fa-shopping-cart mr-4"></i>
+            Your Shopping Cart
+        </h1>
+        <p class="text-xl text-green-100 max-w-2xl mx-auto">
+            Review your items and proceed to checkout
+        </p>
+    </div>
+</section>
+
+<!-- Cart Content -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="cart-content">
+            <!-- Loading State -->
+            <div id="cart-loading" class="text-center py-12">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading your cart...</p>
+            </div>
+            
+            <!-- Empty Cart State -->
+            <div id="empty-cart" class="hidden text-center py-16">
+                <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-6"></i>
+                <h3 class="text-2xl font-semibold text-gray-600 mb-4">Your cart is empty</h3>
+                <p class="text-gray-500 mb-8">Looks like you haven't added any products to your cart yet.</p>
+                <a href="{% url 'catalog:product_list' %}" class="bg-agro-green text-white px-8 py-3 rounded-lg hover:bg-agro-dark transition-colors font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i>Start Shopping
+                </a>
+            </div>
+            
+            <!-- Cart Items -->
+            <div id="cart-items-container" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Cart Items List -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                            <div class="p-6 border-b border-gray-200">
+                                <h2 class="text-2xl font-bold text-gray-800">Cart Items (<span id="cart-item-count">0</span>)</h2>
+                            </div>
+                            
+                            <div id="cart-items-list">
+                                <!-- Cart items will be dynamically loaded here -->
+                            </div>
+                            
+                            <!-- Cart Actions -->
+                            <div class="p-6 bg-gray-50">
+                                <div class="flex justify-between items-center">
+                                    <button onclick="window.cart.clearCart()" class="text-red-500 hover:text-red-700 font-medium transition-colors">
+                                        <i class="fas fa-trash mr-2"></i>Clear Cart
+                                    </button>
+                                    <a href="{% url 'catalog:product_list' %}" class="text-agro-green hover:text-agro-dark font-medium transition-colors">
+                                        <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cart Summary -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-4">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h3>
+                            
+                            <div class="space-y-4 mb-6">
+                                <div class="flex justify-between text-gray-600">
+                                    <span>Subtotal:</span>
+                                    <span id="cart-subtotal">KSh 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-600">
+                                    <span>Shipping:</span>
+                                    <span>Free</span>
+                                </div>
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="flex justify-between text-xl font-bold text-gray-800">
+                                        <span>Total:</span>
+                                        <span id="cart-total-display">KSh 0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <button onclick="checkoutViaWhatsApp()" 
+                                        class="w-full bg-green-500 text-white py-4 px-6 rounded-lg hover:bg-green-600 transition-colors font-medium text-lg">
+                                    <i class="fab fa-whatsapp mr-2"></i>Checkout via WhatsApp
+                                </button>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-green-50 rounded-lg">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-shield-alt text-green-500 mt-1"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-green-800">Secure Checkout</h4>
+                                        <p class="text-sm text-green-600">Your payment information is protected with bank-level security.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Loading spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Cart item hover effects */
+.cart-item {
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Smooth button transitions */
+.remove-item-btn {
+    transition: all 0.3s ease;
+}
+
+.remove-item-btn:hover {
+    transform: scale(1.1);
+}
+</style>
+
+<script>
+// Cart template script loaded
+console.log('Cart template script loaded');
+
+// Migrate cart data from old storage key to new storage key
+function migrateCartData() {
+    const oldCartData = localStorage.getItem('shopping_cart');
+    const newCartData = localStorage.getItem('cart');
+    
+    if (oldCartData && !newCartData) {
+        console.log('Migrating cart data from shopping_cart to cart...');
+        localStorage.setItem('cart', oldCartData);
+        localStorage.removeItem('shopping_cart');
+        console.log('Cart data migrated successfully');
+        return true;
+    }
+    return false;
+}
+
+// Initialize cart display when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, checking cart initialization...');
+    
+    // Migrate cart data if needed
+    migrateCartData();
+    
+    // Check if cart is already available
+    if (window.cart) {
+        console.log('Cart already available:', window.cart);
+        displayCart();
+    } else {
+        console.log('Cart not available, waiting...');
+        // Wait for cart to be initialized
+        setTimeout(() => {
+            if (window.cart) {
+                console.log('Cart now available:', window.cart);
+                displayCart();
+            } else {
+                console.error('Cart still not available after timeout');
+                // Try to initialize cart manually
+                if (typeof Cart !== 'undefined') {
+                    window.cart = new Cart();
+                    console.log('Cart manually initialized:', window.cart);
+                    displayCart();
+                }
+            }
+        }, 500);
+    }
+});
+
+// Listen for cart ready event
+window.addEventListener('cartReady', function() {
+    displayCart();
+});
+
+// Also listen for cart updates
+window.addEventListener('cartUpdated', function() {
+    displayCart();
+});
+
+// Display cart contents
+function displayCart() {
+    console.log('Displaying cart...');
+    console.log('Window cart:', window.cart);
+    console.log('Cart items:', window.cart ? window.cart.items : 'No cart');
+    
+    const cartLoading = document.getElementById('cart-loading');
+    const emptyCart = document.getElementById('empty-cart');
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const cartItemsList = document.getElementById('cart-items-list');
+    const cartItemCount = document.getElementById('cart-item-count');
+    const cartSubtotal = document.getElementById('cart-subtotal');
+    const cartTotalDisplay = document.getElementById('cart-total-display');
+    
+    // Hide loading
+    cartLoading.classList.add('hidden');
+    
+    if (!window.cart || window.cart.items.length === 0) {
+        console.log('Cart is empty, showing empty state');
+        emptyCart.classList.remove('hidden');
+        cartItemsContainer.classList.add('hidden');
+        return;
+    }
+    
+    console.log('Cart has items, showing cart');
+    // Show cart items
+    emptyCart.classList.add('hidden');
+    cartItemsContainer.classList.remove('hidden');
+    
+    // Update counts and totals
+    cartItemCount.textContent = window.cart.getItemCount();
+    cartSubtotal.textContent = `KSh ${window.cart.getTotal().toFixed(2)}`;
+    cartTotalDisplay.textContent = `KSh ${window.cart.getTotal().toFixed(2)}`;
+    
+    // Generate cart items HTML
+    let itemsHtml = '';
+    window.cart.items.forEach(item => {
+        itemsHtml += `
+            <div class="cart-item p-6 border-b border-gray-100 last:border-b-0" data-product-id="${item.id}" data-item-id="${item.id}">
+                <div class="flex items-center space-x-4">
+                    <!-- Product Image Placeholder -->
+                    <div class="flex-shrink-0">
+                        <div class="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-seedling text-2xl text-agro-green"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+                        <p class="text-sm text-gray-600">Unit Price: KSh ${item.price.toFixed(2)}</p>
+                    </div>
+                    
+                    <!-- Quantity Controls -->
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateItemQuantity('${item.id}', ${item.quantity - 1})" 
+                                class="quantity-btn decrease bg-gray-100 hover:bg-gray-200 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="quantity-display w-12 text-center font-semibold text-gray-800">${item.quantity}</span>
+                        <button onclick="updateItemQuantity('${item.id}', ${item.quantity + 1})" 
+                                class="quantity-btn increase bg-gray-100 hover:bg-gray-200 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-agro-green">KSh ${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                    
+                    <!-- Remove Button -->
+                    <button onclick="removeCartItem('${item.id}')" 
+                            class="remove-item-btn text-red-500 hover:text-red-700 transition-colors" 
+                            title="Remove item">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    cartItemsList.innerHTML = itemsHtml;
+}
+
+// Remove cart item - simplified to use the Cart class's built-in animation
+function removeCartItem(productId) {
+    console.log('removeCartItem called with:', productId);
+    
+    if (!window.cart) {
+        console.error('Cart not available');
+        alert('Error: Cart not available');
+        return;
+    }
+    
+    // Use the Cart class's removeItem method which handles animation internally
+    window.cart.removeItem(productId);
+}
+
+// Update item quantity
+function updateItemQuantity(productId, newQuantity) {
+    if (newQuantity <= 0) {
+        removeCartItem(productId);
+    } else {
+        window.cart.updateQuantity(productId, newQuantity);
+    }
+}
+
+// Proceed to checkout (redirect to checkout page)
+function proceedToCheckout() {
+    if (window.cart && window.cart.items.length > 0) {
+        window.location.href = "{% url 'orders:checkout' %}";
+    } else {
+        window.cart.showAlert('Your cart is empty!', 'warning');
+    }
+}
+
+// Simple cart display override - only call displayCart once
+if (window.cart) {
+    const originalUpdateDisplay = window.cart.updateCartDisplay;
+    window.cart.updateCartDisplay = function() {
+        originalUpdateDisplay.call(this);
+        // Only update cart page display if we're on the cart page
+        if (window.location.pathname.includes('/cart/')) {
+            // Use a flag to prevent infinite loops
+            if (!window.cart.isUpdating) {
+                window.cart.isUpdating = true;
+                setTimeout(() => {
+                    displayCart();
+                    window.cart.isUpdating = false;
+                }, 100);
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

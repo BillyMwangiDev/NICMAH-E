@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logout Confirmation -->
+        <div class="text-center animate-on-load stagger-item">
+            <div class="mx-auto h-20 w-20 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-check text-white text-3xl"></i>
+            </div>
+            <h2 class="text-3xl font-display font-bold text-agro-dark mb-2">
+                Successfully Logged Out
+            </h2>
+            <p class="text-gray-600">
+                You have been successfully logged out of your {{ site_name }} account.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 animate-on-load stagger-item">
+            <div class="space-y-4">
+                <a href="{% url 'users:login' %}" 
+                   class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-agro-green to-agro-dark hover:from-agro-dark hover:to-agro-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-agro-green transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-sign-in-alt mr-3"></i>
+                    Sign In Again
+                </a>
+                
+                <a href="{% url 'core:home' %}" 
+                   class="w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-agro-green transition-all duration-300">
+                    <i class="fas fa-home mr-3"></i>
+                    Return to Home
+                </a>
+            </div>
+
+            <!-- Divider -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Need an account?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="mt-6 text-center">
+                <a href="{% url 'users:signup' %}" 
+                   class="font-medium text-agro-green hover:text-agro-dark transition-colors">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Create a new account
+                </a>
+            </div>
+        </div>
+
+        <!-- Thank You Message -->
+        <div class="text-center text-sm text-gray-600 animate-on-load stagger-item">
+            <p>
+                Thank you for using {{ site_name }}. 
+                We hope to see you again soon!
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Background Elements -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-20 left-10 animate-float" style="animation-delay: 0s;">
+        <i class="fas fa-leaf text-4xl text-green-300/30"></i>
+    </div>
+    <div class="absolute top-40 right-20 animate-float" style="animation-delay: 1s;">
+        <i class="fas fa-seedling text-3xl text-emerald-300/30"></i>
+    </div>
+    <div class="absolute bottom-40 left-20 animate-float" style="animation-delay: 2s;">
+        <i class="fas fa-tractor text-4xl text-teal-300/30"></i>
+    </div>
+</div>
+
+<!-- Custom CSS for animations -->
+<style>
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .stagger-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: staggerIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-item:nth-child(2) { animation-delay: 0.3s; }
+    .stagger-item:nth-child(3) { animation-delay: 0.5s; }
+    
+    @keyframes staggerIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Button hover effects */
+    a:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(22, 163, 74, 0.2);
+    }
+</style>
+
+<!-- Enhanced JavaScript for interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-redirect to home page after 5 seconds
+    setTimeout(function() {
+        window.location.href = "{% url 'core:home' %}";
+    }, 5000);
+    
+    // Add click tracking for analytics (if needed)
+    const buttons = document.querySelectorAll('a, button');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Add any tracking or analytics here
+            console.log('Button clicked:', this.textContent.trim());
+        });
+    });
+});
+</script>
+{% endblock %}

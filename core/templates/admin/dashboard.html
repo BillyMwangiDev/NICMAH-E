@@ -1,0 +1,450 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Business Dashboard - Nicmah Agrovet{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .dashboard-container {
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .dashboard-header p {
+        font-size: 1.2rem;
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .charts-section {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .chart-container {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .chart-title {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .recent-activity {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .activity-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        border-left: 4px solid #4CAF50;
+    }
+    
+    .activity-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .activity-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .activity-details {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .action-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .chart-canvas {
+        width: 100%;
+        height: 300px;
+    }
+    
+    @media (max-width: 768px) {
+        .charts-section {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>📊 Business Dashboard</h1>
+        <p>Welcome to Nicmah Agrovet Management System</p>
+        <p>Real-time insights into your business performance</p>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="quick-actions">
+        <a href="{% url 'admin:pos-possession-changelist' %}" class="action-btn">
+            🏪 Manage POS Sessions
+        </a>
+        <a href="{% url 'admin:pos-possale-changelist' %}" class="action-btn">
+            💰 View Sales
+        </a>
+        <a href="{% url 'admin:catalog-product-changelist' %}" class="action-btn">
+            📦 Manage Products
+        </a>
+        <a href="{% url 'admin:users-customuser-changelist' %}" class="action-btn">
+            👥 Manage Users
+        </a>
+        <a href="{% url 'admin:inventory-stockmovement-changelist' %}" class="action-btn">
+            📊 Stock Movements
+        </a>
+        <a href="{% url 'admin:analytics' %}" class="action-btn">
+            📈 Detailed Analytics
+        </a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">KSh {{ total_revenue|floatformat:2 }}</div>
+            <div class="stat-label">30-Day Revenue</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_transactions }}</div>
+            <div class="stat-label">Total Transactions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ active_sellers }}</div>
+            <div class="stat-label">Active Sellers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_products }}</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ low_stock_count }}</div>
+            <div class="stat-label">Low Stock Items</div>
+        </div>
+    </div>
+
+    <!-- Low Stock Notifications Section -->
+    {% if active_alerts or low_stock_products %}
+    <div class="alerts-section" style="margin-bottom: 30px;">
+        <div class="chart-title" style="text-align: center; margin-bottom: 20px;">
+            🚨 Stock Alerts & Notifications
+        </div>
+        
+        <!-- Critical Alerts -->
+        {% if active_alerts %}
+        <div class="alert-container" style="margin-bottom: 20px;">
+            <h4 style="color: #ff6b6b; margin-bottom: 15px;">⚠️ Active Stock Alerts</h4>
+            <div class="alerts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                {% for alert in active_alerts %}
+                <div class="alert-card" style="background: rgba(255, 107, 107, 0.15); padding: 15px; border-radius: 10px; border-left: 4px solid #ff6b6b;">
+                    <div class="alert-header" style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                        <span class="alert-type" style="font-weight: bold; color: #ff6b6b;">
+                            {{ alert.get_alert_type_display|upper }}
+                        </span>
+                        <span class="alert-priority badge" style="background: {% if alert.priority == 'critical' %}#dc3545{% elif alert.priority == 'high' %}#fd7e14{% elif alert.priority == 'medium' %}#ffc107{% else %}#28a745{% endif %}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
+                            {{ alert.get_priority_display|upper }}
+                        </span>
+                    </div>
+                    <div class="alert-product" style="font-weight: bold; margin-bottom: 8px;">
+                        {{ alert.product.name }}
+                    </div>
+                    <div class="alert-details" style="font-size: 0.9rem; opacity: 0.9;">
+                        <div><strong>Current Stock:</strong> {{ alert.current_value }}</div>
+                        {% if alert.threshold_value %}
+                        <div><strong>Threshold:</strong> {{ alert.threshold_value }}</div>
+                        {% endif %}
+                        <div><strong>SKU:</strong> {{ alert.product.sku|default:"N/A" }}</div>
+                        <div><strong>Category:</strong> {{ alert.product.category.name|default:"Uncategorized" }}</div>
+                    </div>
+                    <div class="alert-message" style="margin-top: 10px; font-style: italic; opacity: 0.8;">
+                        {{ alert.message|truncatechars:100 }}
+                    </div>
+                    <div class="alert-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <a href="{% url 'admin:catalog-product-change' alert.product.id %}" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 5px 15px; border-radius: 5px; text-decoration: none; font-size: 0.8rem;">
+                            Manage Product
+                        </a>
+                        <a href="{% url 'admin:inventory-stockalert-change' alert.id %}" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 5px 15px; border-radius: 5px; text-decoration: none; font-size: 0.8rem;">
+                            View Alert
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Low Stock Products -->
+        {% if low_stock_products %}
+        <div class="low-stock-container">
+            <h4 style="color: #ffa726; margin-bottom: 15px;">📦 Low Stock Products</h4>
+            <div class="low-stock-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                {% for product in low_stock_products %}
+                <div class="low-stock-card" style="background: rgba(255, 167, 38, 0.15); padding: 15px; border-radius: 10px; border-left: 4px solid #ffa726;">
+                    <div class="product-header" style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                        <span class="product-name" style="font-weight: bold; color: #ffa726;">
+                            {{ product.name }}
+                        </span>
+                        <span class="stock-level" style="background: {% if product.stock_quantity == 0 %}#dc3545{% elif product.stock_quantity <= 5 %}#fd7e14{% else %}#ffc107{% endif %}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
+                            {% if product.stock_quantity == 0 %}OUT OF STOCK{% elif product.stock_quantity <= 5 %}CRITICAL{% else %}LOW{% endif %}
+                        </span>
+                    </div>
+                    <div class="product-details" style="font-size: 0.9rem; opacity: 0.9;">
+                        <div><strong>Current Stock:</strong> {{ product.stock_quantity }}</div>
+                        <div><strong>SKU:</strong> {{ product.sku|default:"N/A" }}</div>
+                        <div><strong>Category:</strong> {{ product.category.name|default:"Uncategorized" }}</div>
+                        <div><strong>Price:</strong> KSh {{ product.price|floatformat:2 }}</div>
+                    </div>
+                    <div class="product-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <a href="{% url 'admin:catalog-product-change' product.id %}" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 5px 15px; border-radius: 5px; text-decoration: none; font-size: 0.8rem;">
+                            Update Stock
+                        </a>
+                        <a href="{% url 'admin:inventory-stockmovement-add' %}" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 5px 15px; border-radius: 5px; text-decoration: none; font-size: 0.8rem;">
+                            Add Stock
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Quick Actions for Stock Management -->
+        <div class="stock-actions" style="margin-top: 20px; text-align: center;">
+            <a href="{% url 'admin:inventory-stockalert-changelist' %}" class="action-btn" style="background: rgba(255, 107, 107, 0.2); border-color: rgba(255, 107, 107, 0.3); margin-right: 15px;">
+                🚨 View All Alerts
+            </a>
+            <a href="{% url 'admin:catalog-product-changelist' %}" class="action-btn" style="background: rgba(255, 167, 38, 0.2); border-color: rgba(255, 167, 38, 0.3); margin-right: 15px;">
+                📦 Manage Products
+            </a>
+            <a href="{% url 'admin:inventory-stockmovement-changelist' %}" class="action-btn" style="background: rgba(255, 167, 38, 0.2); border-color: rgba(255, 167, 38, 0.3);">
+                📊 Stock Movements
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <!-- Sales Chart -->
+        <div class="chart-container">
+            <div class="chart-title">📈 Daily Sales Trend (Last 30 Days)</div>
+            <canvas id="salesChart" class="chart-canvas"></canvas>
+        </div>
+
+        <!-- Top Products Chart -->
+        <div class="chart-container">
+            <div class="chart-title">🏆 Top Selling Products</div>
+            <canvas id="productsChart" class="chart-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+        <div class="chart-title">🕒 Recent Sales Activity</div>
+        {% for sale in recent_sales %}
+        <div class="activity-item">
+            <div class="activity-title">
+                Sale #{{ sale.sale_number }} - ${{ sale.total_amount }}
+            </div>
+            <div class="activity-details">
+                Customer: {{ sale.customer_name|default:"Walk-in Customer" }} | 
+                Cashier: {{ sale.cashier.get_full_name }} | 
+                Date: {{ sale.created_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% empty %}
+        <div class="activity-item">
+            <div class="activity-title">No recent sales</div>
+            <div class="activity-details">Start making sales to see activity here</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Sales Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesData = {{ sales_data_json|safe }};
+    
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: salesData.map(item => new Date(item.date).toLocaleDateString()),
+            datasets: [{
+                label: 'Daily Sales ($)',
+                data: salesData.map(item => parseFloat(item.total)),
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: 'white'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: 'white'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Products Chart
+    const productsCtx = document.getElementById('productsChart').getContext('2d');
+    const productsData = {{ products_data_json|safe }};
+    
+    new Chart(productsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: productsData.map(item => item.product__name),
+            datasets: [{
+                data: productsData.map(item => parseInt(item.total_quantity)),
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+                ],
+                borderWidth: 2,
+                borderColor: 'rgba(255, 255, 255, 0.3)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'white',
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

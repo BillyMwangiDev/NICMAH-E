@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Sale {{ sale.sale_number }} - {{ site_name }}{% endblock %}
+{% block content %}
+<h2>Sale {{ sale.sale_number }}</h2>
+<p>Status: <strong>{{ sale.status }}</strong></p>
+<p>Total: <strong>${{ sale.total_amount }}</strong></p>
+<table class="table table-sm">
+  <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+  <tbody>
+    {% for item in sale.items.all %}
+    <tr>
+      <td>{{ item.product_name }}</td>
+      <td>{{ item.quantity }}</td>
+                      <td>KSh {{ item.unit_price }}</td>
+                <td>KSh {{ item.total_price }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

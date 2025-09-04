@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Education Blog - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="blog-page">
+  <div class="container py-4">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="blog-hero mb-4">
+        <h2 class="mb-1">Latest Articles</h2>
+        <p class="text-muted mb-0">Curated insights on sustainable agriculture, livestock and crop management.</p>
+      </div>
+
+      <form method="get" class="row g-2 mb-3">
+        <div class="col-md-8">
+          <input type="text" class="form-control" name="q" placeholder="Search articles..." value="{{ q }}">
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" name="cat">
+            <option value="">All categories</option>
+            {% for c in categories %}
+            <option value="{{ c }}" {% if active_cat == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-1 d-grid">
+          <button class="btn btn-success">Go</button>
+        </div>
+      </form>
+
+      {% if featured %}
+      <article class="card border-0 shadow-sm mb-4 article-card">
+        {% if featured.image %}
+        <img class="card-img-top blended-image" src="{{ featured.image.url }}" alt="{{ featured.title }}">
+        {% endif %}
+        <div class="card-body">
+          <div class="small text-muted mb-2">Featured · {{ featured.published_at|date:'M d, Y' }} · {{ featured.reading_minutes|default:3 }} min read</div>
+          <h3 class="h4">{{ featured.title }}</h3>
+          <p class="mb-3">{{ featured.excerpt|default:featured.content|striptags|truncatechars:180 }}</p>
+          <a href="{% url 'educational:article_detail' featured.slug %}" class="btn btn-success btn-sm">Read article</a>
+        </div>
+      </article>
+      {% endif %}
+
+      <div id="article-container">
+        {% include 'educational/_article_cards.html' with articles=articles %}
+      </div>
+
+      <div id="infinite-scroll-trigger" class="text-center py-4">
+        <div class="spinner-border text-success" role="status" style="display: none;"><span class="visually-hidden">Loading...</span></div>
+        <p class="text-muted small mb-0" id="end-of-list" style="display: none;">You have reached the end.</p>
+      </div>
+
+      <script>
+      (function() {
+        const trigger = document.getElementById('infinite-scroll-trigger');
+        const spinner = trigger.querySelector('.spinner-border');
+        const endText = document.getElementById('end-of-list');
+        const container = document.getElementById('article-container');
+        let nextPage = {% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}null{% endif %};
+        let loading = false;
+
+        function loadMore() {
+          if (!nextPage || loading) return;
+          loading = true;
+          spinner.style.display = 'inline-block';
+          fetch(`?page=${nextPage}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
+            .then(r => r.json())
+            .then(data => {
+              container.insertAdjacentHTML('beforeend', data.html);
+              nextPage = data.has_next ? data.next_page : null;
+              if (!nextPage) {
+                endText.style.display = 'block';
+                observer.disconnect();
+              }
+            })
+            .catch(() => {})
+            .finally(() => {
+              spinner.style.display = 'none';
+              loading = false;
+            });
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              loadMore();
+            }
+          });
+        }, { rootMargin: '200px' });
+
+        observer.observe(trigger);
+      })();
+      </script>
+    </div>
+
+    <div class="col-lg-4">
+      <aside class="ps-lg-4 mt-4 mt-lg-0">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">About this blog</h5>
+            <p class="mb-0">Insights, guides, and tips on sustainable agriculture, livestock, crop management, and more.</p>
+          </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Stay updated</h5>
+            <p class="mb-2 small text-muted">New articles are published regularly.</p>
+            <a href="/educational/" class="btn btn-outline-success btn-sm">Refresh</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  </div>
+</div>
+{% endblock %}

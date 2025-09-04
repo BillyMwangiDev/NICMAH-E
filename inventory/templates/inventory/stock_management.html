@@ -1,0 +1,663 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Stock Management - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stock-management-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filters-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: end;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 5px;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+        padding: 10px 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .filter-group input:focus,
+    .filter-group select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .filter-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+    
+    .clear-btn {
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .clear-btn:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+    
+    .products-table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .table-header {
+        background: #f8fafc;
+        padding: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .table-header h2 {
+        color: #1f2937;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .stock-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .stock-table th {
+        background: #f8fafc;
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+        font-size: 14px;
+    }
+    
+    .stock-table td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: middle;
+    }
+    
+    .stock-table tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .product-name {
+        font-weight: 600;
+        color: #1f2937;
+        max-width: 200px;
+    }
+    
+    .product-sku {
+        font-family: monospace;
+        color: #6b7280;
+        font-size: 12px;
+    }
+    
+    .category-badge {
+        background: #e0e7ff;
+        color: #3730a3;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .stock-status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .stock-status.in-stock {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .stock-status.low-stock {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .stock-status.out-of-stock {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .editable-field {
+        position: relative;
+        cursor: pointer;
+        padding: 5px 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .editable-field:hover {
+        background-color: #f3f4f6;
+    }
+    
+    .editable-field.editing {
+        background-color: #e0e7ff;
+    }
+    
+    .editable-input {
+        width: 100%;
+        padding: 5px 8px;
+        border: 2px solid #667eea;
+        border-radius: 4px;
+        font-size: 14px;
+        background: white;
+    }
+    
+    .editable-input:focus {
+        outline: none;
+        border-color: #5a67d8;
+    }
+    
+    .save-btn {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+    
+    .cancel-btn {
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+    
+    .price-value {
+        font-weight: 600;
+        color: #059669;
+    }
+    
+    .stock-quantity {
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .min-stock {
+        font-size: 12px;
+        color: #6b7280;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background: #f8fafc;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .pagination a,
+    .pagination span {
+        padding: 8px 12px;
+        margin: 0 2px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #374151;
+        font-weight: 500;
+    }
+    
+    .pagination a:hover {
+        background: #e5e7eb;
+    }
+    
+    .pagination .current {
+        background: #667eea;
+        color: white;
+    }
+    
+    .bulk-actions {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .bulk-actions h3 {
+        color: #1f2937;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .bulk-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: end;
+    }
+    
+    .bulk-input {
+        padding: 10px 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .bulk-btn {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .bulk-btn:hover {
+        background: #059669;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stock-management-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="text-4xl font-bold mb-2">
+            <i class="fas fa-edit mr-3"></i>
+            Stock Management
+        </h1>
+        <p class="text-xl opacity-90">
+            Edit prices, quantities, and manage your inventory in real-time
+        </p>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <form method="GET" class="filters-grid">
+            <div class="filter-group">
+                <label for="search">Search Products</label>
+                <input type="text" id="search" name="search" value="{{ search }}" 
+                       placeholder="Search by name, SKU, or category...">
+            </div>
+            
+            <div class="filter-group">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="stock_status">Stock Status</label>
+                <select id="stock_status" name="stock_status">
+                    <option value="">All Products</option>
+                    <option value="in_stock" {% if stock_filter == 'in_stock' %}selected{% endif %}>In Stock</option>
+                    <option value="low" {% if stock_filter == 'low' %}selected{% endif %}>Low Stock</option>
+                    <option value="out" {% if stock_filter == 'out' %}selected{% endif %}>Out of Stock</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <button type="submit" class="filter-btn">
+                    <i class="fas fa-search mr-2"></i>Filter
+                </button>
+            </div>
+            
+            <div class="filter-group">
+                <a href="{% url 'inventory:stock_management' %}" class="clear-btn">
+                    <i class="fas fa-times mr-2"></i>Clear
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bulk-actions">
+        <h3><i class="fas fa-tools mr-2"></i>Bulk Actions</h3>
+        <form method="POST" class="bulk-form" id="bulk-form">
+            {% csrf_token %}
+            <div class="filter-group">
+                <label for="bulk_action">Action</label>
+                <select id="bulk_action" name="bulk_action" class="bulk-input">
+                    <option value="">Select Action</option>
+                    <option value="update_prices">Update Prices</option>
+                    <option value="update_stock">Update Stock</option>
+                    <option value="update_min_stock">Update Min Stock</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="bulk_value">Value</label>
+                <input type="number" id="bulk_value" name="bulk_value" step="0.01" 
+                       class="bulk-input" placeholder="Enter value...">
+            </div>
+            
+            <div class="filter-group">
+                <button type="submit" class="bulk-btn" id="bulk-submit" disabled>
+                    <i class="fas fa-save mr-2"></i>Apply Bulk Action
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Products Table -->
+    <div class="products-table">
+        <div class="table-header">
+            <h2>
+                <i class="fas fa-boxes mr-2"></i>
+                Products ({{ page_obj.paginator.count }} total)
+            </h2>
+        </div>
+        
+        <div class="table-container">
+            <table class="stock-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Price (KSh)</th>
+                        <th>Stock</th>
+                        <th>Min Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in page_obj %}
+                    <tr data-product-id="{{ product.id }}">
+                        <td>
+                            <div class="product-name">{{ product.name }}</div>
+                            <div class="product-sku">{{ product.sku }}</div>
+                        </td>
+                        <td>
+                            <span class="product-sku">{{ product.sku }}</span>
+                        </td>
+                        <td>
+                            <span class="category-badge">{{ product.category.name|default:"Uncategorized" }}</span>
+                        </td>
+                        <td>
+                            <div class="editable-field" data-field="price" data-value="{{ product.price }}">
+                                <span class="price-value">KSh {{ product.price|floatformat:2 }}</span>
+                                <i class="fas fa-edit ml-2 text-gray-400"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="editable-field" data-field="stock_quantity" data-value="{{ product.stock_quantity }}">
+                                <span class="stock-quantity">{{ product.stock_quantity|intcomma }}</span>
+                                <i class="fas fa-edit ml-2 text-gray-400"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="editable-field" data-field="min_stock_level" data-value="{{ product.min_stock_level }}">
+                                <span class="min-stock">{{ product.min_stock_level|intcomma }}</span>
+                                <i class="fas fa-edit ml-2 text-gray-400"></i>
+                            </div>
+                        </td>
+                        <td>
+                            {% if product.stock_quantity == 0 %}
+                                <span class="stock-status out-of-stock">Out of Stock</span>
+                            {% elif product.stock_quantity <= product.min_stock_level %}
+                                <span class="stock-status low-stock">Low Stock</span>
+                            {% else %}
+                                <span class="stock-status in-stock">In Stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="text-gray-400 text-sm">
+                                <i class="fas fa-edit mr-1"></i>Inline editing available
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-box-open text-4xl mb-4"></i>
+                            <p>No products found matching your criteria.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if stock_filter %}&stock_status={{ stock_filter }}{% endif %}">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if stock_filter %}&stock_status={{ stock_filter }}{% endif %}">Previous</a>
+            {% endif %}
+            
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if stock_filter %}&stock_status={{ stock_filter }}{% endif %}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if stock_filter %}&stock_status={{ stock_filter }}{% endif %}">Last &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inline editing functionality
+    const editableFields = document.querySelectorAll('.editable-field');
+    
+    editableFields.forEach(field => {
+        field.addEventListener('click', function() {
+            if (this.classList.contains('editing')) return;
+            
+            const currentValue = this.getAttribute('data-value');
+            const fieldType = this.getAttribute('data-field');
+            const productId = this.closest('tr').getAttribute('data-product-id');
+            
+            // Create input field
+            const input = document.createElement('input');
+            input.type = fieldType === 'price' ? 'number' : 'number';
+            input.step = fieldType === 'price' ? '0.01' : '1';
+            input.value = currentValue;
+            input.className = 'editable-input';
+            
+            // Create save button
+            const saveBtn = document.createElement('button');
+            saveBtn.type = 'button';
+            saveBtn.className = 'save-btn';
+            saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+            
+            // Create cancel button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'cancel-btn';
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+            
+            // Replace content with input
+            this.innerHTML = '';
+            this.appendChild(input);
+            this.appendChild(saveBtn);
+            this.appendChild(cancelBtn);
+            this.classList.add('editing');
+            
+            input.focus();
+            
+            // Handle save
+            saveBtn.addEventListener('click', function() {
+                const newValue = input.value;
+                
+                fetch('{% url "inventory:stock_management" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: `product_id=${productId}&field=${fieldType}&value=${newValue}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the display
+                        const displayValue = fieldType === 'price' ? 
+                            `KSh ${parseFloat(newValue).toFixed(2)}` : 
+                            parseInt(newValue).toLocaleString();
+                        
+                        field.innerHTML = `<span class="${fieldType === 'price' ? 'price-value' : 'stock-quantity'}">${displayValue}</span><i class="fas fa-edit ml-2 text-gray-400"></i>`;
+                        field.setAttribute('data-value', newValue);
+                        field.classList.remove('editing');
+                        
+                        // Show success message
+                        showMessage('Updated successfully!', 'success');
+                        
+                        // Refresh page after a short delay to update status
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showMessage(data.message || 'Update failed!', 'error');
+                        field.classList.remove('editing');
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    showMessage('An error occurred!', 'error');
+                    field.classList.remove('editing');
+                    location.reload();
+                });
+            });
+            
+            // Handle cancel
+            cancelBtn.addEventListener('click', function() {
+                location.reload();
+            });
+            
+            // Handle enter key
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveBtn.click();
+                }
+            });
+            
+            // Handle escape key
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cancelBtn.click();
+                }
+            });
+        });
+    });
+    
+    // Bulk actions functionality
+    const bulkAction = document.getElementById('bulk_action');
+    const bulkValue = document.getElementById('bulk_value');
+    const bulkSubmit = document.getElementById('bulk-submit');
+    
+    function updateBulkSubmit() {
+        bulkSubmit.disabled = !bulkAction.value || !bulkValue.value;
+    }
+    
+    bulkAction.addEventListener('change', updateBulkSubmit);
+    bulkValue.addEventListener('input', updateBulkSubmit);
+    
+    // Message display function
+    function showMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        messageDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.querySelector('.stock-management-container').insertBefore(
+            messageDiv, 
+            document.querySelector('.page-header')
+        );
+        
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

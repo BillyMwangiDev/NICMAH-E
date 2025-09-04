@@ -1,0 +1,284 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}POS Overview - Nicmah Agrovet{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .pos-container {
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+    }
+    
+    .pos-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .pos-header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .pos-header p {
+        font-size: 1.2rem;
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .pos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .pos-card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: bold;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 10px;
+    }
+    
+    .session-item, .sale-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        border-left: 4px solid #4CAF50;
+    }
+    
+    .session-item:last-child, .sale-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .session-title, .sale-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #4CAF50;
+    }
+    
+    .session-details, .sale-details {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        line-height: 1.4;
+    }
+    
+    .today-summary {
+        text-align: center;
+        padding: 20px;
+        background: rgba(76, 175, 80, 0.2);
+        border-radius: 15px;
+        border: 2px solid rgba(76, 175, 80, 0.3);
+    }
+    
+    .summary-number {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #4CAF50;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .summary-label {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .back-btn {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .status-open {
+        background: rgba(76, 175, 80, 0.3);
+        color: #4CAF50;
+    }
+    
+    .status-pending {
+        background: rgba(255, 193, 7, 0.3);
+        color: #FFC107;
+    }
+    
+    .status-completed {
+        background: rgba(33, 150, 243, 0.3);
+        color: #2196F3;
+    }
+    
+    @media (max-width: 768px) {
+        .pos-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pos-container">
+    <!-- Back Button -->
+    <a href="{% url 'admin:index' %}" class="back-btn">← Back to Dashboard</a>
+    
+    <!-- POS Header -->
+    <div class="pos-header">
+        <h1>🏪 POS System Overview</h1>
+        <p>Real-time monitoring of Point of Sale operations</p>
+        <p>Active sessions, today's performance, and pending transactions</p>
+    </div>
+
+    <!-- Today's Summary -->
+    <div class="pos-card today-summary">
+        <div class="card-title">📅 Today's Performance</div>
+        <div class="summary-number">${{ today_sales.total|default:"0.00" }}</div>
+        <div class="summary-label">Total Revenue</div>
+        <div style="margin-top: 15px; font-size: 1.1rem;">
+            <strong>{{ today_sales.count|default:0 }}</strong> transactions completed today
+        </div>
+    </div>
+
+    <!-- POS Grid -->
+    <div class="pos-grid">
+        <!-- Active Sessions -->
+        <div class="pos-card">
+            <div class="card-title">🟢 Active POS Sessions</div>
+            {% if active_sessions %}
+                {% for session in active_sessions %}
+                <div class="session-item">
+                    <div class="session-title">
+                        Session #{{ session.session_id|slice:":8" }}...
+                        <span class="status-badge status-open">{{ session.status }}</span>
+                    </div>
+                    <div class="session-details">
+                        <strong>Cashier:</strong> {{ session.cashier.get_full_name }}<br>
+                        {% if session.seller %}
+                            <strong>Seller:</strong> {{ session.seller.get_full_name }}<br>
+                        {% endif %}
+                        <strong>Opened:</strong> {{ session.opened_at|date:"M d, Y H:i" }}<br>
+                        <strong>Total Sales:</strong> ${{ session.total_sales|floatformat:2 }}<br>
+                        <strong>Transactions:</strong> {{ session.total_transactions }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="session-item">
+                    <div class="session-title">No Active Sessions</div>
+                    <div class="session-details">
+                        All POS sessions are currently closed or suspended.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Pending Transactions -->
+        <div class="pos-card">
+            <div class="card-title">⏳ Pending Transactions</div>
+            {% if pending_sales %}
+                {% for sale in pending_sales %}
+                <div class="sale-item">
+                    <div class="sale-title">
+                        Sale #{{ sale.sale_number|slice:":8" }}...
+                        <span class="status-badge status-pending">{{ sale.status }}</span>
+                    </div>
+                    <div class="sale-details">
+                        <strong>Customer:</strong> {{ sale.customer_name|default:"Walk-in Customer" }}<br>
+                        <strong>Cashier:</strong> {{ sale.cashier.get_full_name }}<br>
+                        <strong>Amount:</strong> ${{ sale.total_amount|floatformat:2 }}<br>
+                        <strong>Created:</strong> {{ sale.created_at|date:"M d, Y H:i" }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="sale-item">
+                    <div class="sale-title">No Pending Sales</div>
+                    <div class="sale-details">
+                        All sales have been completed or processed.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="pos-card">
+            <div class="card-title">⚡ Quick Actions</div>
+            <div style="display: grid; gap: 10px;">
+                <a href="{% url 'admin:pos-possession-changelist' %}" class="action-btn">
+                    🏪 Manage All Sessions
+                </a>
+                <a href="{% url 'admin:pos-possale-changelist' %}" class="action-btn">
+                    💰 View All Sales
+                </a>
+                <a href="{% url 'admin:pos-possaleitem-changelist' %}" class="action-btn">
+                    📦 Sale Items
+                </a>
+                <a href="{% url 'admin:pos-receipt-changelist' %}" class="action-btn">
+                    🧾 Receipts
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .action-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        display: block;
+    }
+    
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

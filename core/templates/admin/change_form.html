@@ -1,0 +1,333 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .enhanced-change-form {
+        padding: 20px;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #16a34a, #14532d);
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        border: none;
+        padding: 0;
+    }
+
+    .form-header .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .form-content {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+
+    .form-row {
+        padding: 20px;
+        border-bottom: 1px solid #f3f4f6;
+        transition: all 0.2s ease;
+    }
+
+    .form-row:last-child {
+        border-bottom: none;
+    }
+
+    .form-row:hover {
+        background: #f8fafc;
+    }
+
+    .form-row label {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+        outline: none;
+        border-color: #16a34a;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-row .help {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    .form-row .errors {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    .enhanced-submit-row {
+        background: #f8fafc;
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .enhanced-submit-row input {
+        margin: 0 10px;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .enhanced-submit-row input[type="submit"] {
+        background: #16a34a;
+        color: white;
+    }
+
+    .enhanced-submit-row input[type="submit"]:hover {
+        background: #14532d;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .enhanced-submit-row input[type="submit"].default {
+        background: #10b981;
+    }
+
+    .enhanced-submit-row input[type="submit"].default:hover {
+        background: #059669;
+    }
+
+    .enhanced-submit-row .deletelink {
+        background: #ef4444;
+        color: white;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-block;
+    }
+
+    .enhanced-submit-row .deletelink:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .fieldset {
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+
+    .fieldset h2 {
+        background: linear-gradient(135deg, #16a34a, #14532d);
+        color: white;
+        margin: 0;
+        padding: 20px;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .fieldset .description {
+        background: #f8fafc;
+        padding: 15px 20px;
+        color: #6b7280;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .inline-group {
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+
+    .inline-group h3 {
+        background: #f3f4f6;
+        color: #1f2937;
+        margin: 0;
+        padding: 15px 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .inline-related {
+        padding: 20px;
+    }
+
+    .inline-related .form-row {
+        padding: 15px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .inline-related .form-row:last-child {
+        border-bottom: none;
+    }
+
+    .add-row {
+        background: #16a34a;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+    .add-row:hover {
+        background: #14532d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .delete {
+        background: #ef4444;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-block;
+        margin-left: 10px;
+    }
+
+    .delete:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .enhanced-change-form {
+            padding: 10px;
+        }
+
+        .form-header {
+            padding: 20px;
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .enhanced-submit-row input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+    &rsaquo; {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="enhanced-change-form">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h1>
+            {% if add %}
+                ➕ Add {{ opts.verbose_name }}
+            {% else %}
+                ✏️ Edit {{ opts.verbose_name }}
+            {% endif %}
+        </h1>
+        <p class="subtitle">
+            {% if add %}
+                Create a new {{ opts.verbose_name|lower }} for your business
+            {% else %}
+                Update the {{ opts.verbose_name|lower }} information
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-content">
+        <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>
+            {% csrf_token %}
+            {% block field_sets %}
+                {% for fieldset in adminform %}
+                    {% include "admin/includes/fieldset.html" %}
+                {% endfor %}
+            {% endblock %}
+
+            {% block after_field_sets %}{% endblock %}
+
+            {% block inline_field_sets %}
+                {% for inline_admin_formset in inline_admin_formsets %}
+                    {% include inline_admin_formset.opts.template %}
+                {% endfor %}
+            {% endblock %}
+
+            {% block after_related_objects %}{% endblock %}
+
+            {% block submit_buttons_bottom %}
+                <div class="enhanced-submit-row">
+                    {% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save">{% endif %}
+                    {% if show_delete_link and original %}
+                        {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+                        <a href="{% add_preserved_filters delete_url %}" class="deletelink">{% trans "Delete" %}</a>
+                    {% endif %}
+                    {% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew">{% endif %}
+                    {% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother">{% endif %}
+                    {% if show_save_and_continue %}<input type="submit" value="{% if can_change %}{% trans 'Save and continue editing' %}{% else %}{% trans 'Save and view' %}{% endif %}" name="_continue">{% endif %}
+                    {% if show_close %}<a href="{% url opts|admin_urlname:'changelist' %}" class="closelink">{% trans 'Close' %}</a>{% endif %}
+                </div>
+            {% endblock %}
+        </form>
+    </div>
+</div>
+{% endblock %}

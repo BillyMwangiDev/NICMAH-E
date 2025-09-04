@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Purchase Order - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Generate Purchase Order</h1>
+            <a href="{% url 'inventory:documents' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Documents
+            </a>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Supplier Information -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-truck mr-2 text-purple-600"></i>Supplier Information
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="supplier_name" class="block text-sm font-medium text-gray-700 mb-2">Supplier Name *</label>
+                        <input type="text" name="supplier_name" id="supplier_name" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="supplier_email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" name="supplier_email" id="supplier_email"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="supplier_phone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <input type="tel" name="supplier_phone" id="supplier_phone"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="supplier_address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                        <textarea name="supplier_address" id="supplier_address" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase Order Details -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-shopping-cart mr-2 text-purple-600"></i>Purchase Order Details
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label for="delivery_date" class="block text-sm font-medium text-gray-700 mb-2">Expected Delivery Date</label>
+                        <input type="date" name="delivery_date" id="delivery_date"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="payment_terms" class="block text-sm font-medium text-gray-700 mb-2">Payment Terms</label>
+                        <input type="text" name="payment_terms" id="payment_terms" placeholder="e.g., Net 30 days"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea name="notes" id="notes" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Selection -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-box mr-2 text-green-600"></i>Products
+                </h2>
+                
+                <!-- Product Search -->
+                <div class="mb-4">
+                    <label for="productSearch" class="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="productSearch" placeholder="Search products..."
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" onclick="searchProducts()" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition duration-200">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+
+                <!-- Selected Products -->
+                <div id="selectedProducts" class="space-y-4">
+                    <h3 class="text-lg font-medium text-gray-800">Selected Products</h3>
+                    <div id="productsList" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-calculator mr-2 text-purple-600"></i>Summary
+                </h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span id="subtotal" class="font-semibold">$0.00</span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="flex justify-between text-lg font-bold">
+                            <span>Total:</span>
+                            <span id="totalAmount">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row justify-end gap-3 sm:space-x-4">
+                <button type="button" onclick="previewPurchaseOrder()" 
+                        class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                    <i class="fas fa-eye mr-2"></i>Preview
+                </button>
+                <button type="submit" 
+                        class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                    <i class="fas fa-save mr-2"></i>Generate Purchase Order
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Purchase Order Preview</h2>
+                    <button onclick="closePreview()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="previewContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedProducts = [];
+let currentDate = new Date();
+
+// Set default delivery date to 7 days from now
+document.addEventListener('DOMContentLoaded', function() {
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + 7);
+    document.getElementById('deliveryDate').value = deliveryDate.toISOString().split('T')[0];
+});
+
+function searchProducts() {
+    const searchTerm = document.getElementById('productSearch').value;
+    if (searchTerm.length < 2) return;
+
+    fetch(`/catalog/api/products/search/?q=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(data => {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            data.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition duration-200';
+                productCard.innerHTML = `
+                    <h3 class="font-semibold text-gray-800">${product.name}</h3>
+                    <p class="text-sm text-gray-600">${product.description || 'No description'}</p>
+                    <p class="text-lg font-bold text-green-600 mt-2">$${product.price}</p>
+                    <button type="button" onclick="addProductToPO(${product.id}, '${product.name}', ${product.price})"
+                            class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition duration-200">
+                        <i class="fas fa-plus mr-2"></i>Add to PO
+                    </button>
+                `;
+                productList.appendChild(productCard);
+            });
+        })
+        .catch(error => {
+            console.error('Error searching products:', error);
+        });
+}
+
+function addProductToPO(productId, productName, unitPrice) {
+    const existingProduct = selectedProducts.find(p => p.id === productId);
+    
+    if (existingProduct) {
+        existingProduct.quantity += 1;
+        existingProduct.totalPrice = existingProduct.quantity * existingProduct.unitPrice;
+    } else {
+        selectedProducts.push({
+            id: productId,
+            name: productName,
+            unitPrice: unitPrice,
+            quantity: 1,
+            totalPrice: unitPrice
+        });
+    }
+    
+    updateProductsList();
+    updateTotals();
+}
+
+function updateProductsList() {
+    const productsList = document.getElementById('productsList');
+    productsList.innerHTML = '';
+
+    selectedProducts.forEach((product, index) => {
+        const productDiv = document.createElement('div');
+        productDiv.className = 'flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200';
+        productDiv.innerHTML = `
+            <div class="flex-1">
+                <h4 class="font-semibold text-gray-800">${product.name}</h4>
+                <p class="text-sm text-gray-600">$${product.unitPrice} each</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="number" value="${product.quantity}" min="1" 
+                       onchange="updateProductQuantity(${index}, this.value)"
+                       class="w-16 px-2 py-1 border border-gray-300 rounded-md text-center">
+                <span class="font-semibold text-gray-800">$${product.totalPrice.toFixed(2)}</span>
+                <button type="button" onclick="removeProduct(${index})" 
+                        class="text-red-600 hover:text-red-800">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <input type="hidden" name="products[${index}][id]" value="${product.id}">
+            <input type="hidden" name="products[${index}][quantity]" value="${product.quantity}">
+        `;
+        productsList.appendChild(productDiv);
+    });
+}
+
+function updateProductQuantity(index, quantity) {
+    if (quantity < 1) return;
+    
+    selectedProducts[index].quantity = parseInt(quantity);
+    selectedProducts[index].totalPrice = selectedProducts[index].quantity * selectedProducts[index].unitPrice;
+    
+    updateProductsList();
+    updateTotals();
+}
+
+function removeProduct(index) {
+    selectedProducts.splice(index, 1);
+    updateProductsList();
+    updateTotals();
+}
+
+function updateTotals() {
+    const subtotal = selectedProducts.reduce((sum, product) => sum + product.totalPrice, 0);
+    
+    document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('totalAmount').textContent = `$${subtotal.toFixed(2)}`;
+}
+
+function previewPurchaseOrder() {
+    const supplierName = document.getElementById('supplierName').value;
+    const supplierEmail = document.getElementById('supplierEmail').value;
+    const deliveryDate = document.getElementById('deliveryDate').value;
+    
+    if (!supplierName) {
+        alert('Please enter supplier name');
+        return;
+    }
+    
+    if (selectedProducts.length === 0) {
+        alert('Please add at least one product');
+        return;
+    }
+    
+    const previewContent = document.getElementById('previewContent');
+    const subtotal = selectedProducts.reduce((sum, product) => sum + product.totalPrice, 0);
+    
+    previewContent.innerHTML = `
+        <div class="space-y-4">
+            <div class="text-center">
+                <h1 class="text-2xl font-bold text-gray-800">PURCHASE ORDER</h1>
+                <p class="text-gray-600">Date: ${currentDate.toLocaleDateString()}</p>
+                <p class="text-gray-600">Expected Delivery: ${deliveryDate}</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="font-semibold text-gray-800">Supplier:</h3>
+                    <p>${supplierName}</p>
+                    <p>${supplierEmail}</p>
+                </div>
+            </div>
+            
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border border-gray-300 px-4 py-2 text-left">Product</th>
+                        <th class="border border-gray-300 px-4 py-2 text-right">Qty</th>
+                        <th class="border border-gray-300 px-4 py-2 text-right">Price</th>
+                        <th class="border border-gray-300 px-4 py-2 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${selectedProducts.map(product => `
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2">${product.name}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-right">${product.quantity}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-right">$${product.unitPrice}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-right">$${product.totalPrice.toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="text-right space-y-2">
+                <p class="text-xl font-bold"><strong>Total:</strong> $${subtotal.toFixed(2)}</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('previewModal').classList.remove('hidden');
+}
+
+function closePreview() {
+    document.getElementById('previewModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

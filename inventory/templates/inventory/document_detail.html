@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ document.document_type|title }} - {{ document.document_number }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">{{ document.document_type|title }} Details</h1>
+                <p class="text-gray-600 mt-2">{{ document.document_number }}</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                <a href="{% url 'inventory:documents' %}" 
+                   class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Documents
+                </a>
+                <a href="{% url 'inventory:download_document_pdf' document.pk %}" 
+                   class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-download mr-2"></i>Download PDF
+                </a>
+                <button onclick="window.print()" 
+                        class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-print mr-2"></i>Print
+                </button>
+                <a href="{% url 'inventory:email_document' document.pk %}" 
+                   class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-envelope mr-2"></i>Email
+                </a>
+            </div>
+        </div>
+
+        {% if not documents_available %}
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <p><i class="fas fa-exclamation-triangle mr-2"></i>Document system is not available.</p>
+        </div>
+        {% else %}
+
+        <!-- Document Content -->
+        <div class="bg-white border border-gray-300 rounded-lg p-6 mb-6 print:border-0 print:p-0">
+            <!-- Company Header -->
+            <div class="text-center mb-8 print:mb-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">NICMAH AGROVET</h1>
+                <p class="text-gray-600 text-lg mb-1">Quality Agricultural Solutions</p>
+                <p class="text-sm text-gray-500">Naromoru town, Timberland building near KFA</p>
+                <p class="text-sm text-gray-500">Phone: 0726476128/0740368581 | Email: nicmahagrovet@gmail.com</p>
+            </div>
+
+            <!-- Document Type Header -->
+            <div class="text-center mb-6 print:mb-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ document.document_type|upper }}</h2>
+                <p class="text-gray-600">{{ document.document_number }}</p>
+            </div>
+
+            <!-- Document Information Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 print:mb-4">
+                <!-- Customer/Client Information -->
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-3 text-lg">
+                        {% if document.document_type == 'purchase_order' %}Supplier{% else %}Customer{% endif %} Information:
+                    </h3>
+                    <div class="space-y-2">
+                        <p class="text-gray-700"><strong>Name:</strong> {{ document.customer_name|default:"Not specified" }}</p>
+                        {% if document.customer_email %}
+                        <p class="text-gray-700"><strong>Email:</strong> {{ document.customer_email }}</p>
+                        {% endif %}
+                        {% if document.customer_phone %}
+                        <p class="text-gray-700"><strong>Phone:</strong> {{ document.customer_phone }}</p>
+                        {% endif %}
+                        {% if document.customer_address %}
+                        <p class="text-gray-700"><strong>Address:</strong> {{ document.customer_address }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Document Details -->
+                <div class="text-right">
+                    <h3 class="font-semibold text-gray-800 mb-3 text-lg">Document Details:</h3>
+                    <div class="space-y-2">
+                        <p class="text-gray-700"><strong>Number:</strong> {{ document.document_number }}</p>
+                        <p class="text-gray-700"><strong>Date:</strong> {{ document.issue_date|date:"F j, Y" }}</p>
+                        {% if document.due_date %}
+                        <p class="text-gray-700"><strong>Due Date:</strong> {{ document.due_date|date:"F j, Y" }}</p>
+                        {% endif %}
+                        <p class="text-gray-700"><strong>Status:</strong> 
+                            <span class="px-2 py-1 rounded text-sm font-medium
+                                {% if document.status == 'draft' %}bg-gray-100 text-gray-800
+                                {% elif document.status == 'sent' %}bg-blue-100 text-blue-800
+                                {% elif document.status == 'paid' %}bg-green-100 text-green-800
+                                {% elif document.status == 'overdue' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ document.get_status_display|default:"Draft" }}
+                            </span>
+                        </p>
+                        <p class="text-gray-700"><strong>Created by:</strong> {{ document.created_by.get_full_name|default:document.created_by.username }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="mb-6 print:mb-4">
+                <h3 class="font-semibold text-gray-800 mb-3 text-lg">Items:</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left font-semibold">Item</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-semibold">SKU</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-semibold">Qty</th>
+                                <th class="border border-gray-300 px-4 py-2 text-right font-semibold">Unit Price</th>
+                                <th class="border border-gray-300 px-4 py-2 text-right font-semibold">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in document.documentitem_set.all %}
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">{{ item.product.name }}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">{{ item.product.sku|default:"N/A" }}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">{{ item.quantity }}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-right">KSh {{ item.unit_price|floatformat:2 }}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-right">KSh {{ item.total_price|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="border border-gray-300 px-4 py-4 text-center text-gray-500">
+                                    No items found for this document.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Totals Section -->
+            <div class="flex justify-end mb-6 print:mb-4">
+                <div class="w-64">
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="font-medium">Subtotal:</span>
+                            <span>KSh {{ document.subtotal|default:0|floatformat:2 }}</span>
+                        </div>
+                        {% if document.tax_amount and document.tax_amount > 0 %}
+                        <div class="flex justify-between">
+                            <span class="font-medium">Tax:</span>
+                            <span>KSh {{ document.tax_amount|floatformat:2 }}</span>
+                        </div>
+                        {% endif %}
+                        {% if document.discount_amount and document.discount_amount > 0 %}
+                        <div class="flex justify-between">
+                            <span class="font-medium">Discount:</span>
+                            <span>KSh {{ document.discount_amount|floatformat:2 }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between font-bold text-lg border-t pt-2">
+                            <span>Total:</span>
+                            <span>KSh {{ document.total_amount|default:document.subtotal|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Specific Information -->
+            {% if document.document_type == 'quotation' %}
+            <div class="mb-6 print:mb-4">
+                <h3 class="font-semibold text-gray-800 mb-3 text-lg">Quotation Details:</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% if document.validity_period %}
+                    <div>
+                        <p class="text-gray-700"><strong>Validity Period:</strong> {{ document.validity_period }} days</p>
+                    </div>
+                    {% endif %}
+                    {% if document.delivery_terms %}
+                    <div>
+                        <p class="text-gray-700"><strong>Delivery Terms:</strong> {{ document.delivery_terms }}</p>
+                    </div>
+                    {% endif %}
+                    {% if document.payment_terms %}
+                    <div>
+                        <p class="text-gray-700"><strong>Payment Terms:</strong> {{ document.payment_terms }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if document.document_type == 'invoice' %}
+            <div class="mb-6 print:mb-4">
+                <h3 class="font-semibold text-gray-800 mb-3 text-lg">Invoice Details:</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% if document.due_date %}
+                    <div>
+                        <p class="text-gray-700"><strong>Due Date:</strong> {{ document.due_date|date:"F j, Y" }}</p>
+                    </div>
+                    {% endif %}
+                    {% if document.payment_terms %}
+                    <div>
+                        <p class="text-gray-700"><strong>Payment Terms:</strong> {{ document.payment_terms }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if document.document_type == 'receipt' %}
+            <div class="mb-6 print:mb-4">
+                <h3 class="font-semibold text-gray-800 mb-3 text-lg">Receipt Details:</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% if document.payment_method %}
+                    <div>
+                        <p class="text-gray-700"><strong>Payment Method:</strong> {{ document.payment_method|title }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if document.document_type == 'purchase_order' %}
+            <div class="mb-6 print:mb-4">
+                <h3 class="font-semibold text-gray-800 mb-3 text-lg">Purchase Order Details:</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% if document.due_date %}
+                    <div>
+                        <p class="text-gray-700"><strong>Delivery Date:</strong> {{ document.due_date|date:"F j, Y" }}</p>
+                    </div>
+                    {% endif %}
+                    {% if document.payment_terms %}
+                    <div>
+                        <p class="text-gray-700"><strong>Payment Terms:</strong> {{ document.payment_terms }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Notes Section -->
+            {% if document.notes %}
+            <div class="mb-6 print:mb-4">
+                <h3 class="font-semibold text-gray-800 mb-3 text-lg">Notes:</h3>
+                <div class="bg-gray-50 p-4 rounded-lg print:bg-transparent print:border print:border-gray-300">
+                    <p class="text-gray-700">{{ document.notes|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <div class="text-center text-sm text-gray-500 mt-8 print:mt-6">
+                <p>Thank you for your business!</p>
+                <p>For any questions, please contact us at 0726476128</p>
+                <p class="mt-2">Generated on {{ document.created_at|date:"F j, Y \a\t g:i A" }}</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-2 justify-center print:hidden">
+            <a href="{% url 'inventory:download_document_pdf' document.pk %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-download mr-2"></i>Download PDF
+            </a>
+            <button onclick="window.print()" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-print mr-2"></i>Print Document
+            </button>
+            <a href="{% url 'inventory:email_document' document.pk %}" 
+               class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-envelope mr-2"></i>Email Document
+            </a>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+<!-- Print Styles -->
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .container, .container * {
+        visibility: visible;
+    }
+    .container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .bg-white {
+        background: white !important;
+        box-shadow: none !important;
+    }
+    .border {
+        border: 1px solid #000 !important;
+    }
+    .text-gray-800 {
+        color: #000 !important;
+    }
+    .text-gray-700 {
+        color: #333 !important;
+    }
+    .text-gray-600 {
+        color: #666 !important;
+    }
+    .text-gray-500 {
+        color: #888 !important;
+    }
+    .bg-gray-100 {
+        background: #f5f5f5 !important;
+    }
+    .bg-gray-50 {
+        background: #fafafa !important;
+    }
+    .font-bold {
+        font-weight: bold !important;
+    }
+    .font-semibold {
+        font-weight: 600 !important;
+    }
+    .font-medium {
+        font-weight: 500 !important;
+    }
+    .rounded-lg {
+        border-radius: 0 !important;
+    }
+    .shadow-md {
+        box-shadow: none !important;
+    }
+    .print\:hidden {
+        display: none !important;
+    }
+    .print\:mb-4 {
+        margin-bottom: 1rem !important;
+    }
+    .print\:mb-6 {
+        margin-bottom: 1.5rem !important;
+    }
+    .print\:p-0 {
+        padding: 0 !important;
+    }
+    .print\:border-0 {
+        border: none !important;
+    }
+    .print\:bg-transparent {
+        background: transparent !important;
+    }
+    .print\:border {
+        border: 1px solid #000 !important;
+    }
+    .print\:border-gray-300 {
+        border-color: #000 !important;
+    }
+}
+</style>
+{% endblock %}

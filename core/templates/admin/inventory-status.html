@@ -1,0 +1,308 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Inventory Status - Nicmah Agrovet{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .inventory-container {
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+    }
+    
+    .inventory-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .inventory-header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .inventory-header p {
+        font-size: 1.2rem;
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .inventory-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .inventory-card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: bold;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 10px;
+    }
+    
+    .alert-item, .movement-item, .expiry-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        border-left: 4px solid #FF5722;
+    }
+    
+    .movement-item {
+        border-left-color: #2196F3;
+    }
+    
+    .expiry-item {
+        border-left-color: #FF9800;
+    }
+    
+    .alert-item:last-child, .movement-item:last-child, .expiry-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .item-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #FF5722;
+    }
+    
+    .movement-item .item-title {
+        color: #2196F3;
+    }
+    
+    .expiry-item .item-title {
+        color: #FF9800;
+    }
+    
+    .item-details {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        line-height: 1.4;
+    }
+    
+    .stock-level {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .stock-critical {
+        background: rgba(244, 67, 54, 0.3);
+        color: #F44336;
+    }
+    
+    .stock-low {
+        background: rgba(255, 152, 0, 0.3);
+        color: #FF9800;
+    }
+    
+    .stock-warning {
+        background: rgba(255, 193, 7, 0.3);
+        color: #FFC107;
+    }
+    
+    .back-btn {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .quick-actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .action-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        display: block;
+    }
+    
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .inventory-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="inventory-container">
+    <!-- Back Button -->
+    <a href="{% url 'admin:index' %}" class="back-btn">← Back to Dashboard</a>
+    
+    <!-- Inventory Header -->
+    <div class="inventory-header">
+        <h1>📦 Inventory Status</h1>
+        <p>Real-time monitoring of stock levels and movements</p>
+        <p>Low stock alerts, recent activities, and expiry management</p>
+    </div>
+
+    <!-- Inventory Grid -->
+    <div class="inventory-grid">
+        <!-- Low Stock Alerts -->
+        <div class="inventory-card">
+            <div class="card-title">🚨 Low Stock Alerts</div>
+            {% if low_stock_products %}
+                {% for product in low_stock_products %}
+                <div class="alert-item">
+                    <div class="item-title">
+                        {{ product.name }}
+                        {% if product.stock_quantity <= 5 %}
+                            <span class="stock-level stock-critical">Critical</span>
+                        {% elif product.stock_quantity <= 10 %}
+                            <span class="stock-level stock-low">Low</span>
+                        {% else %}
+                            <span class="stock-level stock-warning">Warning</span>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <strong>SKU:</strong> {{ product.sku }}<br>
+                        <strong>Current Stock:</strong> {{ product.stock_quantity }}<br>
+                        <strong>Reorder Level:</strong> {{ product.reorder_level|default:"Not set" }}<br>
+                        <strong>Category:</strong> {{ product.category.name|default:"Uncategorized" }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert-item">
+                    <div class="item-title">All Stock Levels OK</div>
+                    <div class="item-details">
+                        No products are currently below reorder levels.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Stock Movements -->
+        <div class="inventory-card">
+            <div class="card-title">📊 Recent Stock Movements</div>
+            {% if recent_movements %}
+                {% for movement in recent_movements %}
+                <div class="movement-item">
+                    <div class="item-title">
+                        {{ movement.movement_type|title }} - {{ movement.product.name }}
+                    </div>
+                    <div class="item-details">
+                        <strong>Quantity:</strong> {{ movement.quantity }}<br>
+                        <strong>User:</strong> {{ movement.user.get_full_name }}<br>
+                        <strong>Date:</strong> {{ movement.created_at|date:"M d, Y H:i" }}<br>
+                        {% if movement.reason %}
+                            <strong>Reason:</strong> {{ movement.reason }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="movement-item">
+                    <div class="item-title">No Recent Movements</div>
+                    <div class="item-details">
+                        No stock movements recorded recently.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Expiring Products -->
+        <div class="inventory-card">
+            <div class="card-title">⏰ Expiring Products</div>
+            {% if expiring_products %}
+                {% for product in expiring_products %}
+                <div class="expiry-item">
+                    <div class="item-title">
+                        {{ product.name }}
+                    </div>
+                    <div class="item-details">
+                        <strong>SKU:</strong> {{ product.sku }}<br>
+                        <strong>Expiry Date:</strong> {{ product.expiry_date|date:"M d, Y" }}<br>
+                        <strong>Days Left:</strong> 
+                        {% with days_left=product.expiry_date|timeuntil %}
+                            {{ days_left }}
+                        {% endwith %}<br>
+                        <strong>Current Stock:</strong> {{ product.stock_quantity }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="expiry-item">
+                    <div class="item-title">No Expiring Products</div>
+                    <div class="item-details">
+                        All products have valid expiry dates or no expiry dates set.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="inventory-card">
+            <div class="card-title">⚡ Quick Actions</div>
+            <div class="quick-actions">
+                <a href="{% url 'admin:catalog-product-changelist' %}" class="action-btn">
+                    📦 Manage Products
+                </a>
+                <a href="{% url 'admin:inventory-stockmovement-changelist' %}" class="action-btn">
+                    📊 View All Movements
+                </a>
+                <a href="{% url 'admin:inventory-stockalert-changelist' %}" class="action-btn">
+                    🚨 Stock Alerts
+                </a>
+                <a href="{% url 'admin:inventory-purchaseorder-changelist' %}" class="action-btn">
+                    📋 Purchase Orders
+                </a>
+                <a href="{% url 'admin:inventory-supplier-changelist' %}" class="action-btn">
+                    🏢 Manage Suppliers
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

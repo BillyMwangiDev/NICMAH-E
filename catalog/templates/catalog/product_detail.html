@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<!-- Product Detail Header -->
+<section class="bg-gradient-to-r from-agro-dark to-agro-green text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center space-x-4">
+            <a href="{% url 'catalog:product_list' %}" class="text-green-100 hover:text-white transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Products
+            </a>
+            <span class="text-green-100">/</span>
+            <span class="text-green-100">{{ product.category.name }}</span>
+            <span class="text-green-100">/</span>
+            <span class="text-white">{{ product.name }}</span>
+        </div>
+    </div>
+</section>
+
+<!-- Product Detail Content -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Product Images -->
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" 
+                             alt="{{ product.name }}"
+                             class="w-full h-96 object-cover">
+                    {% else %}
+                        <div class="w-full h-96 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                            <i class="fas fa-seedling text-6xl text-agro-green"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Additional Images -->
+                {% if product.images.count > 1 %}
+                <div class="grid grid-cols-4 gap-2">
+                    {% for image in product.images.all|slice:":4" %}
+                    <div class="bg-white rounded-lg overflow-hidden">
+                        <img src="{{ image.image.url }}" 
+                             alt="{{ product.name }}"
+                             class="w-full h-24 object-cover">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Product Info -->
+            <div class="space-y-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ product.name }}</h1>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <span class="inline-block bg-green-100 text-agro-green text-sm px-3 py-1 rounded-full font-medium">
+                            {{ product.category.name }}
+                        </span>
+                        <span class="text-sm text-gray-500">SKU: {{ product.sku }}</span>
+                    </div>
+                    
+                    <!-- Stock Status -->
+                    <div class="mb-4">
+                        {% if product.stock_quantity > 0 %}
+                            {% if product.is_low_stock %}
+                                <span class="bg-yellow-500 text-white text-sm px-3 py-1 rounded-full font-medium">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>Low Stock ({{ product.stock_quantity }} available)
+                                </span>
+                            {% else %}
+                                <span class="bg-green-500 text-white text-sm px-3 py-1 rounded-full font-medium">
+                                    <i class="fas fa-check mr-1"></i>In Stock ({{ product.stock_quantity }} available)
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="bg-red-500 text-white text-sm px-3 py-1 rounded-full font-medium">
+                                <i class="fas fa-times mr-1"></i>Out of Stock
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Price -->
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-3xl font-bold text-agro-green">KSh {{ product.price }}</span>
+                        {% if product.old_price %}
+                            <span class="text-lg text-gray-500 line-through">KSh {{ product.old_price }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Add to Cart Section -->
+                    {% if product.stock_quantity > 0 %}
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <label class="text-gray-700 font-medium">Quantity:</label>
+                                <div class="flex items-center space-x-2">
+                                    <button id="decrease-qty" class="bg-gray-100 hover:bg-gray-200 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                                        <i class="fas fa-minus text-xs"></i>
+                                    </button>
+                                    <input type="number" id="quantity-input" value="1" min="1" max="{{ product.stock_quantity }}" 
+                                           class="w-16 text-center border border-gray-300 rounded-lg py-1">
+                                    <button id="increase-qty" class="bg-gray-100 hover:bg-gray-200 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button onclick="addToCartWithQuantity()" 
+                                    class="w-full bg-agro-green text-white py-4 px-6 rounded-lg hover:bg-agro-dark transition-colors transform hover:scale-105 font-medium text-lg">
+                                <i class="fas fa-plus mr-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    {% else %}
+                        <button class="w-full bg-gray-300 text-gray-500 py-4 px-6 rounded-lg cursor-not-allowed font-medium text-lg">
+                            <i class="fas fa-times mr-2"></i>Out of Stock
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Product Description -->
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Description</h3>
+                    <div class="prose text-gray-600">
+                        {{ product.description|linebreaks }}
+                    </div>
+                </div>
+                
+                <!-- Product Specifications -->
+                {% if product.specifications %}
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Specifications</h3>
+                    <div class="prose text-gray-600">
+                        {{ product.specifications|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Products -->
+{% if related_products %}
+<section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Related Products</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for rp in related_products %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                    {% if rp.main_image %}
+                        <img src="{{ rp.main_image.url }}" 
+                             alt="{{ rp.name }}"
+                             class="w-full h-full object-cover">
+                    {% else %}
+                        <i class="fas fa-seedling text-3xl text-agro-green"></i>
+                    {% endif %}
+                </div>
+                <div class="p-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">
+                        <a href="{% url 'catalog:product_detail' rp.slug %}" class="hover:text-agro-green transition-colors">
+                            {{ rp.name }}
+                        </a>
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">{{ rp.description|truncatewords:10 }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-agro-green">KSh {{ rp.price }}</span>
+                        {% if rp.stock_quantity > 0 %}
+                            <button onclick="window.cart.addItem({{ rp.id }}, '{{ rp.name|escapejs }}', {{ rp.price }})" 
+                                    class="bg-agro-green text-white px-3 py-1 rounded-lg hover:bg-agro-dark transition-colors text-sm">
+                                <i class="fas fa-plus mr-1"></i>Add
+                            </button>
+                        {% else %}
+                            <span class="text-red-500 text-sm">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+// Quantity controls
+document.getElementById('decrease-qty').addEventListener('click', function() {
+    const input = document.getElementById('quantity-input');
+    const currentValue = parseInt(input.value);
+    if (currentValue > 1) {
+        input.value = currentValue - 1;
+    }
+});
+
+document.getElementById('increase-qty').addEventListener('click', function() {
+    const input = document.getElementById('quantity-input');
+    const currentValue = parseInt(input.value);
+    const maxValue = parseInt(input.getAttribute('max'));
+    if (currentValue < maxValue) {
+        input.value = currentValue + 1;
+    }
+});
+
+// Add to cart with quantity
+function addToCartWithQuantity() {
+    const quantity = parseInt(document.getElementById('quantity-input').value);
+    const productId = {{ product.id }};
+    const productName = '{{ product.name|escapejs }}';
+    const productPrice = {{ product.price }};
+    
+    window.cart.addItem(productId, productName, productPrice, quantity);
+}
+</script>
+{% endblock %}

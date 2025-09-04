@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quick Stock Receiving - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-green-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-display font-bold text-agro-dark">Quick Stock Receiving</h1>
+                    <p class="text-gray-600 mt-2">Scan or enter product details to quickly receive stock</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'inventory:dashboard' %}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Quick Receiving Form -->
+        <div class="bg-white rounded-xl shadow-lg border border-green-200 p-6 mb-8">
+            <h2 class="text-xl font-semibold text-agro-dark mb-6">Scan Product</h2>
+            
+            <form id="quick-receiving-form" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- SKU Input -->
+                <div>
+                    <label for="sku" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-barcode mr-2"></i>Product SKU
+                    </label>
+                    <input type="text" 
+                           id="sku" 
+                           name="sku" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-lg"
+                           placeholder="Scan or enter SKU"
+                           autocomplete="off">
+                </div>
+
+                <!-- Product Name Input -->
+                <div>
+                    <label for="product_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-box mr-2"></i>Product Name (if no SKU)
+                    </label>
+                    <input type="text" 
+                           id="product_name" 
+                           name="product_name" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-lg"
+                           placeholder="Enter product name"
+                           autocomplete="off">
+                </div>
+
+                <!-- Quantity Input -->
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-layer-group mr-2"></i>Quantity
+                    </label>
+                    <input type="number" 
+                           id="quantity" 
+                           name="quantity" 
+                           value="1"
+                           min="1"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-lg"
+                           placeholder="Enter quantity">
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex space-x-4">
+                    <button type="submit" 
+                            class="flex-1 bg-agro-green text-white py-3 px-6 rounded-lg font-semibold hover:bg-agro-dark transition-colors text-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Receive Stock
+                    </button>
+                    <button type="button" 
+                            onclick="clearForm()"
+                            class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-eraser mr-2"></i>
+                        Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden">
+            <div class="bg-white rounded-xl shadow-lg border border-green-200 p-6">
+                <h3 class="text-lg font-semibold text-agro-dark mb-4">Receiving Results</h3>
+                <div id="results-content"></div>
+            </div>
+        </div>
+
+        <!-- Recent Receivings -->
+        <div class="bg-white rounded-xl shadow-lg border border-green-200 p-6 mt-8">
+            <h3 class="text-lg font-semibold text-agro-dark mb-4">Recent Receivings</h3>
+            <div id="recent-receivings" class="space-y-3">
+                <!-- Recent receivings will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Stock Received Successfully!</h3>
+                <p id="success-message" class="text-gray-600 mb-6"></p>
+                <button onclick="closeSuccessModal()" 
+                        class="w-full bg-agro-green text-white py-2 px-4 rounded-lg font-semibold hover:bg-agro-dark transition-colors">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('quick-receiving-form');
+    const skuInput = document.getElementById('sku');
+    const productNameInput = document.getElementById('product_name');
+    const quantityInput = document.getElementById('quantity');
+    const resultsSection = document.getElementById('results-section');
+    const resultsContent = document.getElementById('results-content');
+    const successModal = document.getElementById('success-modal');
+    const successMessage = document.getElementById('success-message');
+
+    // Auto-focus SKU input
+    skuInput.focus();
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+        submitBtn.disabled = true;
+
+        fetch('{% url "inventory:quick_stock_receiving" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success modal
+                successMessage.textContent = data.message;
+                successModal.classList.remove('hidden');
+                
+                // Clear form
+                clearForm();
+                
+                // Update recent receivings
+                loadRecentReceivings();
+            } else {
+                // Show error
+                showError(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('An error occurred while processing the request.');
+        })
+        .finally(() => {
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+
+    // Auto-submit on SKU scan (when SKU field loses focus with content)
+    skuInput.addEventListener('blur', function() {
+        if (skuInput.value.trim() && quantityInput.value > 0) {
+            setTimeout(() => {
+                if (skuInput.value.trim()) {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }, 100);
+        }
+    });
+
+    // Load recent receivings on page load
+    loadRecentReceivings();
+});
+
+function clearForm() {
+    document.getElementById('sku').value = '';
+    document.getElementById('product_name').value = '';
+    document.getElementById('quantity').value = '1';
+    document.getElementById('sku').focus();
+}
+
+function showError(message) {
+    const resultsSection = document.getElementById('results-section');
+    const resultsContent = document.getElementById('results-content');
+    
+    resultsContent.innerHTML = `
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-red-600 mr-3"></i>
+                <span class="text-red-800">${message}</span>
+            </div>
+        </div>
+    `;
+    
+    resultsSection.classList.remove('hidden');
+}
+
+function closeSuccessModal() {
+    document.getElementById('success-modal').classList.add('hidden');
+}
+
+function loadRecentReceivings() {
+    // This would typically load from an API endpoint
+    // For now, we'll show a placeholder
+    const recentReceivings = document.getElementById('recent-receivings');
+    recentReceivings.innerHTML = `
+        <div class="text-center text-gray-500 py-8">
+            <i class="fas fa-history text-3xl mb-3"></i>
+            <p>Recent receivings will appear here</p>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

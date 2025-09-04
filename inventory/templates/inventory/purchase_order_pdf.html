@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Purchase Order {{ po.document_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .company-tagline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .company-info {
+            font-size: 12px;
+            color: #888;
+        }
+        .document-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .document-number {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .supplier-info, .po-info {
+            flex: 1;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .info-item {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 12px;
+        }
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2) {
+            text-align: center;
+        }
+        .totals {
+            float: right;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .total-row.final {
+            font-weight: bold;
+            font-size: 14px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            margin-top: 10px;
+        }
+        .po-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .po-details h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .po-details p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .delivery-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+        }
+        .delivery-info h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #0066cc;
+        }
+        .delivery-info p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .terms {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .terms h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .terms ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .terms li {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #666;
+        }
+        .delivery-date {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            text-align: center;
+            color: #155724;
+        }
+        .qr-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .signature-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            width: 45%;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        .signature-line {
+            border-bottom: 1px solid #333;
+            height: 30px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{ company_name }}</div>
+        <div class="company-tagline">Quality Agricultural Solutions</div>
+        <div class="company-info">{{ company_address }}</div>
+        <div class="company-info">Phone: {{ company_phone }} | Email: {{ company_email }}</div>
+    </div>
+
+    <div class="document-title">PURCHASE ORDER</div>
+    <div class="document-number">{{ po.document_number }}</div>
+
+    <div class="info-grid">
+        <div class="supplier-info">
+            <div class="section-title">Supplier Information</div>
+            <div class="info-item"><strong>Name:</strong> {{ po.customer_name|default:"Not specified" }}</div>
+            {% if po.customer_email %}
+            <div class="info-item"><strong>Email:</strong> {{ po.customer_email }}</div>
+            {% endif %}
+            {% if po.customer_phone %}
+            <div class="info-item"><strong>Phone:</strong> {{ po.customer_phone }}</div>
+            {% endif %}
+            {% if po.customer_address %}
+            <div class="info-item"><strong>Address:</strong> {{ po.customer_address }}</div>
+            {% endif %}
+        </div>
+        <div class="po-info">
+            <div class="section-title">Purchase Order Details</div>
+            <div class="info-item"><strong>PO #:</strong> {{ po.document_number }}</div>
+            <div class="info-item"><strong>Date:</strong> {{ po.issue_date|date:"F j, Y" }}</div>
+            {% if po.due_date %}
+            <div class="info-item"><strong>Delivery Date:</strong> {{ po.due_date|date:"F j, Y" }}</div>
+            {% endif %}
+            <div class="info-item"><strong>Status:</strong> {{ po.get_status_display|default:"Draft" }}</div>
+        </div>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>KSh {{ item.unit_price|floatformat:2 }}</td>
+                <td>KSh {{ item.total_price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <div class="total-row">
+            <span>Subtotal:</span>
+            <span>KSh {{ po.subtotal|default:0|floatformat:2 }}</span>
+        </div>
+        <div class="total-row final">
+            <span>Total:</span>
+            <span>KSh {{ po.total_amount|default:po.subtotal|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    <div class="po-details">
+        <h3>Purchase Order Details</h3>
+        {% if po.due_date %}
+        <p><strong>Delivery Date:</strong> {{ po.due_date|date:"F j, Y" }}</p>
+        {% endif %}
+        {% if po.payment_terms %}
+        <p><strong>Payment Terms:</strong> {{ po.payment_terms }}</p>
+        {% endif %}
+    </div>
+
+    <div class="delivery-info">
+        <h3>Delivery Information</h3>
+        <p><strong>Delivery Address:</strong> {{ company_address }}</p>
+        <p><strong>Contact Person:</strong> {{ company_name }} Team</p>
+        <p><strong>Phone:</strong> {{ company_phone }}</p>
+        <p><strong>Email:</strong> {{ company_email }}</p>
+    </div>
+
+    {% if po.due_date %}
+    <div class="delivery-date">
+        <strong>Expected Delivery: {{ po.due_date|date:"F j, Y" }}</strong>
+    </div>
+    {% endif %}
+
+    <div class="terms">
+        <h3>Terms and Conditions</h3>
+        <ul>
+            <li>All items must be delivered in good condition and as specified</li>
+            <li>Payment will be made within {{ po.payment_terms|default:"30 days" }} of delivery</li>
+            <li>Late deliveries may result in order cancellation</li>
+            <li>All prices are in Kenyan Shillings (KSh)</li>
+            <li>Quality standards must be maintained as per our specifications</li>
+            <li>Returns and exchanges are subject to our return policy</li>
+            <li>For any questions regarding this purchase order, please contact us immediately</li>
+        </ul>
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-box">
+            <p><strong>Authorized by:</strong></p>
+            <div class="signature-line"></div>
+            <p>Date: {{ po.issue_date|date:"F j, Y" }}</p>
+        </div>
+        <div class="signature-box">
+            <p><strong>Supplier Signature:</strong></p>
+            <div class="signature-line"></div>
+            <p>Date: _________________</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Thank you for your service!</p>
+        <p>For any questions regarding this purchase order, please contact us at {{ company_phone }}</p>
+        <p>Generated on {{ po.created_at|date:"F j, Y \a\t g:i A" }}</p>
+    </div>
+
+    <div class="qr-code">
+        <!-- QR code will be generated by the PDF generation function -->
+    </div>
+</body>
+</html>

@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Record Purchase - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .purchase-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .purchase-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .purchase-form {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .input-group {
+        margin-bottom: 20px;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .input-group input, .input-group select, .input-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+    
+    .info-box {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-box h3 {
+        color: #0c4a6e;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-box .icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .info-box ul {
+        color: #0c4a6e;
+        margin: 0;
+        padding-left: 20px;
+    }
+    
+    .info-box li {
+        margin-bottom: 8px;
+    }
+    
+    .recent-purchases {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .recent-purchases h3 {
+        color: #1f2937;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .purchase-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .purchase-item {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 4px solid #10b981;
+    }
+    
+    .purchase-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .purchase-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .purchase-product {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 1.1rem;
+    }
+    
+    .purchase-quantity {
+        background: #10b981;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .purchase-details {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .purchase-date {
+        color: #9ca3af;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="purchase-container">
+    <!-- Purchase Header -->
+    <div class="purchase-header">
+        <h1 class="text-3xl font-bold mb-2">
+            <i class="fas fa-shopping-cart mr-3"></i>
+            Record Product Purchase
+        </h1>
+        <p class="text-lg opacity-90">
+            Record when products are bought and add them to inventory
+        </p>
+    </div>
+
+    <!-- Information Box -->
+    <div class="info-box">
+        <h3>
+            <i class="fas fa-info-circle icon"></i>
+            How to Record Purchases
+        </h3>
+        <ul>
+            <li><strong>Product Name:</strong> Enter the exact product name (SKU is optional)</li>
+            <li><strong>Quantity:</strong> How many units were purchased</li>
+            <li><strong>Unit Cost:</strong> Cost per unit from supplier</li>
+            <li><strong>Supplier:</strong> Who you bought from (optional)</li>
+            <li><strong>Notes:</strong> Any additional information about the purchase</li>
+        </ul>
+        <p class="mt-3 text-sm">
+            <strong>Note:</strong> If the product doesn't exist, it will be created automatically with a 30% markup for retail pricing.
+        </p>
+    </div>
+
+    <!-- Purchase Form -->
+    <div class="purchase-form">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Purchase Details</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="product_name">Product Name *</label>
+                    <input type="text" id="product_name" name="product_name" required
+                           placeholder="Enter product name" autocomplete="off">
+                </div>
+                
+                <div class="input-group">
+                    <label for="quantity">Quantity *</label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" step="1" required>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="unit_cost">Unit Cost ($) *</label>
+                    <input type="number" id="unit_cost" name="unit_cost" value="0.00" min="0" step="0.01" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="supplier">Supplier (Optional)</label>
+                    <input type="text" id="supplier" name="supplier" placeholder="Supplier name">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="notes">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Additional information about this purchase"></textarea>
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="btn btn-success mr-4">
+                    <i class="fas fa-save mr-2"></i>
+                    Record Purchase
+                </button>
+                <a href="{% url 'inventory:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Recent Purchases -->
+    <div class="recent-purchases">
+        <h3>📦 Recent Purchases</h3>
+        <div class="purchase-list">
+            {% for movement in recent_purchases %}
+            <div class="purchase-item">
+                <div class="purchase-header-row">
+                    <div class="purchase-product">{{ movement.product.name }}</div>
+                    <div class="purchase-quantity">+{{ movement.quantity }}</div>
+                </div>
+                <div class="purchase-details">
+                    {% if movement.notes %}
+                        {{ movement.notes }}
+                    {% else %}
+                        Stock purchased and added to inventory
+                    {% endif %}
+                </div>
+                <div class="purchase-date">
+                    {{ movement.created_at|date:"M d, Y H:i" }} by {{ movement.user.username }}
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-500 py-8">
+                <i class="fas fa-inbox text-4xl mb-4"></i>
+                <p>No recent purchases recorded yet.</p>
+                <p class="text-sm">Start recording purchases above to see them here.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focus on product name field
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('product_name').focus();
+    
+    // Auto-submit when Enter is pressed in product name field
+    document.getElementById('product_name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('form').submit();
+        }
+    });
+});
+
+// Format unit cost input
+document.getElementById('unit_cost').addEventListener('blur', function() {
+    const value = parseFloat(this.value);
+    if (!isNaN(value)) {
+        this.value = value.toFixed(2);
+    }
+});
+</script>
+{% endblock %}

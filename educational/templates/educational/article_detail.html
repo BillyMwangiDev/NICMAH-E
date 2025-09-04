@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }} - {{ site_name }}{% endblock %}
+{% block meta_description %}{{ article.excerpt|default:article.content|striptags|truncatechars:160 }}{% endblock %}
+{% block og_title %}{{ article.title }}{% endblock %}
+{% block og_description %}{{ article.excerpt|default:article.content|striptags|truncatechars:160 }}{% endblock %}
+{% block extra_css %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ article.title|escapejs }}",
+  "datePublished": "{{ article.published_at|date:'c' }}",
+  "dateModified": "{{ article.updated_at|date:'c' }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ article.author.get_full_name|default:article.author.username|escapejs }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site_name|escapejs }}"
+  }
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="blog-page">
+  <div class="container py-4 reading-container">
+  <div class="row">
+    <div class="col-lg-8">
+      <a href="/educational/" class="btn btn-outline-success btn-sm mb-3">← Back to blog</a>
+      <h1 class="h3">{{ article.title }}</h1>
+      <div class="text-muted mb-3">
+        {{ article.published_at|date:'M d, Y' }} ·
+        {{ article.content|striptags|length|divisibleby:200 }}
+      </div>
+      {% if article.image %}
+      <img class="img-fluid rounded mb-3" src="{{ article.image.url }}" alt="{{ article.title }}">
+      {% endif %}
+      <div class="card border-0 shadow-sm article-detail-card">
+        <div class="card-body">
+          {# Treat content as trusted HTML produced by staff. If user-generated, sanitize beforehand. #}
+          {{ article.content|safe }}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <aside class="ps-lg-4 mt-4 mt-lg-0">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-2">About the author</h5>
+            <p class="mb-0 small">{{ article.author.get_full_name|default:article.author.username }}</p>
+          </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-2">Published</h5>
+            <p class="small text-muted mb-0">{{ article.published_at|date:'M d, Y H:i' }}</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  </div>
+</div>
+{% endblock %}

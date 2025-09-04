@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventory Documents - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Document Management</h1>
+            <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                <a href="{% url 'inventory:generate_quotation_from_products' %}" 
+                   class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-file-alt mr-2"></i>Generate Quotation
+                </a>
+                <a href="{% url 'inventory:generate_receipt' %}" 
+                   class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-receipt mr-2"></i>Generate Receipt
+                </a>
+                <a href="{% url 'inventory:generate_invoice' %}" 
+                   class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-file-invoice mr-2"></i>Generate Invoice
+                </a>
+                <a href="{% url 'inventory:generate_purchase_order' %}" 
+                   class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base">
+                    <i class="fas fa-shopping-cart mr-2"></i>Generate PO
+                </a>
+            </div>
+        </div>
+
+        {% if not documents_available %}
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <p><i class="fas fa-exclamation-triangle mr-2"></i>Document system is not available. Please ensure the documents app is properly configured.</p>
+        </div>
+        {% else %}
+        
+        <!-- Filters -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <form method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
+                    <select name="type" id="type" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">All Types</option>
+                        {% for type_code, type_name in document_types %}
+                        <option value="{{ type_code }}" {% if filters.type == type_code %}selected{% endif %}>{{ type_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" id="status" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">All Status</option>
+                        {% for status_code, status_name in status_choices %}
+                        <option value="{{ status_code }}" {% if filters.status == status_code %}selected{% endif %}>{{ status_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <input type="text" name="search" id="search" value="{{ filters.search }}" 
+                           placeholder="Document number, customer..." 
+                           class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                
+                <div class="flex items-end">
+                    <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition duration-200 text-sm sm:text-base">
+                        <i class="fas fa-search mr-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Documents Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Document</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for document in page_obj %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ document.document_number }}</div>
+                            <div class="text-sm text-gray-500">{{ document.title|default:"No title" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ document.customer_name }}</div>
+                            <div class="text-sm text-gray-500">{{ document.customer_email|default:"" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if document.document_type == 'receipt' %}bg-green-100 text-green-800
+                                {% elif document.document_type == 'quotation' %}bg-blue-100 text-blue-800
+                                {% elif document.document_type == 'invoice' %}bg-purple-100 text-purple-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ document.get_document_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            KSh {{ document.total_amount|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if document.status == 'draft' %}bg-gray-100 text-gray-800
+                                {% elif document.status == 'sent' %}bg-blue-100 text-blue-800
+                                {% elif document.status == 'paid' %}bg-green-100 text-green-800
+                                {% elif document.status == 'overdue' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ document.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ document.created_at|date:"M d, Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex flex-wrap gap-2">
+                                <a href="{% url 'inventory:view_document' document.pk %}" 
+                                   class="text-blue-600 hover:text-blue-900 p-1" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'inventory:download_document_pdf' document.pk %}" 
+                                   class="text-green-600 hover:text-green-900 p-1" title="Download PDF">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <a href="{% url 'inventory:email_document' document.pk %}" 
+                                   class="text-purple-600 hover:text-purple-900 p-1" title="Email">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <a href="{% url 'inventory:print_document' document.pk %}" 
+                                   class="text-orange-600 hover:text-orange-900 p-1" title="Print">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-file-alt text-4xl mb-2"></i>
+                            <p>No documents found.</p>
+                            <p class="text-sm mt-2">Create your first document by generating a quotation or receipt.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="mt-6 flex justify-center">
+            <nav class="flex flex-col sm:flex-row items-center gap-2 sm:space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if filters.type %}&type={{ filters.type }}{% endif %}{% if filters.status %}&status={{ filters.status }}{% endif %}{% if filters.search %}&search={{ filters.search }}{% endif %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+                
+                <span class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if filters.type %}&type={{ filters.type }}{% endif %}{% if filters.status %}&status={{ filters.status }}{% endif %}{% if filters.search %}&search={{ filters.search }}{% endif %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+        
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

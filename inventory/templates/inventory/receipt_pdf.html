@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Receipt {{ receipt.document_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .company-tagline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .company-info {
+            font-size: 12px;
+            color: #888;
+        }
+        .document-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .document-number {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .customer-info, .receipt-info {
+            flex: 1;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .info-item {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 12px;
+        }
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2) {
+            text-align: center;
+        }
+        .totals {
+            float: right;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .total-row.final {
+            font-weight: bold;
+            font-size: 14px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #666;
+        }
+        .payment-method {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .notes {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .qr-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{ company_name }}</div>
+        <div class="company-tagline">Quality Agricultural Solutions</div>
+        <div class="company-info">{{ company_address }}</div>
+        <div class="company-info">Phone: {{ company_phone }} | Email: {{ company_email }}</div>
+    </div>
+
+    <div class="document-title">RECEIPT</div>
+    <div class="document-number">{{ receipt.document_number }}</div>
+
+    <div class="info-grid">
+        <div class="customer-info">
+            <div class="section-title">Customer Information</div>
+            <div class="info-item"><strong>Name:</strong> {{ receipt.customer_name|default:"Not specified" }}</div>
+            {% if receipt.customer_email %}
+            <div class="info-item"><strong>Email:</strong> {{ receipt.customer_email }}</div>
+            {% endif %}
+            {% if receipt.customer_phone %}
+            <div class="info-item"><strong>Phone:</strong> {{ receipt.customer_phone }}</div>
+            {% endif %}
+        </div>
+        <div class="receipt-info">
+            <div class="section-title">Receipt Details</div>
+            <div class="info-item"><strong>Receipt #:</strong> {{ receipt.document_number }}</div>
+            <div class="info-item"><strong>Date:</strong> {{ receipt.issue_date|date:"F j, Y" }}</div>
+            <div class="info-item"><strong>Time:</strong> {{ receipt.created_at|date:"g:i A" }}</div>
+            {% if receipt.payment_method %}
+            <div class="info-item"><strong>Payment Method:</strong> {{ receipt.payment_method|title }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>KSh {{ item.unit_price|floatformat:2 }}</td>
+                <td>KSh {{ item.total_price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <div class="total-row">
+            <span>Subtotal:</span>
+            <span>KSh {{ receipt.subtotal|default:0|floatformat:2 }}</span>
+        </div>
+        {% if receipt.tax_amount and receipt.tax_amount > 0 %}
+        <div class="total-row">
+            <span>Tax:</span>
+            <span>KSh {{ receipt.tax_amount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+        {% if receipt.discount_amount and receipt.discount_amount > 0 %}
+        <div class="total-row">
+            <span>Discount:</span>
+            <span>KSh {{ receipt.discount_amount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+        <div class="total-row final">
+            <span>Total:</span>
+            <span>KSh {{ receipt.total_amount|default:receipt.subtotal|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    {% if receipt.payment_method %}
+    <div class="payment-method">
+        <strong>Payment Method:</strong> {{ receipt.payment_method|title }}
+    </div>
+    {% endif %}
+
+    {% if receipt.notes %}
+    <div class="notes">
+        <strong>Notes:</strong><br>
+        {{ receipt.notes|linebreaks }}
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>Thank you for your purchase!</p>
+        <p>For any questions, please contact us at {{ company_phone }}</p>
+        <p>Generated on {{ receipt.created_at|date:"F j, Y \a\t g:i A" }}</p>
+    </div>
+
+    <div class="qr-code">
+        <!-- QR code will be generated by the PDF generation function -->
+    </div>
+</body>
+</html>

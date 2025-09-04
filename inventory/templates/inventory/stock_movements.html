@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Stock Movements - Inventory Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-exchange-alt me-2"></i>
+                            Stock Movements
+                        </h4>
+                        <a href="{% url 'inventory:stock_movements' %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Refresh
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filters -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <label for="movement_type" class="form-label">Movement Type</label>
+                            <select class="form-select" id="movement_type">
+                                <option value="">All Types</option>
+                                <option value="purchase">Purchase</option>
+                                <option value="sale">Sale</option>
+                                <option value="adjustment">Adjustment</option>
+                                <option value="transfer">Transfer</option>
+                                <option value="return">Return</option>
+                                <option value="damaged">Damaged</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="product_filter" class="form-label">Product</label>
+                            <select class="form-select" id="product_filter">
+                                <option value="">All Products</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="date_from" class="form-label">From Date</label>
+                            <input type="date" class="form-control" id="date_from">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="date_to" class="form-label">To Date</label>
+                            <input type="date" class="form-control" id="date_to">
+                        </div>
+                    </div>
+
+                    <!-- Stock Movements Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Product</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Previous Stock</th>
+                                    <th>New Stock</th>
+                                    <th>Reference</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movement in stock_movements %}
+                                <tr>
+                                    <td>{{ movement.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if movement.product.image %}
+                                            <img src="{{ movement.product.image.url }}" alt="{{ movement.product.name }}" 
+                                                 class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-secondary rounded me-2 d-flex align-items-center justify-content-center" 
+                                                 style="width: 32px; height: 32px;">
+                                                <i class="fas fa-box text-white"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <div class="fw-bold">{{ movement.product.name }}</div>
+                                                <small class="text-muted">{{ movement.product.sku }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if movement.movement_type == 'purchase' %}
+                                        <span class="badge bg-success">Purchase</span>
+                                        {% elif movement.movement_type == 'sale' %}
+                                        <span class="badge bg-danger">Sale</span>
+                                        {% elif movement.movement_type == 'adjustment' %}
+                                        <span class="badge bg-warning">Adjustment</span>
+                                        {% elif movement.movement_type == 'transfer' %}
+                                        <span class="badge bg-info">Transfer</span>
+                                        {% elif movement.movement_type == 'return' %}
+                                        <span class="badge bg-primary">Return</span>
+                                        {% elif movement.movement_type == 'damaged' %}
+                                        <span class="badge bg-dark">Damaged</span>
+                                        {% elif movement.movement_type == 'expired' %}
+                                        <span class="badge bg-secondary">Expired</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ movement.movement_type|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold {% if movement.quantity > 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if movement.quantity > 0 %}+{% endif %}{{ movement.quantity }}
+                                        </span>
+                                    </td>
+                                    <td>{{ movement.previous_stock }}</td>
+                                    <td>{{ movement.new_stock }}</td>
+                                    <td>
+                                        {% if movement.reference_number %}
+                                        <small class="text-muted">{{ movement.reference_number }}</small>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if movement.notes %}
+                                        <small class="text-muted">{{ movement.notes|truncatechars:30 }}</small>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                                            <p>No stock movements found</p>
+                                            <small>Stock movements will appear here when inventory changes occur</small>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if stock_movements.has_other_pages %}
+                    <nav aria-label="Stock movements pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if stock_movements.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ stock_movements.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in stock_movements.paginator.page_range %}
+                            {% if stock_movements.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > stock_movements.number|add:'-3' and num < stock_movements.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if stock_movements.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ stock_movements.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const movementTypeFilter = document.getElementById('movement_type');
+    const productFilter = document.getElementById('product_filter');
+    const dateFromFilter = document.getElementById('date_from');
+    const dateToFilter = document.getElementById('date_to');
+
+    function applyFilters() {
+        const params = new URLSearchParams();
+        
+        if (movementTypeFilter.value) {
+            params.append('type', movementTypeFilter.value);
+        }
+        if (productFilter.value) {
+            params.append('product', productFilter.value);
+        }
+        if (dateFromFilter.value) {
+            params.append('date_from', dateFromFilter.value);
+        }
+        if (dateToFilter.value) {
+            params.append('date_to', dateToFilter.value);
+        }
+
+        const url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.location.href = url;
+    }
+
+    // Add event listeners
+    [movementTypeFilter, productFilter, dateFromFilter, dateToFilter].forEach(filter => {
+        filter.addEventListener('change', applyFilters);
+    });
+
+    // Set current filter values from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('type')) {
+        movementTypeFilter.value = urlParams.get('type');
+    }
+    if (urlParams.get('product')) {
+        productFilter.value = urlParams.get('product');
+    }
+    if (urlParams.get('date_from')) {
+        dateFromFilter.value = urlParams.get('date_from');
+    }
+    if (urlParams.get('date_to')) {
+        dateToFilter.value = urlParams.get('date_to');
+    }
+});
+</script>
+{% endblock %}

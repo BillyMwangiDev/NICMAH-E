@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}SKU Scanner - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .scanner-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .scanner-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .scanner-form {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .input-group {
+        margin-bottom: 20px;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .input-group input, .input-group select, .input-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .dual-input {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+    }
+    
+    .product-info {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        margin-top: 20px;
+    }
+    
+    .product-info h3 {
+        color: #1f2937;
+        margin-bottom: 15px;
+    }
+    
+    .product-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .detail-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .detail-label {
+        font-size: 12px;
+        color: #6b7280;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        font-size: 16px;
+        color: #1f2937;
+        font-weight: 600;
+    }
+    
+    .stock-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .stock-status.in-stock {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .stock-status.low-stock {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .stock-status.out-of-stock {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .quick-actions {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .quick-actions h3 {
+        color: #1f2937;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .action-card {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .action-card:hover {
+        border-color: #667eea;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+    }
+    
+    .action-card .icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #667eea;
+    }
+    
+    .action-card h4 {
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+    
+    .action-card p {
+        color: #6b7280;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="scanner-container">
+    <!-- Scanner Header -->
+    <div class="scanner-header">
+        <h1 class="text-3xl font-bold mb-2">
+            <i class="fas fa-barcode mr-3"></i>
+            SKU Scanner & Stock Management
+        </h1>
+        <p class="text-lg opacity-90">
+            Scan SKUs or enter product names to manage inventory
+        </p>
+    </div>
+
+    <!-- Scanner Form -->
+    <div class="scanner-form">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Product Lookup & Management</h2>
+        
+        <form method="post" id="scannerForm">
+            {% csrf_token %}
+            
+            <!-- Dual Input: SKU and Product Name -->
+            <div class="dual-input">
+                <div class="input-group">
+                    <label for="sku">SKU/Barcode (Optional)</label>
+                    <input type="text" id="sku" name="sku" value="{{ scanned_sku|default:'' }}" 
+                           placeholder="Scan or enter SKU" autocomplete="off">
+                </div>
+                
+                <div class="input-group">
+                    <label for="product_name">Product Name (Optional)</label>
+                    <input type="text" id="product_name" name="product_name" value="{{ product_name|default:'' }}" 
+                           placeholder="Enter product name" autocomplete="off">
+                </div>
+            </div>
+            
+            <!-- Action Selection -->
+            <div class="input-group">
+                <label for="action">Action</label>
+                <select id="action" name="action" onchange="toggleActionFields()">
+                    <option value="lookup">🔍 Lookup Product</option>
+                    <option value="receive_stock">📦 Receive Stock</option>
+                    <option value="adjust_stock">⚖️ Adjust Stock</option>
+                </select>
+            </div>
+            
+            <!-- Dynamic Fields Based on Action -->
+            <div id="receiveStockFields" style="display: none;">
+                <div class="input-group">
+                    <label for="quantity">Quantity to Receive</label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" rows="2" placeholder="Stock received via scanner"></textarea>
+                </div>
+            </div>
+            
+            <div id="adjustStockFields" style="display: none;">
+                <div class="input-group">
+                    <label for="adjustment_type">Adjustment Type</label>
+                    <select id="adjustment_type" name="adjustment_type">
+                        <option value="set">Set to Specific Amount</option>
+                        <option value="add">Add to Current Stock</option>
+                        <option value="subtract">Subtract from Current Stock</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="new_quantity">Quantity</label>
+                    <input type="number" id="new_quantity" name="new_quantity" value="0" min="0" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="adjust_notes">Notes</label>
+                    <textarea id="adjust_notes" name="notes" rows="2" placeholder="Stock adjustment via scanner"></textarea>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search mr-2"></i>
+                    Process Action
+                </button>
+                <button type="reset" class="btn btn-warning" onclick="resetForm()">
+                    <i class="fas fa-undo mr-2"></i>
+                    Reset Form
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Product Information Display -->
+    {% if product %}
+    <div class="product-info">
+        <h3>📦 Product Information</h3>
+        <div class="product-details">
+            <div class="detail-item">
+                <div class="detail-label">Product Name</div>
+                <div class="detail-value">{{ product.name }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">SKU</div>
+                <div class="detail-value">{{ product.sku|default:"No SKU" }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Category</div>
+                <div class="detail-value">{{ product.category.name|default:"Uncategorized" }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Current Stock</div>
+                <div class="detail-value">{{ product.stock_quantity|intcomma }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Unit Price</div>
+                <div class="detail-value">KSh {{ product.price|floatformat:2 }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Stock Status</div>
+                <div class="stock-status {% if product.stock_quantity == 0 %}out-of-stock{% elif product.stock_quantity <= product.min_stock_level %}low-stock{% else %}in-stock{% endif %}">
+                    {% if product.stock_quantity == 0 %}
+                        Out of Stock
+                    {% elif product.stock_quantity <= product.min_stock_level %}
+                        Low Stock
+                    {% else %}
+                        In Stock
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3>🚀 Quick Actions</h3>
+        <div class="action-grid">
+            <a href="{% url 'inventory:record_purchase' %}" class="action-card">
+                <div class="icon">💰</div>
+                <h4>Record Purchase</h4>
+                <p>Record when products are bought and add to stock</p>
+            </a>
+            
+            <a href="{% url 'inventory:quick_stock_receiving' %}" class="action-card">
+                <div class="icon">📦</div>
+                <h4>Quick Receiving</h4>
+                <p>Fast stock receiving for high-volume operations</p>
+            </a>
+            
+            <a href="{% url 'inventory:dashboard' %}" class="action-card">
+                <div class="icon">📊</div>
+                <h4>Inventory Dashboard</h4>
+                <p>View overall inventory status and analytics</p>
+            </a>
+            
+            <a href="{% url 'inventory:import_stock_data' %}" class="action-card">
+                <div class="icon">📥</div>
+                <h4>Import Stock</h4>
+                <p>Bulk import stock data from Excel files</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleActionFields() {
+    const action = document.getElementById('action').value;
+    const receiveFields = document.getElementById('receiveStockFields');
+    const adjustFields = document.getElementById('adjustStockFields');
+    
+    // Hide all fields first
+    receiveFields.style.display = 'none';
+    adjustFields.style.display = 'none';
+    
+    // Show relevant fields based on action
+    if (action === 'receive_stock') {
+        receiveFields.style.display = 'block';
+    } else if (action === 'adjust_stock') {
+        adjustFields.style.display = 'block';
+    }
+}
+
+function resetForm() {
+    document.getElementById('scannerForm').reset();
+    toggleActionFields();
+}
+
+// Auto-focus on SKU field when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('sku').focus();
+    
+    // Auto-submit when Enter is pressed in SKU field
+    document.getElementById('sku').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('scannerForm').submit();
+        }
+    });
+    
+    // Auto-submit when Enter is pressed in product name field
+    document.getElementById('product_name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('scannerForm').submit();
+        }
+    });
+});
+
+// Initialize fields on page load
+toggleActionFields();
+</script>
+{% endblock %}

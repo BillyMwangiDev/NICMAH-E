@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Quotation {{ quotation.document_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .company-tagline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .company-info {
+            font-size: 12px;
+            color: #888;
+        }
+        .document-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .document-number {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .customer-info, .quotation-info {
+            flex: 1;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .info-item {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 12px;
+        }
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2) {
+            text-align: center;
+        }
+        .totals {
+            float: right;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .total-row.final {
+            font-weight: bold;
+            font-size: 14px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            margin-top: 10px;
+        }
+        .quotation-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .quotation-details h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .quotation-details p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .terms {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .terms h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .terms ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .terms li {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #666;
+        }
+        .validity {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .qr-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{ company_name }}</div>
+        <div class="company-tagline">Quality Agricultural Solutions</div>
+        <div class="company-info">{{ company_address }}</div>
+        <div class="company-info">Phone: {{ company_phone }} | Email: {{ company_email }}</div>
+    </div>
+
+    <div class="document-title">QUOTATION</div>
+    <div class="document-number">{{ quotation.document_number }}</div>
+
+    <div class="info-grid">
+        <div class="customer-info">
+            <div class="section-title">Customer Information</div>
+            <div class="info-item"><strong>Name:</strong> {{ quotation.customer_name|default:"Not specified" }}</div>
+            {% if quotation.customer_email %}
+            <div class="info-item"><strong>Email:</strong> {{ quotation.customer_email }}</div>
+            {% endif %}
+            {% if quotation.customer_phone %}
+            <div class="info-item"><strong>Phone:</strong> {{ quotation.customer_phone }}</div>
+            {% endif %}
+            {% if quotation.customer_address %}
+            <div class="info-item"><strong>Address:</strong> {{ quotation.customer_address }}</div>
+            {% endif %}
+        </div>
+        <div class="quotation-info">
+            <div class="section-title">Quotation Details</div>
+            <div class="info-item"><strong>Quotation #:</strong> {{ quotation.document_number }}</div>
+            <div class="info-item"><strong>Date:</strong> {{ quotation.issue_date|date:"F j, Y" }}</div>
+            {% if quotation.validity_period %}
+            <div class="info-item"><strong>Valid Until:</strong> {{ quotation.issue_date|date:"F j, Y"|add_days:quotation.validity_period }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>KSh {{ item.unit_price|floatformat:2 }}</td>
+                <td>KSh {{ item.total_price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <div class="total-row">
+            <span>Subtotal:</span>
+            <span>KSh {{ quotation.subtotal|default:0|floatformat:2 }}</span>
+        </div>
+        {% if quotation.tax_amount and quotation.tax_amount > 0 %}
+        <div class="total-row">
+            <span>Tax:</span>
+            <span>KSh {{ quotation.tax_amount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+        {% if quotation.discount_amount and quotation.discount_amount > 0 %}
+        <div class="total-row">
+            <span>Discount:</span>
+            <span>KSh {{ quotation.discount_amount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
+        <div class="total-row final">
+            <span>Total:</span>
+            <span>KSh {{ quotation.total_amount|default:quotation.subtotal|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    <div class="quotation-details">
+        <h3>Quotation Details</h3>
+        {% if quotation.validity_period %}
+        <p><strong>Validity Period:</strong> {{ quotation.validity_period }} days from the date of issue</p>
+        {% endif %}
+        {% if quotation.delivery_terms %}
+        <p><strong>Delivery Terms:</strong> {{ quotation.delivery_terms }}</p>
+        {% endif %}
+        {% if quotation.payment_terms %}
+        <p><strong>Payment Terms:</strong> {{ quotation.payment_terms }}</p>
+        {% endif %}
+    </div>
+
+    <div class="terms">
+        <h3>Terms and Conditions</h3>
+        <ul>
+            <li>This quotation is valid for {{ quotation.validity_period|default:30 }} days from the date of issue</li>
+            <li>Prices are subject to change without prior notice after the validity period</li>
+            <li>Payment is required before delivery unless otherwise agreed</li>
+            <li>Delivery will be made within 3-5 business days after order confirmation</li>
+            <li>Returns and exchanges are subject to our return policy</li>
+            <li>All products come with standard warranty unless otherwise specified</li>
+        </ul>
+    </div>
+
+    <div class="validity">
+        <strong>This quotation is valid until {{ quotation.issue_date|date:"F j, Y"|add_days:quotation.validity_period|default:30 }}</strong>
+    </div>
+
+    <div class="footer">
+        <p>Thank you for considering our services!</p>
+        <p>For any questions or to place an order, please contact us at {{ company_phone }}</p>
+        <p>Generated on {{ quotation.created_at|date:"F j, Y \a\t g:i A" }}</p>
+    </div>
+
+    <div class="qr-code">
+        <!-- QR code will be generated by the PDF generation function -->
+    </div>
+</body>
+</html>

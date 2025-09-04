@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Email {{ document.document_type|title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Email {{ document.document_type|title }}</h1>
+            <a href="{% url 'inventory:view_document' document.pk %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Document
+            </a>
+        </div>
+
+        {% if not documents_available %}
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <p><i class="fas fa-exclamation-triangle mr-2"></i>Document system is not available.</p>
+        </div>
+        {% else %}
+
+        <!-- Document Preview -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-gray-800 mb-2">Document Preview:</h3>
+            <div class="text-sm text-gray-600">
+                <p><strong>Type:</strong> {{ document.document_type|title }}</p>
+                <p><strong>Number:</strong> {{ document.document_number }}</p>
+                <p><strong>Date:</strong> {{ document.issue_date|date:"F j, Y" }}</p>
+                <p><strong>Customer:</strong> {{ document.customer_name|default:"Not specified" }}</p>
+                <p><strong>Total:</strong> KSh {{ document.total_amount|default:document.subtotal|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <!-- Email Form -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Email Address -->
+            <div>
+                <label for="email_address" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                <input type="email" name="email_address" id="email_address" required
+                       value="{{ document.customer_email|default:'' }}"
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="recipient@example.com">
+                <p class="text-sm text-gray-500 mt-1">Enter the email address where you want to send this document.</p>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                <input type="text" name="subject" id="subject" required
+                       value="{{ document.document_type|title }} - {{ document.document_number }}"
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Document subject">
+                <p class="text-sm text-gray-500 mt-1">The subject line for the email.</p>
+            </div>
+
+            <!-- Message -->
+            <div>
+                <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                <textarea name="message" id="message" rows="6"
+                          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Enter your message here...">Dear {{ document.customer_name|default:"Valued Customer" }},
+
+Please find attached the {{ document.document_type|title }} {{ document.document_number }} dated {{ document.issue_date|date:"F j, Y" }}.
+
+{% if document.document_type == 'invoice' %}Payment is due by {{ document.due_date|date:"F j, Y" }}.{% endif %}
+{% if document.document_type == 'quotation' %}This quotation is valid for 30 days from the date of issue.{% endif %}
+
+If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+NICMAH AGROVET Team
+Phone: 0726476128/0740368581
+Email: nicmahagrovet@gmail.com</textarea>
+                <p class="text-sm text-gray-500 mt-1">The message body for the email. The document will be attached as a PDF.</p>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition duration-200 font-medium">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Email
+                </button>
+                <a href="{% url 'inventory:view_document' document.pk %}" 
+                   class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition duration-200 font-medium text-center">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+
+        <!-- Email Tips -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="font-semibold text-blue-800 mb-2">
+                <i class="fas fa-info-circle mr-2"></i>Email Tips:
+            </h4>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>• The document will be automatically attached as a PDF</li>
+                <li>• Make sure the email address is correct before sending</li>
+                <li>• You can customize the subject and message as needed</li>
+                <li>• The email will be sent from your system's default email configuration</li>
+            </ul>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Auto-fill email if customer email exists
+document.addEventListener('DOMContentLoaded', function() {
+    const customerEmail = '{{ document.customer_email }}';
+    if (customerEmail) {
+        document.getElementById('email_address').value = customerEmail;
+    }
+});
+</script>
+{% endblock %}
