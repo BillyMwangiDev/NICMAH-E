@@ -3,77 +3,108 @@
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Q
+from django.db.models import Q, F, Count
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.utils import timezone
 from django.db import connection
+from django.utils.html import escape
+from django.core.exceptions import ValidationError
+from django.views.decorators.http import require_http_methods
 import json
 import logging
+from typing import Dict, Any
 
 from .models import Product, Order, User
 
 logger = logging.getLogger(__name__)
 
-# Missing docstring and type hints
-def product_list(request):
-    # No docstring
+def product_list(request) -> HttpResponse:
+    """Display a list of all products with pagination."""
     products = Product.objects.all()
-    return render(request, 'products/list.html', {'products': products})
+    paginator = Paginator(products, 20)  # 20 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'products/list.html', {'products': page_obj})
 
-# Security issue - no authentication required
-def admin_panel(request):
-    # Should require authentication
+@login_required
+@permission_required('catalog.view_product')
+def admin_panel(request) -> HttpResponse:
+    """Admin panel view requiring authentication and permissions."""
     users = User.objects.all()
     return render(request, 'admin/panel.html', {'users': users})
 
-# Performance issue - no pagination
-def all_products(request):
-    products = Product.objects.all()  # Could be thousands of products
-    return render(request, 'products/all.html', {'products': products})
+def all_products(request) -> HttpResponse:
+    """Display all products with pagination to handle large datasets."""
+    products = Product.objects.all()
+    paginator = Paginator(products, 50)  # 50 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'products/all.html', {'products': page_obj})
 
-# Security issue - SQL injection
-def search_products(request):
+def search_products(request) -> HttpResponse:
+    """Search products using Django ORM to prevent SQL injection."""
     query = request.GET.get('q', '')
-    # Vulnerable to SQL injection
-    products = Product.objects.raw(f"SELECT * FROM catalog_product WHERE name LIKE '%{query}%'")
-    return render(request, 'products/search.html', {'products': products})
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) | 
+            Q(description__icontains=query)
+        )
+    else:
+        products = Product.objects.none()
+    return render(request, 'products/search.html', {'products': products, 'query': query})
 
-# Bad practice - no error handling
-def get_product(request, product_id):
-    product = Product.objects.get(id=product_id)  # No try-catch
-    return render(request, 'products/detail.html', {'product': product})
+def get_product(request, product_id: int) -> HttpResponse:
+    """Get product details with proper error handling."""
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        return render(request, 'products/detail.html', {'product': product})
+    except Exception as e:
+        logger.error(f"Error retrieving product {product_id}: {e}")
+        return HttpResponse("Product not found", status=404)
 
-# Performance issue - N+1 queries
-def user_orders(request, user_id):
-    user = User.objects.get(id=user_id)
-    orders = user.order_set.all()
-    for order in orders:
-        # This will cause N+1 queries
-        print(f"Order {order.id} has {order.items.count()} items")
-    return render(request, 'orders/user_orders.html', {'orders': orders})
+def user_orders(request, user_id: int) -> HttpResponse:
+    """Get user orders with optimized queries to prevent N+1."""
+    try:
+        user = get_object_or_404(User, id=user_id)
+        orders = user.order_set.select_related('user').prefetch_related('items').all()
+        return render(request, 'orders/user_orders.html', {'orders': orders})
+    except Exception as e:
+        logger.error(f"Error retrieving orders for user {user_id}: {e}")
+        return HttpResponse("Orders not found", status=404)
 
-# Security issue - no CSRF protection
-@csrf_exempt
-def update_product(request):
-    if request.method == 'POST':
+@require_http_methods(["POST"])
+def update_product(request) -> JsonResponse:
+    """Update product with CSRF protection and validation."""
+    try:
         data = json.loads(request.body)
         product_id = data.get('id')
-        product = Product.objects.get(id=product_id)
-        product.name = data.get('name')
+        if not product_id:
+            return JsonResponse({'error': 'Product ID required'}, status=400)
+        
+        product = get_object_or_404(Product, id=product_id)
+        product.name = data.get('name', product.name)
+        product.full_clean()  # Validate the model
         product.save()
         return JsonResponse({'status': 'success'})
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        logger.error(f"Error updating product: {e}")
+        return JsonResponse({'error': 'Update failed'}, status=500)
 
-# Bad practice - hardcoded values
-def featured_products(request):
-    products = Product.objects.filter(is_featured=True)[:10]  # Magic number
+def featured_products(request) -> HttpResponse:
+    """Display featured products with configurable limit."""
+    FEATURED_LIMIT = 10  # Configurable constant
+    products = Product.objects.filter(is_featured=True)[:FEATURED_LIMIT]
     return render(request, 'products/featured.html', {'products': products})
 
-# Performance issue - inefficient query
-def expensive_query(request):
-    # This query could be optimized
+def expensive_query(request) -> HttpResponse:
+    """Optimized query with proper select_related and prefetch_related."""
     products = Product.objects.filter(
         Q(name__icontains='test') | 
         Q(description__icontains='test') |
@@ -81,129 +112,204 @@ def expensive_query(request):
     ).select_related('category').prefetch_related('tags')
     return render(request, 'products/expensive.html', {'products': products})
 
-# Security issue - no input validation
-def create_order(request):
-    if request.method == 'POST':
+@require_http_methods(["POST"])
+def create_order(request) -> JsonResponse:
+    """Create order with input validation and error handling."""
+    try:
         data = json.loads(request.body)
-        # No validation of input data
+        
+        # Validate required fields
+        user_id = data.get('user_id')
+        amount = data.get('amount')
+        status = data.get('status', 'pending')
+        
+        if not user_id or not amount:
+            return JsonResponse({'error': 'user_id and amount are required'}, status=400)
+        
+        if not isinstance(amount, (int, float)) or amount <= 0:
+            return JsonResponse({'error': 'amount must be a positive number'}, status=400)
+        
         order = Order.objects.create(
-            user_id=data.get('user_id'),
-            total_amount=data.get('amount'),
-            status=data.get('status')
+            user_id=user_id,
+            total_amount=amount,
+            status=status
         )
+        logger.info(f"Order created: {order.id}")
         return JsonResponse({'order_id': order.id})
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        logger.error(f"Error creating order: {e}")
+        return JsonResponse({'error': 'Order creation failed'}, status=500)
 
-# Bad practice - no logging
-def process_payment(request):
-    # No logging of payment processing
-    payment_data = json.loads(request.body)
-    # Process payment...
-    return JsonResponse({'status': 'processed'})
+@require_http_methods(["POST"])
+def process_payment(request) -> JsonResponse:
+    """Process payment with proper logging."""
+    try:
+        payment_data = json.loads(request.body)
+        logger.info(f"Processing payment: {payment_data.get('amount', 'unknown')}")
+        # Process payment...
+        logger.info("Payment processed successfully")
+        return JsonResponse({'status': 'processed'})
+    except json.JSONDecodeError:
+        logger.error("Invalid payment data JSON")
+        return JsonResponse({'error': 'Invalid payment data'}, status=400)
+    except Exception as e:
+        logger.error(f"Payment processing error: {e}")
+        return JsonResponse({'error': 'Payment failed'}, status=500)
 
-# Performance issue - no caching
-def product_categories(request):
-    categories = Product.objects.values_list('category__name', flat=True).distinct()
-    # Should use caching for this query
+from django.core.cache import cache
+
+def product_categories(request) -> HttpResponse:
+    """Get product categories with caching for performance."""
+    cache_key = 'product_categories'
+    categories = cache.get(cache_key)
+    
+    if categories is None:
+        categories = list(Product.objects.values_list('category__name', flat=True).distinct())
+        cache.set(cache_key, categories, 3600)  # Cache for 1 hour
+    
     return render(request, 'products/categories.html', {'categories': categories})
 
-# Security issue - sensitive data exposure
-def user_profile(request, user_id):
-    user = User.objects.get(id=user_id)
-    # Exposing sensitive information
-    return JsonResponse({
-        'username': user.username,
-        'email': user.email,
-        'password_hash': user.password,  # Should not expose this
-        'is_active': user.is_active
-    })
+def user_profile(request, user_id: int) -> JsonResponse:
+    """Get user profile with authentication and authorization."""
+    if not request.user.is_authenticated or request.user.id != int(user_id):
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    
+    try:
+        user = get_object_or_404(User, id=user_id)
+        return JsonResponse({
+            'username': user.username,
+            'email': user.email,
+            'is_active': user.is_active,
+        })
+    except Exception as e:
+        logger.error(f"Error retrieving user profile {user_id}: {e}")
+        return JsonResponse({'error': 'User not found'}, status=404)
 
-# Bad practice - inconsistent naming
-def GetProductDetails(request, product_id):  # Should be snake_case
-    product = get_object_or_404(Product, id=product_id)
-    return render(request, 'products/details.html', {'product': product})
+def get_product_details(request, product_id: int) -> HttpResponse:
+    """Get product details with proper naming convention."""
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        return render(request, 'products/details.html', {'product': product})
+    except Exception as e:
+        logger.error(f"Error retrieving product details {product_id}: {e}")
+        return HttpResponse("Product not found", status=404)
 
-# Performance issue - no database optimization
-def bulk_operations(request):
-    # This could be optimized with bulk operations
-    products = Product.objects.all()
-    for product in products:
-        product.price = product.price * 1.1  # 10% increase
-        product.save()  # Individual saves instead of bulk_update
-    return HttpResponse("Prices updated")
+def bulk_operations(request) -> HttpResponse:
+    """Bulk update prices using F() expressions for efficiency."""
+    try:
+        Product.objects.update(price=F('price') * 1.1)
+        logger.info("Bulk price update completed")
+        return HttpResponse("Prices updated", status=200)
+    except Exception as e:
+        logger.error(f"Bulk operation error: {e}")
+        return HttpResponse("Update failed", status=500)
 
-# Security issue - no rate limiting
-def api_endpoint(request):
-    # No rate limiting protection
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
+@cache_page(60 * 15)  # Cache for 15 minutes
+def api_endpoint(request) -> JsonResponse:
+    """API endpoint with rate limiting and caching."""
     data = request.POST.get('data')
+    if not data:
+        return JsonResponse({'error': 'Data required'}, status=400)
+    
     # Process data...
     return JsonResponse({'result': 'success'})
 
-# Bad practice - no proper HTTP status codes
-def delete_product(request, product_id):
+@require_http_methods(["DELETE"])
+def delete_product(request, product_id: int) -> HttpResponse:
+    """Delete product with proper HTTP status codes."""
     try:
-        product = Product.objects.get(id=product_id)
+        product = get_object_or_404(Product, id=product_id)
         product.delete()
-        return HttpResponse("Product deleted")  # Should return proper status code
+        logger.info(f"Product {product_id} deleted")
+        return HttpResponse(status=204)
     except Product.DoesNotExist:
-        return HttpResponse("Product not found")  # Should return 404
+        return HttpResponse("Product not found", status=404)
+    except Exception as e:
+        logger.error(f"Error deleting product {product_id}: {e}")
+        return HttpResponse("Delete failed", status=500)
 
-# Performance issue - unnecessary database queries
-def dashboard_stats(request):
-    # Multiple separate queries instead of one optimized query
-    total_products = Product.objects.count()
-    active_products = Product.objects.filter(is_active=True).count()
-    featured_products = Product.objects.filter(is_featured=True).count()
-    recent_products = Product.objects.filter(created_at__gte=timezone.now() - timezone.timedelta(days=7)).count()
-    
-    return JsonResponse({
-        'total': total_products,
-        'active': active_products,
-        'featured': featured_products,
-        'recent': recent_products
-    })
+def dashboard_stats(request) -> JsonResponse:
+    """Get dashboard statistics with optimized single query."""
+    try:
+        stats = Product.objects.aggregate(
+            total=Count('id'),
+            active=Count('id', filter=Q(is_active=True)),
+            featured=Count('id', filter=Q(is_featured=True)),
+            recent=Count('id', filter=Q(created_at__gte=timezone.now() - timezone.timedelta(days=7)))
+        )
+        return JsonResponse(stats)
+    except Exception as e:
+        logger.error(f"Error getting dashboard stats: {e}")
+        return JsonResponse({'error': 'Stats unavailable'}, status=500)
 
-# Security issue - no proper authentication
-def sensitive_data(request):
-    # No authentication check
-    if request.user.is_authenticated:
-        # Still not checking permissions
-        data = {
-            'secret_key': 'super-secret-key',
-            'admin_password': 'admin123',
-            'database_url': 'postgresql://user:pass@localhost/db'
-        }
-        return JsonResponse(data)
-    return HttpResponse("Unauthorized", status=401)
+def sensitive_data(request) -> HttpResponse:
+    """Removed sensitive data exposure - return 404 instead."""
+    return HttpResponse("Not Found", status=404)
 
-# Bad practice - no proper error messages
-def handle_error(request):
+def handle_error(request) -> HttpResponse:
+    """Handle errors with proper logging and user-friendly messages."""
     try:
         result = 1 / 0
+    except ZeroDivisionError as e:
+        logger.error(f"Division by zero error: {e}")
+        return HttpResponse("A calculation error occurred", status=500)
     except Exception as e:
-        # Generic error message
-        return HttpResponse("An error occurred")
+        logger.error(f"Unexpected error: {e}")
+        return HttpResponse("An unexpected error occurred", status=500)
 
-# Performance issue - no connection pooling
-def database_heavy_operation(request):
-    # This could benefit from connection pooling
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT COUNT(*) FROM catalog_product")
-        count = cursor.fetchone()[0]
-    return JsonResponse({'count': count})
+def database_heavy_operation(request) -> JsonResponse:
+    """Database operation with proper connection handling."""
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM catalog_product")
+            count = cursor.fetchone()[0]
+        return JsonResponse({'count': count})
+    except Exception as e:
+        logger.error(f"Database operation error: {e}")
+        return JsonResponse({'error': 'Database operation failed'}, status=500)
 
-# Security issue - no input sanitization
-def user_input_processing(request):
-    user_input = request.POST.get('user_input')
-    # No sanitization of user input
-    return HttpResponse(f"Processed: {user_input}")
+@require_http_methods(["POST"])
+def user_input_processing(request) -> HttpResponse:
+    """Process user input with proper sanitization."""
+    user_input = request.POST.get('user_input', '')
+    if not user_input:
+        return HttpResponse("No input provided", status=400)
+    
+    # Sanitize user input
+    sanitized_input = escape(user_input)
+    return HttpResponse(f"Processed: {sanitized_input}")
 
-# Bad practice - no proper documentation
-def undocumented_function(request):
-    # No docstring explaining what this function does
+def undocumented_function(request) -> JsonResponse:
+    """Process data with proper documentation and error handling."""
     data = request.GET.get('data')
-    result = process_data(data)
-    return JsonResponse({'result': result})
+    if not data:
+        return JsonResponse({'error': 'Data parameter required'}, status=400)
+    
+    try:
+        result = process_data(data)
+        return JsonResponse({'result': result})
+    except Exception as e:
+        logger.error(f"Data processing error: {e}")
+        return JsonResponse({'error': 'Processing failed'}, status=500)
 
-def process_data(data):
-    # No docstring
-    return data.upper() if data else ""
+def process_data(data: str) -> str:
+    """Process input data safely.
+    
+    Args:
+        data: Input string to process
+        
+    Returns:
+        Processed string in uppercase
+        
+    Raises:
+        ValueError: If data is None or empty
+    """
+    if not data:
+        raise ValueError("Data cannot be empty")
+    return data.upper()

@@ -2,40 +2,43 @@
 <!-- This template contains intentional issues to test CodeRabbit suggestions -->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Test Page</title>
-    <!-- Missing meta tags -->
-    <!-- Missing viewport meta tag -->
-    <!-- Missing charset declaration -->
+    <!-- Prefer setting CSP via HTTP headers; meta is a fallback for demos -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
 </head>
 <body>
     <!-- Security issue - XSS vulnerability -->
-    <div id="user-input">{{ user_input|safe }}</div>
+    <div id="user-input">{{ user_input }}</div>
     
     <!-- Security issue - no CSRF token -->
     <form method="post" action="/submit">
+        {% csrf_token %}
         <input type="text" name="data">
         <button type="submit">Submit</button>
     </form>
     
     <!-- Accessibility issue - missing alt text -->
-    <img src="/static/images/logo.png">
+    <img src="/static/images/logo.png" alt="Company Logo">
     
     <!-- Performance issue - no lazy loading -->
-    <img src="/static/images/large-image.jpg">
+    <img src="/static/images/large-image.jpg" loading="lazy" alt="Large Image">
     
     <!-- Security issue - inline JavaScript -->
     <script>
-        var userData = "{{ user_data }}";  // XSS risk
-        document.write(userData);
+        const userData = "{{ user_data|escapejs }}";
+        document.getElementById('user-input').textContent = userData;
     </script>
     
     <!-- Bad practice - inline styles -->
-    <div style="color: red; font-size: 16px;">Inline styles are bad</div>
+    <div class="error-text">Inline styles are bad</div>
     
     <!-- Accessibility issue - no semantic HTML -->
-    <div class="button" onclick="submitForm()">Click me</div>
+    <button class="button" onclick="submitForm()">Click me</button>
     
     <!-- Performance issue - no minification -->
     <script src="/static/js/large-file.js"></script>
@@ -44,46 +47,49 @@
     <!-- Missing CSP headers -->
     
     <!-- Bad practice - hardcoded URLs -->
-    <a href="http://localhost:8000/admin/">Admin</a>
+    <a href="{% url 'admin:index' %}">Admin</a>
     
     <!-- Accessibility issue - no proper heading structure -->
-    <h3>Subheading</h3>
     <h1>Main heading</h1>
+    <h2>Subheading</h2>
     
     <!-- Performance issue - no image optimization -->
-    <img src="/static/images/unoptimized.png" width="1000" height="1000">
+    <img src="/static/images/unoptimized.png" width="1000" height="1000" alt="Unoptimized Image">
     
     <!-- Security issue - no input validation -->
-    <input type="text" name="search" value="{{ search_query }}">
+    <input type="text" name="search" value="{{ search_query|escape }}" maxlength="100">
     
     <!-- Bad practice - no proper error handling -->
-    <div id="error">{{ error_message }}</div>
+    <div id="error" class="error-message">{{ error_message|escape }}</div>
     
     <!-- Performance issue - no caching headers -->
     <!-- Missing cache control -->
     
     <!-- Accessibility issue - no ARIA labels -->
-    <button>Submit</button>
+    <button aria-label="Submit form">Submit</button>
     
     <!-- Security issue - no HTTPS enforcement -->
-    <script src="http://example.com/script.js"></script>
+    <script src="https://example.com/script.js"></script>
     
     <!-- Bad practice - no responsive design -->
-    <div style="width: 800px;">Fixed width</div>
+    <div class="responsive-container">Fixed width</div>
     
     <!-- Performance issue - no CDN usage -->
-    <script src="/static/js/jquery.js"></script>
+    <script src="https://cdn.example.com/jquery.js"></script>
     
     <!-- Security issue - no input sanitization -->
-    <div>{{ user_content }}</div>
+    <div>{{ user_content|escape }}</div>
     
     <!-- Bad practice - no proper form structure -->
-    <input type="text" name="name">
-    <input type="email" name="email">
-    <button type="submit">Send</button>
+    <form method="post" action="/contact">
+        {% csrf_token %}
+        <input type="text" name="name" required>
+        <input type="email" name="email" required>
+        <button type="submit">Send</button>
+    </form>
     
     <!-- Accessibility issue - no focus management -->
-    <div tabindex="-1">No focus</div>
+    <div tabindex="0" role="button" onkeypress="handleKeyPress(event)">No focus</div>
     
     <!-- Performance issue - no resource hints -->
     <!-- Missing preload/prefetch -->
@@ -92,20 +98,20 @@
     <!-- Missing secure and httpOnly flags -->
     
     <!-- Bad practice - no proper error pages -->
-    <div>Error: {{ error }}</div>
+    <div class="error-display">Error: {{ error|escape }}</div>
     
     <!-- Accessibility issue - no keyboard navigation -->
-    <div onclick="handleClick()">Click me</div>
+    <button onclick="handleClick()" onkeypress="handleKeyPress(event)">Click me</button>
     
     <!-- Performance issue - no critical CSS -->
     <link rel="stylesheet" href="/static/css/all.css">
     
     <!-- Security issue - no input length limits -->
-    <textarea name="comment"></textarea>
+    <textarea name="comment" maxlength="1000" placeholder="Enter your comment"></textarea>
     
     <!-- Bad practice - no proper HTML structure -->
-    <body>
-        <div>Nested body tag</div>
-    </body>
+    <div class="nested-content">
+        <div>Nested content</div>
+    </div>
 </body>
 </html>
