@@ -1,0 +1,151 @@
+# CodeRabbit Configuration
+# This file configures automated code reviews for your repository
+
+# Review settings
+review:
+  # Enable automated code reviews
+  enabled: true
+  
+  # Review all pull requests
+  auto_review: true
+  
+  # Review specific file types
+  file_types:
+    - "*.py"
+    - "*.js"
+    - "*.html"
+    - "*.css"
+    - "*.yml"
+    - "*.yaml"
+    - "*.md"
+    - "*.txt"
+  
+  # Exclude certain directories and files
+  exclude:
+    - "venv/"
+    - "__pycache__/"
+    - "*.pyc"
+    - "migrations/"
+    - "staticfiles/"
+    - "logs/"
+    - ".git/"
+    - "node_modules/"
+    - "*.log"
+    - "db.sqlite3"
+
+# AI Assistant settings
+assistant:
+  # Enable AI assistant for code suggestions
+  enabled: true
+  
+  # Language-specific settings
+  python:
+    # Check for Django best practices
+    framework: "django"
+    # Suggest improvements for Django models, views, etc.
+    suggestions: true
+    
+  javascript:
+    # Check for modern JS practices
+    suggestions: true
+    
+  html:
+    # Check for accessibility and SEO
+    suggestions: true
+
+# Security settings
+security:
+  # Enable security scanning
+  enabled: true
+  
+  # Check for common security issues
+  checks:
+    - "sql_injection"
+    - "xss"
+    - "csrf"
+    - "authentication"
+    - "authorization"
+    - "secrets_exposure"
+
+# Performance settings
+performance:
+  # Enable performance suggestions
+  enabled: true
+  
+  # Check for common performance issues
+  checks:
+    - "database_queries"
+    - "n_plus_one"
+    - "memory_usage"
+    - "file_size"
+
+# Code quality settings
+quality:
+  # Enable code quality checks
+  enabled: true
+  
+  # Check for code smells
+  checks:
+    - "complexity"
+    - "duplication"
+    - "maintainability"
+    - "readability"
+
+# Documentation settings
+documentation:
+  # Enable documentation suggestions
+  enabled: true
+  
+  # Check for missing docstrings
+  checks:
+    - "function_docstrings"
+    - "class_docstrings"
+    - "module_docstrings"
+    - "readme_updates"
+
+# Custom prompts for Django-specific reviews
+custom_prompts:
+  django_models:
+    - "Check if the model follows Django best practices"
+    - "Verify field choices and constraints"
+    - "Check for proper model relationships"
+    - "Suggest improvements for model methods"
+    
+  django_views:
+    - "Check if the view follows Django patterns"
+    - "Verify proper error handling"
+    - "Check for security best practices"
+    - "Suggest performance optimizations"
+    
+  django_forms:
+    - "Check form validation and security"
+    - "Verify proper field types and widgets"
+    - "Check for CSRF protection"
+    - "Suggest user experience improvements"
+
+# Notification settings
+notifications:
+  # Comment on pull requests
+  comments: true
+  
+  # Create review summaries
+  summaries: true
+  
+  # Suggest improvements
+  suggestions: true
+  
+  # Mark issues as resolved
+  auto_resolve: false
+
+# Integration settings
+integrations:
+  # GitHub integration
+  github:
+    # Comment on pull requests
+    comments: true
+    
+    # Create review summaries
+    summaries: true
+    
+    # Suggest improvements
+    suggestions: true

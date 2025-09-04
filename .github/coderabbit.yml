@@ -1,0 +1,148 @@
+# CodeRabbit GitHub App Configuration
+# This file configures the CodeRabbit GitHub App for your repository
+
+# App settings
+app:
+  # Enable CodeRabbit for this repository
+  enabled: true
+  
+  # Repository-specific settings
+  repository:
+    # Review all pull requests
+    auto_review: true
+    
+    # Review specific branches
+    branches:
+      - "main"
+      - "develop"
+      - "feature/*"
+      - "bugfix/*"
+      - "hotfix/*"
+    
+    # Exclude certain file types from review
+    exclude_files:
+      - "*.pyc"
+      - "*.log"
+      - "db.sqlite3"
+      - "migrations/*.py"
+      - "staticfiles/*"
+      - "venv/*"
+      - "__pycache__/*"
+
+# Review configuration
+review:
+  # Enable automated reviews
+  enabled: true
+  
+  # Review types
+  types:
+    - "security"
+    - "performance"
+    - "quality"
+    - "documentation"
+    - "best_practices"
+  
+  # Django-specific review rules
+  django:
+    # Check Django best practices
+    best_practices: true
+    
+    # Check for security issues
+    security: true
+    
+    # Check for performance issues
+    performance: true
+    
+    # Check for proper documentation
+    documentation: true
+
+# Comment settings
+comments:
+  # Enable inline comments
+  enabled: true
+  
+  # Comment on specific issues
+  on_issues:
+    - "security_vulnerabilities"
+    - "performance_issues"
+    - "code_smells"
+    - "missing_documentation"
+    - "best_practice_violations"
+  
+  # Comment style
+  style:
+    # Use friendly tone
+    tone: "helpful"
+    
+    # Include suggestions
+    suggestions: true
+    
+    # Include explanations
+    explanations: true
+
+# Summary settings
+summary:
+  # Enable review summaries
+  enabled: true
+  
+  # Summary format
+  format:
+    # Include issue count
+    issue_count: true
+    
+    # Include severity levels
+    severity: true
+    
+    # Include recommendations
+    recommendations: true
+    
+    # Include action items
+    action_items: true
+
+# Integration with existing CI
+ci_integration:
+  # Work with existing GitHub Actions
+  github_actions: true
+  
+  # Don't block CI on review issues
+  non_blocking: true
+  
+  # Provide feedback alongside CI
+  parallel: true
+
+# Custom rules for Django project
+custom_rules:
+  django_models:
+    - "Check for proper model relationships"
+    - "Verify field choices and constraints"
+    - "Check for model methods efficiency"
+    - "Suggest improvements for model validation"
+  
+  django_views:
+    - "Check for proper error handling"
+    - "Verify security best practices"
+    - "Check for performance optimizations"
+    - "Suggest improvements for user experience"
+  
+  django_forms:
+    - "Check form validation and security"
+    - "Verify proper field types"
+    - "Check for CSRF protection"
+    - "Suggest user experience improvements"
+  
+  django_templates:
+    - "Check for template security"
+    - "Verify proper template inheritance"
+    - "Check for accessibility issues"
+    - "Suggest SEO improvements"
+
+# Notification preferences
+notifications:
+  # Notify on review completion
+  on_completion: true
+  
+  # Notify on critical issues
+  on_critical_issues: true
+  
+  # Include review summary
+  include_summary: true
