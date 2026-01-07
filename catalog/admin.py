@@ -6,11 +6,11 @@ from .models import Category, Product, ProductImage
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "is_active", "product_count", "created_at")
-    list_filter = ("is_active", "created_at")
+    list_display = ("name", "is_active", "is_admin_only", "product_count", "created_at")
+    list_filter = ("is_active", "is_admin_only", "created_at")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
-    list_editable = ("is_active",)
+    list_editable = ("is_active", "is_admin_only")
 
     def product_count(self, obj):
         """Display product count with link to filtered products."""

@@ -18,6 +18,10 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to="categories/", blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_admin_only = models.BooleanField(
+        default=False,
+        help_text="If checked, this category will only be visible to admin users."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
