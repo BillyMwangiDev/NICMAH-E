@@ -1,5 +1,5 @@
 """
-Inventory management models for Nichmah Agrovet application.
+Inventory management models for NICMAH application.
 """
 
 from django.db import models
@@ -11,6 +11,7 @@ from decimal import Decimal
 import uuid
 import random
 import string
+import json
 from django.utils import timezone
 
 User = get_user_model()
@@ -221,8 +222,24 @@ class InventoryTransaction(models.Model):
 
     # Notes and metadata
     notes = models.TextField(blank=True)
-    tags = models.JSONField(default=list, blank=True)
-
+    tags = models.TextField(default='[]', blank=True, help_text="JSON array of tags")
+    
+    def get_tags(self):
+        """Get tags as a list."""
+        if not self.tags:
+            return []
+        try:
+            return json.loads(self.tags)
+        except (json.JSONDecodeError, TypeError):
+            return []
+    
+    def set_tags(self, value):
+        """Set tags from a list."""
+        if value is None:
+            self.tags = '[]'
+        else:
+            self.tags = json.dumps(value)
+    
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
 

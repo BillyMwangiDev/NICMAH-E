@@ -1,30 +1,56 @@
 version: '3.9'
+
+# Development Docker Compose Configuration
 services:
   db:
-    image: postgres:15
+    image: postgres:15-alpine
+    container_name: nicmah_db_dev
     environment:
-      POSTGRES_DB: nichmah_agrovet
-      POSTGRES_USER: nichmah_user
-      POSTGRES_PASSWORD: your_secure_password
+      POSTGRES_DB: ${DB_NAME:-nichmah_agrovet}
+      POSTGRES_USER: ${DB_USER:-nichmah_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dev_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - nicmah_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nichmah_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
-    build: .
-    command: bash -lc "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nicmah_web_dev
+    command: bash -c "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     env_file:
       - .env
-    depends_on:
-      - db
     environment:
+      - DEBUG=True
       - DB_HOST=db
       - DB_PORT=5432
+      - DB_ENGINE=django.db.backends.postgresql
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - nicmah_network
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  nicmah_network:
+    driver: bridge

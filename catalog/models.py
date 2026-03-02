@@ -1,23 +1,36 @@
 """
-Product catalog models for Nichmah Agrovet application.
+Product catalog models for NICMAH application.
 """
 
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MinLengthValidator
+import json
 
 
 class Category(models.Model):
     """
-    Product category model.
+    Product category model with support for subcategories.
     """
 
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True, blank=True)
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, blank=True)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='subcategories',
+        null=True,
+        blank=True,
+        help_text="Parent category for subcategories"
+    )
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to="categories/", blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_admin_only = models.BooleanField(
+        default=False,
+        help_text="If checked, this category will only be visible to admin users."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -25,13 +38,29 @@ class Category(models.Model):
         verbose_name = "category"
         verbose_name_plural = "categories"
         ordering = ["name"]
+        unique_together = [['name', 'parent']]  # Same name allowed if different parent
 
     def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} > {self.name}"
         return self.name
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name)
+            if self.parent:
+                # For subcategories, include parent slug in the slug
+                parent_slug = self.parent.slug or slugify(self.parent.name)
+                self.slug = f"{parent_slug}-{base_slug}"
+            else:
+                self.slug = base_slug
+            
+            # Ensure slug uniqueness
+            original_slug = self.slug
+            counter = 1
+            while Category.objects.filter(slug=self.slug).exclude(pk=self.pk if self.pk else None).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -40,6 +69,15 @@ class Category(models.Model):
     @property
     def product_count(self):
         return self.products.filter(is_active=True).count()
+    
+    @property
+    def is_subcategory(self):
+        """Check if this category is a subcategory."""
+        return self.parent is not None
+    
+    def get_all_subcategories(self):
+        """Get all active subcategories of this category."""
+        return self.subcategories.filter(is_active=True)
 
 
 class Product(models.Model):
@@ -66,7 +104,23 @@ class Product(models.Model):
 
     # Images
     main_image = models.ImageField(upload_to="products/", blank=True, null=True)
-    additional_images = models.JSONField(default=list, blank=True)
+    additional_images = models.TextField(default='[]', blank=True, help_text="JSON array of additional image URLs")
+    
+    def get_additional_images(self):
+        """Get additional images as a list."""
+        if not self.additional_images:
+            return []
+        try:
+            return json.loads(self.additional_images)
+        except (json.JSONDecodeError, TypeError):
+            return []
+    
+    def set_additional_images(self, value):
+        """Set additional images from a list."""
+        if value is None:
+            self.additional_images = '[]'
+        else:
+            self.additional_images = json.dumps(value)
 
     # Status and visibility
     is_active = models.BooleanField(default=True)

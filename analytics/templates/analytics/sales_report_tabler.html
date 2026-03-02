@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Sales Report - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Override Tabler colors with Agro theme */
+    :root {
+        --tblr-primary: #16a34a;
+        --tblr-primary-rgb: 22, 163, 74;
+        --tblr-primary-dark: #14532d;
+        --tblr-success: #059669;
+        --tblr-info: #0ea5e9;
+        --tblr-warning: #f59e0b;
+        --tblr-danger: #ef4444;
+    }
+    
+    /* Ensure base template styles take precedence */
+    .analytics-dashboard {
+        background: transparent;
+    }
+    
+    /* Scoped card styling for analytics pages only */
+    .analytics-content .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        background: white;
+        margin-bottom: 1.5rem;
+    }
+    
+    .analytics-content .card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+    
+    .analytics-content .card-header {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .analytics-content .card-title {
+        color: #14532d;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin: 0;
+    }
+    
+    .analytics-content .card-body {
+        padding: 1.5rem;
+    }
+    
+    .analytics-content .btn-primary {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1.5rem;
+        color: white;
+    }
+    
+    .analytics-content .btn-primary:hover {
+        background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        color: white;
+    }
+    
+    .analytics-content .btn-success {
+        background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+        color: white;
+    }
+    
+    .analytics-content .btn-success:hover {
+        background: linear-gradient(135deg, #047857 0%, #059669 100%);
+        transform: translateY(-1px);
+        color: white;
+    }
+    
+    .analytics-content .btn-outline-primary {
+        border: 2px solid #16a34a;
+        color: #16a34a;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        background: transparent;
+        font-weight: 600;
+    }
+    
+    .analytics-content .btn-outline-primary:hover {
+        background: #16a34a;
+        color: white;
+    }
+    
+    .analytics-content .chart-container {
+        position: relative;
+        height: 400px;
+    }
+    
+    .analytics-content .table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .analytics-content .table thead {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    }
+    
+    .analytics-content .table thead th {
+        color: #14532d;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
+    }
+    
+    .analytics-content .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .analytics-content .table tbody tr:hover {
+        background: #f0fdf4;
+    }
+    
+    .analytics-content .table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    .analytics-content .form-select,
+    .analytics-content .form-control {
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem 1rem;
+    }
+    
+    .analytics-content .form-select:focus,
+    .analytics-content .form-control:focus {
+        border-color: #16a34a;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        outline: none;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .analytics-content .chart-container {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sales Report Header -->
+<section class="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
+                <i class="fas fa-chart-column mr-4"></i>
+                Sales Report
+            </h1>
+            <p class="text-xl text-green-50 max-w-2xl mx-auto">
+                Detailed sales analysis and reporting for {{ user.first_name|default:user.username }}
+            </p>
+        </div>
+    </div>
+</section>
+
+<div class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 analytics-content">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header with Actions -->
+        <div class="bg-white rounded-xl shadow-lg border border-green-200 p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <div class="text-sm font-semibold text-agro-green uppercase tracking-wide mb-1">Reports</div>
+                    <h2 class="text-2xl font-display font-bold text-agro-dark">Sales Analysis</h2>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{% url 'analytics:dashboard' %}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold">
+                        <i class="fas fa-arrow-left-long mr-2"></i>Back to Dashboard
+                    </a>
+                    <a href="{% url 'analytics:export_sales_data' %}?start_date={{ start_date }}&end_date={{ end_date }}&period={{ period }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-colors font-semibold">
+                        <i class="fas fa-download mr-2"></i>Export Data
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="card-title">Filter Options</h3>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'analytics:sales_report' %}" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Period</label>
+                        <select name="period" class="form-select">
+                            <option value="daily" {% if period == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="weekly" {% if period == 'weekly' %}selected{% endif %}>Weekly</option>
+                            <option value="monthly" {% if period == 'monthly' %}selected{% endif %}>Monthly</option>
+                            <option value="annual" {% if period == 'annual' %}selected{% endif %}>Annual</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-600">Total Sales</div>
+                        <i class="fas fa-money-bill-1-wave text-primary"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-agro-dark">KSh {{ total_sales|floatformat:0|intcomma }}</div>
+                    <div class="text-xs text-gray-500 mt-1">{{ total_transactions|intcomma }} transactions</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-600">Average Order</div>
+                        <i class="fas fa-chart-simple text-info"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-agro-dark">KSh {{ average_order|floatformat:0|intcomma }}</div>
+                    <div class="text-xs text-gray-500 mt-1">Per transaction</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-600">Total Items</div>
+                        <i class="fas fa-box text-warning"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-agro-dark">{{ total_items|intcomma }}</div>
+                    <div class="text-xs text-gray-500 mt-1">Items sold</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-600">Growth</div>
+                        <i class="fas fa-arrow-trend-up text-success"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-agro-dark">{{ growth_percentage|floatformat:1 }}%</div>
+                    <div class="text-xs text-gray-500 mt-1">vs previous period</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Chart -->
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="card-title">Sales Trend</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Sales Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Sale #</th>
+                                <th>Cashier</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                            <tr>
+                                <td>{{ sale.created_at|date:"M d, Y" }}</td>
+                                <td>{{ sale.sale_number|truncatechars:12 }}</td>
+                                <td>{% if sale.cashier.get_full_name %}{{ sale.cashier.get_full_name }}{% else %}{{ sale.cashier.username }}{% endif %}</td>
+                                <td class="text-muted">{{ sale.customer_name|default:"Walk-in" }}</td>
+                                <td>{{ sale.items.count|intcomma }}</td>
+                                <td class="font-semibold">KSh {{ sale.total_amount|floatformat:0|intcomma }}</td>
+                                <td>
+                                    <span class="badge bg-{% if sale.payment_method == 'cash' %}primary{% elif sale.payment_method == 'card' %}info{% else %}success{% endif %}">
+                                        {{ sale.payment_method|capfirst }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">Completed</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">No sales data available for the selected period</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if sales.has_other_pages %}
+                <div class="mt-4 flex justify-center">
+                    <nav>
+                        <ul class="pagination">
+                            {% if sales.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ sales.previous_page_number }}&start_date={{ start_date }}&end_date={{ end_date }}&period={{ period }}">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in sales.paginator.page_range %}
+                            {% if sales.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > sales.number|add:'-3' and num < sales.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}&start_date={{ start_date }}&end_date={{ end_date }}&period={{ period }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if sales.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ sales.next_page_number }}&start_date={{ start_date }}&end_date={{ end_date }}&period={{ period }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% block extra_js %}
+<script>
+// Sales Chart
+const salesChartData = {{ chart_data|safe }};
+new Chart(document.getElementById('salesChart'), {
+    type: 'line',
+    data: salesChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'KSh ' + context.parsed.y.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

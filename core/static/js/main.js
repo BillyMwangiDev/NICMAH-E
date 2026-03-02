@@ -1,9 +1,93 @@
 /**
- * Nichmah Agrovet - Main JavaScript
- * Handles cart functionality, alerts, and general interactivity
+ * NICMAH - Main JavaScript
+ * Compatible with Tailwind CDN - No Bootstrap Dependencies
+ * Handles cart functionality, alerts, modals, and general interactivity
  */
 
-// Cart functionality
+/* ============================================
+   Modal System (Tailwind-based, no Bootstrap)
+   ============================================ */
+class Modal {
+    constructor(elementId) {
+        this.element = document.getElementById(elementId);
+        if (!this.element) {
+            console.warn(`Modal element with id "${elementId}" not found`);
+            return;
+        }
+        this.isVisible = false;
+        this.init();
+    }
+
+    init() {
+        // Add close button handlers
+        const closeButtons = this.element.querySelectorAll('[data-dismiss="modal"], .btn-close, [data-bs-dismiss="modal"]');
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', () => this.hide());
+        });
+
+        // Close on overlay click
+        this.element.addEventListener('click', (e) => {
+            if (e.target === this.element) {
+                this.hide();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isVisible) {
+                this.hide();
+            }
+        });
+    }
+
+    show() {
+        if (!this.element) return;
+        this.element.classList.remove('hidden');
+        this.element.classList.add('show');
+        this.isVisible = true;
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    hide() {
+        if (!this.element) return;
+        this.element.classList.add('hidden');
+        this.element.classList.remove('show');
+        this.isVisible = false;
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+
+    toggle() {
+        if (this.isVisible) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    }
+}
+
+// Bootstrap-compatible Modal class for existing code
+window.bootstrap = window.bootstrap || {};
+window.bootstrap.Modal = function(element) {
+    // Handle both element and element ID
+    const el = typeof element === 'string' ? document.getElementById(element) : element;
+    if (!el) {
+        console.warn('Modal element not found');
+        return null;
+    }
+
+    // Convert Bootstrap modal to our modal system
+    const modal = new Modal(el.id || 'previewModal');
+    
+    return {
+        show: () => modal.show(),
+        hide: () => modal.hide(),
+        toggle: () => modal.toggle()
+    };
+};
+
+/* ============================================
+   Cart Functionality
+   ============================================ */
 class Cart {
     constructor() {
         this.items = JSON.parse(localStorage.getItem('cart')) || [];
@@ -190,12 +274,12 @@ class Cart {
                 <div class="p-3 border-b border-gray-100 last:border-b-0">
                     <div class="flex items-center space-x-3">
                         <div class="flex-1">
-                            <p class="font-medium text-gray-800 text-sm">${item.name}</p>
+                            <p class="font-medium text-gray-800 text-sm">${this.escapeHtml(item.name)}</p>
                             <p class="text-xs text-gray-600">Qty: ${item.quantity}</p>
                         </div>
                         <div class="text-right">
                             <span class="font-semibold text-agro-green text-sm">KSh ${(item.price * item.quantity).toFixed(2)}</span>
-                            <button onclick="window.cart.removeItem('${item.id}')" class="ml-2 text-xs text-red-500 hover:text-red-700">
+                            <button onclick="window.cart.removeItem('${this.escapeHtml(item.id)}')" class="ml-2 text-xs text-red-500 hover:text-red-700">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -216,6 +300,12 @@ class Cart {
         }
     }
 
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     showAlert(message, type = 'info') {
         const alertDiv = document.createElement('div');
         const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
@@ -223,7 +313,7 @@ class Cart {
         alertDiv.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-2 fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300`;
         alertDiv.innerHTML = `
             <div class="flex items-center justify-between">
-                <span>${message}</span>
+                <span>${this.escapeHtml(message)}</span>
                 <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
                     <i class="fas fa-times"></i>
                 </button>
@@ -249,42 +339,20 @@ class Cart {
     }
 }
 
-// Initialize cart when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    window.cart = new Cart();
-    
-    // Clean cart on initialization to remove any invalid data
-    window.cart.cleanCart();
-    
-    // Debug: Log cart state
-    console.log('Cart initialized:', window.cart);
-    console.log('Cart items:', window.cart.items);
-    console.log('Cart count:', window.cart.getItemCount());
-    
-    // Trigger a custom event when cart is ready
-    window.dispatchEvent(new CustomEvent('cartReady'));
-    
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Initialize popovers
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
-});
-
-// WhatsApp checkout function
+/* ============================================
+   WhatsApp Checkout
+   ============================================ */
 function checkoutViaWhatsApp() {
     if (!window.cart || window.cart.items.length === 0) {
-        window.cart.showAlert('Your cart is empty!', 'warning');
+        if (window.cart) {
+            window.cart.showAlert('Your cart is empty!', 'warning');
+        } else {
+            alert('Your cart is empty!');
+        }
         return;
     }
 
-    const phoneNumber = '+254740368581'; // Updated WhatsApp number
+    const phoneNumber = '+254740368581';
     const orderDetails = generateOrderMessage();
     const encodedMessage = encodeURIComponent(orderDetails);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -292,8 +360,9 @@ function checkoutViaWhatsApp() {
     window.open(whatsappUrl, '_blank');
 }
 
-// Generate order message for WhatsApp
 function generateOrderMessage() {
+    if (!window.cart) return '';
+    
     const items = window.cart.items.map(item => 
         `• ${item.name} - Qty: ${item.quantity} - KSh ${(item.price * item.quantity).toFixed(2)}`
     ).join('\n');
@@ -301,7 +370,7 @@ function generateOrderMessage() {
     const total = window.cart.getTotal();
     const itemCount = window.cart.getItemCount();
     
-    return `Hello! I would like to place an order from Nichmah Agrovet:
+    return `Hello! I would like to place an order from NICMAH:
 
 ${items}
 
@@ -311,17 +380,19 @@ Total Amount: KSh ${total.toFixed(2)}
 Please confirm my order and arrange delivery. Thank you!`;
 }
 
-// Utility functions
+/* ============================================
+   Utility Functions
+   ============================================ */
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-KE', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'KES'
     }).format(amount);
 }
 
 function showLoading(element) {
     if (element) {
-        element.innerHTML = '<div class="spinner"></div>';
+        element.innerHTML = '<div class="loading-spinner"></div>';
         element.disabled = true;
     }
 }
@@ -333,7 +404,6 @@ function hideLoading(element, originalText) {
     }
 }
 
-// Form validation
 function validateForm(form) {
     const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
     let isValid = true;
@@ -350,7 +420,6 @@ function validateForm(form) {
     return isValid;
 }
 
-// Search functionality
 function performSearch(query) {
     if (query.length < 2) return;
     
@@ -358,7 +427,6 @@ function performSearch(query) {
     console.log('Searching for:', query);
 }
 
-// Debounce function for search
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -371,21 +439,121 @@ function debounce(func, wait) {
     };
 }
 
-// Initialize search with debouncing
-const debouncedSearch = debounce(performSearch, 300);
+/* ============================================
+   Scroll Animation Observer
+   ============================================ */
+function initScrollAnimations() {
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    
+    if (animatedElements.length === 0) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+    
+    animatedElements.forEach(el => observer.observe(el));
+}
 
-// Export functions for use in other scripts
-window.NichmahAgrovet = {
+/* ============================================
+   Initialize on DOM Ready
+   ============================================ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize cart
+    window.cart = new Cart();
+    window.cart.cleanCart();
+    
+    // Debug: Log cart state
+    console.log('Cart initialized:', window.cart);
+    console.log('Cart items:', window.cart.items);
+    console.log('Cart count:', window.cart.getItemCount());
+    
+    // Trigger a custom event when cart is ready
+    window.dispatchEvent(new CustomEvent('cartReady'));
+    
+    // Initialize scroll animations
+    initScrollAnimations();
+    
+    // Initialize all modals on the page
+    const modalElements = document.querySelectorAll('.modal, .modal-overlay');
+    modalElements.forEach(modalEl => {
+        if (modalEl.id) {
+            new Modal(modalEl.id);
+        }
+    });
+    
+    // Handle Bootstrap data attributes for modals
+    document.querySelectorAll('[data-bs-toggle="modal"], [data-toggle="modal"]').forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-bs-target') || this.getAttribute('data-target');
+            if (targetId) {
+                const modalId = targetId.replace('#', '');
+                const modal = new Modal(modalId);
+                modal.show();
+            }
+        });
+    });
+});
+
+/* ============================================
+   CSRF Token Utilities
+   ============================================ */
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function getCSRFToken() {
+    // Try meta tag first (more reliable)
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    if (metaTag) {
+        const token = metaTag.getAttribute('content');
+        if (token && token.length > 0) {
+            return token;
+        }
+    }
+    
+    // Fallback to cookie
+    return getCookie('csrftoken');
+}
+
+/* ============================================
+   Export Functions for Global Use
+   ============================================ */
+window.NICMAH = {
     Cart: Cart,
+    Modal: Modal,
     checkoutViaWhatsApp: checkoutViaWhatsApp,
     formatCurrency: formatCurrency,
     showLoading: showLoading,
     hideLoading: hideLoading,
     validateForm: validateForm,
-    performSearch: performSearch
+    performSearch: performSearch,
+    debounce: debounce,
+    getCSRFToken: getCSRFToken,
+    getCookie: getCookie
 };
 
-// Add console commands for debugging
+/* ============================================
+   Debug Console Commands
+   ============================================ */
 window.clearCartForTesting = function() {
     if (window.cart) {
         window.cart.clearCart();
@@ -395,7 +563,6 @@ window.clearCartForTesting = function() {
     }
 };
 
-// Force refresh cart page
 window.refreshCartPage = function() {
     if (window.location.pathname.includes('/cart/')) {
         if (typeof displayCart === 'function') {
@@ -406,10 +573,8 @@ window.refreshCartPage = function() {
     }
 };
 
-// Clear corrupted cart data
 window.clearCorruptedCart = function() {
     if (window.cart) {
-        // Remove items with undefined names
         window.cart.items = window.cart.items.filter(item => 
             item && item.name && item.name !== 'undefined' && item.name !== 'null'
         );
@@ -420,10 +585,8 @@ window.clearCorruptedCart = function() {
     }
 };
 
-// Add test items to cart
 window.addTestItems = function() {
     if (window.cart) {
-        // Add some test products
         window.cart.addItem('test-1', 'Cattle Dewormer', 28.75);
         window.cart.addItem('test-2', 'Pig Feed Mix', 35.00);
         window.cart.addItem('test-3', 'Premium Seeds', 24.99);
@@ -433,6 +596,7 @@ window.addTestItems = function() {
 };
 
 // Log available console commands
+console.log('NICMAH - JavaScript Loaded');
 console.log('Available commands:');
 console.log('- window.clearCartForTesting() - Clear cart for testing');
 console.log('- window.clearCorruptedCart() - Clear corrupted cart data');

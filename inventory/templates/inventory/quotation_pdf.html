@@ -12,10 +12,28 @@
             line-height: 1.4;
         }
         .header {
-            text-align: center;
+            position: relative;
             margin-bottom: 30px;
             border-bottom: 2px solid #333;
             padding-bottom: 20px;
+            min-height: 120px;
+        }
+        .logo-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .logo-container img {
+            max-height: 100px;
+            max-width: 200px;
+            height: auto;
+        }
+        .company-info-container {
+            text-align: center;
+            margin-left: 220px;
+        }
+        .header.no-logo .company-info-container {
+            margin-left: 0;
         }
         .company-name {
             font-size: 24px;
@@ -165,11 +183,18 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="company-name">{{ company_name }}</div>
-        <div class="company-tagline">Quality Agricultural Solutions</div>
-        <div class="company-info">{{ company_address }}</div>
-        <div class="company-info">Phone: {{ company_phone }} | Email: {{ company_email }}</div>
+    <div class="header{% if not company_logo %} no-logo{% endif %}">
+        {% if company_logo %}
+        <div class="logo-container">
+            <img src="{{ company_logo }}" alt="{{ company_name }}">
+        </div>
+        {% endif %}
+        <div class="company-info-container">
+            <div class="company-name">{{ company_name }}</div>
+            <div class="company-tagline">{{ company_tagline|default:"Quality Agricultural Solutions" }}</div>
+            <div class="company-info">{{ company_address }}</div>
+            <div class="company-info">Phone: {{ company_phone }} | Email: {{ company_email }}</div>
+        </div>
     </div>
 
     <div class="document-title">QUOTATION</div>

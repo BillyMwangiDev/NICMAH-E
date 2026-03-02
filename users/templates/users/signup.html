@@ -31,7 +31,10 @@
                             <i class="fas fa-user mr-2 text-agro-green"></i>
                             First Name *
                         </label>
-                        {{ form.first_name }}
+                        <div class="relative">
+                            {{ form.first_name }}
+                            <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                         {% if form.first_name.errors %}
                             <div class="mt-1 text-red-600 text-sm">
                                 {% for error in form.first_name.errors %}
@@ -47,7 +50,10 @@
                             <i class="fas fa-user mr-2 text-agro-green"></i>
                             Last Name *
                         </label>
-                        {{ form.last_name }}
+                        <div class="relative">
+                            {{ form.last_name }}
+                            <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                         {% if form.last_name.errors %}
                             <div class="mt-1 text-red-600 text-sm">
                                 {% for error in form.last_name.errors %}
@@ -64,7 +70,10 @@
                         <i class="fas fa-at mr-2 text-agro-green"></i>
                         Username *
                     </label>
-                    {{ form.username }}
+                    <div class="relative">
+                        {{ form.username }}
+                        <i class="fas fa-at absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    </div>
                     {% if form.username.errors %}
                         <div class="mt-1 text-red-600 text-sm">
                             {% for error in form.username.errors %}
@@ -80,7 +89,10 @@
                         <i class="fas fa-envelope mr-2 text-agro-green"></i>
                         Email Address *
                     </label>
-                    {{ form.email }}
+                    <div class="relative">
+                        {{ form.email }}
+                        <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    </div>
                     {% if form.email.errors %}
                         <div class="mt-1 text-red-600 text-sm">
                             {% for error in form.email.errors %}
@@ -97,7 +109,10 @@
                             <i class="fas fa-phone mr-2 text-agro-green"></i>
                             Phone Number
                         </label>
-                        {{ form.phone }}
+                        <div class="relative">
+                            {{ form.phone }}
+                            <i class="fas fa-phone absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                         {% if form.phone.errors %}
                             <div class="mt-1 text-red-600 text-sm">
                                 {% for error in form.phone.errors %}
@@ -113,7 +128,10 @@
                             <i class="fas fa-user-tag mr-2 text-agro-green"></i>
                             Account Type *
                         </label>
-                        {{ form.role }}
+                        <div class="relative">
+                            {{ form.role }}
+                            <i class="fas fa-user-tag absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                         {% if form.role.errors %}
                             <div class="mt-1 text-red-600 text-sm">
                                 {% for error in form.role.errors %}
@@ -130,7 +148,10 @@
                         <i class="fas fa-map-marker-alt mr-2 text-agro-green"></i>
                         Address
                     </label>
-                    {{ form.address }}
+                    <div class="relative">
+                        {{ form.address }}
+                        <i class="fas fa-map-marker-alt absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                    </div>
                     {% if form.address.errors %}
                         <div class="mt-1 text-red-600 text-sm">
                             {% for error in form.address.errors %}
@@ -147,7 +168,10 @@
                             <i class="fas fa-lock mr-2 text-agro-green"></i>
                             Password *
                         </label>
-                        {{ form.password1 }}
+                        <div class="relative">
+                            {{ form.password1 }}
+                            <i class="fas fa-lock absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                         {% if form.password1.errors %}
                             <div class="mt-1 text-red-600 text-sm">
                                 {% for error in form.password1.errors %}
@@ -163,7 +187,10 @@
                             <i class="fas fa-lock mr-2 text-agro-green"></i>
                             Confirm Password *
                         </label>
-                        {{ form.password2 }}
+                        <div class="relative">
+                            {{ form.password2 }}
+                            <i class="fas fa-lock absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                         {% if form.password2.errors %}
                             <div class="mt-1 text-red-600 text-sm">
                                 {% for error in form.password2.errors %}
@@ -193,11 +220,9 @@
                 <!-- Submit Button -->
                 <div>
                     <button type="submit" 
-                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-agro-green to-agro-dark hover:from-agro-dark hover:to-agro-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-agro-green transition-all duration-300 transform hover:scale-105">
-                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                            <i class="fas fa-user-plus text-agro-light group-hover:text-white transition-colors"></i>
-                        </span>
-                        Create Account
+                            class="w-full bg-agro-green text-white px-6 py-4 rounded-full font-semibold hover:bg-agro-dark transition-colors shadow-lg transform hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Create Account</span>
                     </button>
                 </div>
             </form>
@@ -289,22 +314,69 @@
         }
     }
     
-    /* Form input focus effects */
+    /* Form input styling to match theme */
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        padding-right: 3rem; /* Space for icon */
+        border: 2px solid #bbf7d0; /* border-green-200 */
+        border-radius: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+        line-height: 1.5;
+        background-color: white;
+    }
+    
     .form-input:focus {
+        outline: none;
+        border-color: var(--agro-green);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: #9ca3af;
+    }
+    
+    /* Textarea specific styling */
+    textarea.form-input {
+        padding-right: 3rem;
+        min-height: 80px;
+        resize: vertical;
+    }
+    
+    /* Select dropdown styling */
+    select.form-input {
+        padding-right: 3rem;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1.5em 1.5em;
     }
     
     /* Button hover effects */
     button[type="submit"]:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 15px 30px rgba(22, 163, 74, 0.2);
+        transform: scale(1.02);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    button[type="submit"]:active {
+        transform: scale(0.98);
     }
 </style>
 
 <!-- Enhanced JavaScript for form interactions -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Ensure all form inputs have proper styling
+    const formInputs = document.querySelectorAll('.form-input, input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea');
+    formInputs.forEach(input => {
+        if (!input.classList.contains('form-input')) {
+            input.classList.add('form-input');
+        }
+    });
+    
     // Form input animations
     const inputs = document.querySelectorAll('.form-input');
     inputs.forEach(input => {
@@ -321,26 +393,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const submitBtn = document.querySelector('button[type="submit"]');
     
-    form.addEventListener('submit', function(e) {
-        // Add loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Account...';
-        submitBtn.disabled = true;
-        
-        // Simulate loading delay (remove in production)
-        setTimeout(() => {
-            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Success!';
-            submitBtn.classList.add('bg-green-600');
-        }, 1000);
-    });
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            // Add loading state
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Creating Account...</span>';
+            submitBtn.disabled = true;
+            
+            // Note: Don't prevent actual form submission
+            // The form will submit normally, and if there's an error, the page will reload
+        });
+    }
     
     // Auto-focus first input
     if (inputs.length > 0) {
         inputs[0].focus();
     }
     
-    // Password strength indicator
-    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
-    const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+    // Password strength indicator and match checking
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
     
     if (password1 && password2) {
         password1.addEventListener('input', function() {
@@ -373,8 +445,8 @@ function updatePasswordStrengthIndicator(strength) {
 }
 
 function checkPasswordMatch() {
-    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
-    const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
     
     if (password1 && password2) {
         if (password1.value !== password2.value) {

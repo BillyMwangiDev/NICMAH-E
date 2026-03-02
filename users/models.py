@@ -1,5 +1,5 @@
 """
-User models for Nicmah Agrovet application.
+User models for NICMAH application.
 """
 
 from django.db import models

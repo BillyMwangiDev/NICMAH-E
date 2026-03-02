@@ -5,7 +5,6 @@ Admin views for catalog app - handles quick image upload functionality.
 import json
 from django.http import JsonResponse
 from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -13,7 +12,6 @@ from .models import Product, ProductImage
 
 
 @staff_member_required
-@csrf_exempt
 @require_http_methods(["POST"])
 def quick_upload_image(request):
     """

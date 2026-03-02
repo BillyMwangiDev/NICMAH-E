@@ -2,12 +2,23 @@ from django.contrib import admin
 from .models import Sales, SalesItem, SalesAnalytics
 
 
-@admin.register(Sales)
 class SalesAdmin(admin.ModelAdmin):
+    """Admin for unified Sales model - shows all sales (POS, e-commerce, manual) that match analytics views.
+    
+    This is the SAME data shown in analytics pages. Use this for viewing unified sales data.
+    For raw POS transactions, see POSSale model in POS section.
+    """
     list_display = ("sale_number", "sale_type", "customer_name", "total_amount", "payment_method", "status", "created_at")
     list_filter = ("sale_type", "status", "payment_method", "created_at")
     search_fields = ("sale_number", "customer_name", "customer_phone", "customer_email")
     readonly_fields = ("sale_number", "created_at", "updated_at")
+    ordering = ["-created_at"]
+    
+    def get_queryset(self, request):
+        """Show same data as analytics views - all unified sales with optimized queries."""
+        qs = super().get_queryset(request)
+        # Use select_related and prefetch_related for performance (same as analytics views)
+        return qs.select_related("cashier", "seller", "pos_sale", "ecommerce_order").prefetch_related("items", "items__product")
     
     fieldsets = (
         ('Basic Information', {
@@ -33,7 +44,6 @@ class SalesAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(SalesItem)
 class SalesItemAdmin(admin.ModelAdmin):
     list_display = ("sale", "product", "quantity", "unit_price", "total_price", "created_at")
     list_filter = ("created_at", "product")
@@ -41,7 +51,6 @@ class SalesItemAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-@admin.register(SalesAnalytics)
 class SalesAnalyticsAdmin(admin.ModelAdmin):
     list_display = ("date", "total_sales", "total_revenue", "pos_sales", "ecommerce_sales", "manual_sales")
     list_filter = ("date",)

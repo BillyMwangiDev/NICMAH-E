@@ -245,7 +245,7 @@ function syncAllTransactions() {
     fetch('{% url "pos:sync_offline_transactions" %}', {
         method: 'POST',
         headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
+            'X-CSRFToken': window.NICMAH.getCSRFToken(),
             'Content-Type': 'application/json',
         }
     })

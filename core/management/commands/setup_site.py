@@ -1,5 +1,5 @@
 """
-Management command to set up default site settings for Nicmah Agrovet.
+Management command to set up default site settings for NICMAH.
 """
 
 from django.core.management.base import BaseCommand
@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 
 
 class Command(BaseCommand):
-    help = "Set up default site settings for Nicmah Agrovet"
+    help = "Set up default site settings for NICMAH"
 
     def handle(self, *args, **options):
         try:
@@ -20,19 +20,19 @@ class Command(BaseCommand):
             # Get or create default site
             site, created = Site.objects.get_or_create(
                 id=1,
-                defaults={'domain': 'nicmahagrovet.com', 'name': 'Nicmah Agrovet'}
+                defaults={'domain': 'nicmahagrovet.com', 'name': 'NICMAH'}
             )
 
             # Create default site settings
             settings = SiteSettings.objects.create(
                 site=site,
-                site_name="Nicmah Agrovet",
+                site_name="NICMAH",
                 tagline=(
                     "Farmers focused business specializing in livestock farming "
                     "and crop farming for over two decades."
                 ),
                 business_description=(
-                    "Nicmah Agrovet is a farmers focused business that majors on livestock farming "
+                    "NICMAH is a farmers focused business that majors on livestock farming "
                     "and crop farming for over two decades."
                 ),
                 mission_statement=(

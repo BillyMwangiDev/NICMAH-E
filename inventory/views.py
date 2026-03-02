@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.db import transaction
 from django.core.paginator import Paginator
-from django.db.models import Sum, F, Q
+from django.db.models import Sum, Q, F
 from django.utils import timezone
 from decimal import Decimal
 import pandas as pd
@@ -16,12 +16,9 @@ from openpyxl.styles import Font, PatternFill, Alignment
 import io
 from django.urls import reverse
 
-from .models import StockMovement, StockAlert, PurchaseOrder
+from .models import StockMovement, StockAlert, PurchaseOrder, Document, DocumentItem, DocumentTemplate
 from catalog.models import Category, Product
 from .document_generation import DOCUMENTS_AVAILABLE, generate_receipt_pdf, generate_quotation_pdf, generate_invoice_pdf, send_document_email, print_document
-from .models import Document, DocumentItem, DocumentTemplate
-
-# Document models are now imported from .models above
 
 
 @login_required
@@ -43,12 +40,24 @@ def dashboard(request):
         "total_value"
     ] or Decimal("0.00")
 
+    # Get additional statistics
+    in_stock_products = Product.objects.filter(stock_quantity__gt=F("min_stock_level")).count()
+    total_categories = Category.objects.count()
+    
+    # Get recent movements count
+    recent_movements_count = StockMovement.objects.count()
+    today_movements = StockMovement.objects.filter(created_at__date=timezone.now().date()).count()
+    
     context = {
         "total_products": total_products,
         "low_stock_products": low_stock_products,
         "out_of_stock": out_of_stock,
+        "in_stock_products": in_stock_products,
         "total_stock_value": total_stock_value,
+        "total_categories": total_categories,
         "recent_movements": recent_movements,
+        "recent_movements_count": recent_movements_count,
+        "today_movements": today_movements,
         "low_stock_alerts": low_stock_alerts,
     }
 
@@ -308,7 +317,12 @@ def stock_movements(request):
     date_to = request.GET.get("date_to")
 
     if product_filter:
-        movements = movements.filter(product__name__icontains=product_filter)
+        # Support both product ID and product name search
+        try:
+            product_id = int(product_filter)
+            movements = movements.filter(product_id=product_id)
+        except (ValueError, TypeError):
+            movements = movements.filter(product__name__icontains=product_filter)
     if movement_type:
         movements = movements.filter(movement_type=movement_type)
     if date_from:
@@ -976,16 +990,9 @@ def stock_management(request):
                     product.price = new_price
                     product.save()
                     
-                    # Create stock movement for price change
-                    StockMovement.objects.create(
-                        product=product,
-                        movement_type="price_change",
-                        quantity=0,
-                        previous_stock=product.stock_quantity,
-                        new_stock=product.stock_quantity,
-                        notes=f"Price updated from KSh {old_price} to KSh {new_price}",
-                        user=request.user
-                    )
+                    # Note: Price changes don't create stock movements
+                    # Stock movements track quantity changes only
+                    # Price changes are tracked in product model history
                     
                     messages.success(request, f"Price updated for {product.name}")
                     
@@ -997,18 +1004,21 @@ def stock_management(request):
                     product.save()
                     
                     # Create stock movement
-                    movement_type = "adjustment"
-                    if new_quantity > old_quantity:
-                        movement_type = "purchase"
-                    elif new_quantity < old_quantity:
-                        movement_type = "sale"
+                    quantity_diff = new_quantity - old_quantity
+                    if quantity_diff > 0:
+                        movement_type = StockMovement.MovementType.PURCHASE
+                    elif quantity_diff < 0:
+                        movement_type = StockMovement.MovementType.ADJUSTMENT
+                    else:
+                        movement_type = StockMovement.MovementType.ADJUSTMENT
                     
                     StockMovement.objects.create(
                         product=product,
                         movement_type=movement_type,
-                        quantity=new_quantity - old_quantity,
+                        quantity=quantity_diff,
                         previous_stock=old_quantity,
                         new_stock=new_quantity,
+                        reference_type='Manual Adjustment',
                         notes=f"Stock quantity updated from {old_quantity} to {new_quantity}",
                         user=request.user
                     )
@@ -1340,11 +1350,13 @@ def download_document_pdf(request, pk):
     
     try:
         if document.document_type == 'receipt':
-            pdf_content = generate_receipt_pdf(document)
+            pdf_content = generate_receipt_pdf(document, request)
         elif document.document_type == 'quotation':
-            pdf_content = generate_quotation_pdf(document)
+            pdf_content = generate_quotation_pdf(document, request)
         elif document.document_type == 'invoice':
-            pdf_content = generate_invoice_pdf(document)
+            pdf_content = generate_invoice_pdf(document, request)
+        elif document.document_type == 'purchase_order':
+            pdf_content = generate_purchase_order_pdf(document, request)
         else:
             messages.error(request, "Unsupported document type.")
             return redirect('inventory:view_document', pk=pk)
@@ -1373,7 +1385,7 @@ def email_document(request, pk):
         message = request.POST.get('message', '')
         
         try:
-            send_document_email(document, email_address, subject, message)
+            send_document_email(document, email_address, subject, message, request)
             messages.success(request, f"Document sent to {email_address}")
         except Exception as e:
             messages.error(request, f"Error sending email: {str(e)}")
@@ -1396,7 +1408,7 @@ def print_document_view(request, pk):
     document = get_object_or_404(Document, pk=pk)
     
     try:
-        print_document(document)
+        print_document(document, request)
         messages.success(request, "Document sent to printer")
     except Exception as e:
         messages.error(request, f"Error printing document: {str(e)}")

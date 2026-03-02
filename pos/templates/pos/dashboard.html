@@ -4,326 +4,546 @@
 
 {% block title %}POS Dashboard - {{ site_name }}{% endblock %}
 
-{% block content %}
-<!-- POS Dashboard Header -->
-<section class="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 text-white py-16 pos-dashboard">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center animate-on-load stagger-item">
-            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
-                <i class="fas fa-cash-register mr-4"></i>
-                POS Dashboard
-            </h1>
-            <p class="text-xl text-green-50 max-w-2xl mx-auto">
-                Welcome back, {{ user.first_name|default:user.username }}! 
-                Manage your point of sale operations and track sales performance.
-            </p>
-        </div>
-    </div>
-</section>
-
-<!-- Active Session Status -->
-{% if active_session %}
-<section class="py-8 bg-gradient-to-r from-yellow-100 to-amber-100 border-b border-yellow-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white border border-yellow-300 rounded-xl p-6 shadow-lg">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-play text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-amber-800">Active POS Session</h3>
-                        <p class="text-amber-700">Session ID: {{ active_session.session_id }}</p>
-                        <p class="text-amber-700">Started: {{ active_session.opened_at|date:"M d, Y H:i" }}</p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="text-sm text-amber-700">Total Sales</p>
-                        <p class="text-2xl font-bold text-amber-800">KSh {{ active_session.total_sales|floatformat:2|intcomma }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-amber-700">Transactions</p>
-                        <p class="text-2xl font-bold text-amber-800">{{ active_session.total_transactions|intcomma }}</p>
-                    </div>
-                    <a href="{% url 'pos:sale_create' %}" class="bg-gradient-to-r from-yellow-500 to-amber-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-amber-700 transition-all transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-plus mr-2"></i>New Sale
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endif %}
-
-<!-- Quick Stats -->
-<section class="py-12 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-display font-bold text-gray-800 mb-8 text-center">
-            Today's Overview
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Today's Sales -->
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-green-100">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-money-bill text-white text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Today's Sales</p>
-                        <p class="text-2xl font-bold text-gray-900">KSh {{ today_total|floatformat:2|intcomma }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Today's Transactions -->
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-blue-100">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-shopping-cart text-white text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Transactions</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ today_transactions|intcomma }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Today's Tax -->
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-yellow-100">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-chart-line text-white text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Tax Collected</p>
-                        <p class="text-2xl font-bold text-gray-900">KSh {{ today_tax|floatformat:2|intcomma }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Today's Discounts -->
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-purple-100">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-tags text-white text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Discounts</p>
-                        <p class="text-2xl font-bold text-gray-900">KSh {{ today_discounts|floatformat:2|intcomma }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Quick Actions -->
-<section class="py-12 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-display font-bold text-gray-800 mb-8 text-center">
-            Quick Actions
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- New Sale -->
-            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl shadow-lg card-hover border border-green-200">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-plus text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">New Sale</h3>
-                    <p class="text-gray-600 mb-4">Start a new point of sale transaction</p>
-                    <a href="{% url 'pos:sale_create' %}" 
-                       class="inline-block bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-play mr-2"></i>
-                        Start Sale
-                    </a>
-                </div>
-            </div>
-
-            <!-- View Sales -->
-            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl shadow-lg card-hover border border-blue-200">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-list text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Sales History</h3>
-                    <p class="text-gray-600 mb-4">View all sales and transactions</p>
-                    <a href="{% url 'pos:sales_list' %}" 
-                       class="inline-block bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-eye mr-2"></i>
-                        View Sales
-                    </a>
-                </div>
-            </div>
-
-            <!-- Analytics -->
-            <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg card-hover border border-purple-200">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-chart-bar text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Analytics</h3>
-                    <p class="text-gray-600 mb-4">View sales analytics and reports</p>
-                    <a href="{% url 'pos:analytics' %}" 
-                       class="inline-block bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg">
-                        <i class="fas fa-chart-line mr-2"></i>
-                        View Analytics
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Recent Sales -->
-<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-display font-bold text-gray-800 mb-8 text-center">
-            Recent Sales
-        </h2>
-        
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gradient-to-r from-gray-50 to-slate-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Sale ID
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Customer
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Items
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for sale in recent_sales %}
-                        <tr class="hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ sale.sale_number }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ sale.created_at|date:"M d, Y H:i" }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ sale.customer_name|default:"Walk-in Customer" }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ sale.items.count }} items
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                                KSh {{ sale.total_amount|floatformat:2 }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                    {% if sale.status == 'completed' %}bg-green-100 text-green-800
-                                    {% elif sale.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ sale.status|title }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{% url 'pos:sale_detail' sale.id %}" class="text-emerald-600 hover:text-emerald-900 mr-3">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{% url 'pos:receipt_download' sale.id %}" class="text-blue-600 hover:text-blue-900">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                                <div class="text-center">
-                                    <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
-                                    <p class="text-lg">No sales yet today</p>
-                                    <p class="text-sm">Start your first sale to see it here!</p>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Custom CSS for animations -->
+{% block extra_css %}
 <style>
-    .card-hover {
+    .pos-dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(22, 163, 74, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    .session-banner {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--card-color, #16a34a), transparent);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card.sales { --card-color: #16a34a; }
+    .stat-card.transactions { --card-color: #3b82f6; }
+    .stat-card.tax { --card-color: #f59e0b; }
+    .stat-card.discounts { --card-color: #a855f7; }
+    
+    .stat-card .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--card-color, #16a34a), var(--card-color-dark, #059669));
+    }
+    
+    .stat-card .icon-wrapper i {
+        color: white;
+        font-size: 24px;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 10px 0;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .section-header {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        padding: 20px 25px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .section-header h2 {
+        color: #14532d;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-body {
+        padding: 25px;
+    }
+    
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .action-card {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        padding: 25px;
+        border-radius: 12px;
+        border: 2px solid #bbf7d0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(22, 163, 74, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .action-card:hover::before {
+        opacity: 1;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.2);
+        border-color: #16a34a;
+    }
+    
+    .action-card .icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+    
+    .action-card .icon-wrapper i {
+        color: white;
+        font-size: 28px;
+    }
+    
+    .action-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+    
+    .action-card p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 15px;
+    }
+    
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
         transition: all 0.3s ease;
     }
     
-    .card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    .action-card:hover .action-btn {
+        background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        transform: scale(1.05);
     }
     
-    .animate-on-load {
-        animation: fadeInUp 0.8s ease-out;
+    /* Different colors for action cards */
+    .action-card:nth-child(1) { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #bbf7d0; }
+    .action-card:nth-child(2) { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #bfdbfe; }
+    .action-card:nth-child(2) .icon-wrapper { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .action-card:nth-child(2) .action-btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .action-card:nth-child(3) { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-color: #d8b4fe; }
+    .action-card:nth-child(3) .icon-wrapper { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
+    .action-card:nth-child(3) .action-btn { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
+    
+    .sales-table {
+        width: 100%;
+        border-collapse: collapse;
     }
     
-    .stagger-item {
-        animation-delay: 0.2s;
+    .sales-table thead {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
     }
     
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
+    .sales-table thead th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #14532d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .sales-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s ease;
+    }
+    
+    .sales-table tbody tr:hover {
+        background-color: #f0fdf4;
+    }
+    
+    .sales-table tbody td {
+        padding: 15px;
+        color: #374151;
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .badge-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .sales-table {
+            font-size: 0.875rem;
         }
     }
 </style>
+{% endblock %}
 
-<!-- JavaScript to ensure POS content stays visible -->
-<script>
-    // Immediate function to ensure POS content is visible
-    (function() {
-        // Force all POS elements to be visible
-        const posElements = document.querySelectorAll('.pos-dashboard, .pos-dashboard *');
-        posElements.forEach(element => {
-            element.style.opacity = '1';
-            element.style.visibility = 'visible';
-            element.style.transform = 'none';
-            element.style.animation = 'none';
-            element.style.transition = 'none';
-        });
+{% block content %}
+<div class="pos-dashboard-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="mb-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4 shadow-lg">
+                <i class="fas fa-cash-register text-4xl text-white"></i>
+            </div>
+        </div>
+        <h1 class="text-4xl sm:text-5xl font-display font-bold mb-3">
+            POS Dashboard
+        </h1>
+        <p class="text-xl opacity-95 max-w-2xl mx-auto">
+            Welcome back, {{ user.first_name|default:user.username }}! 
+            Manage your point of sale operations and track sales performance.
+        </p>
+    </div>
+
+    <!-- Active Session Banner -->
+    {% if active_session %}
+    <div class="session-banner">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-play text-white text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-amber-900 mb-1">Active POS Session</h3>
+                    <p class="text-sm text-amber-700">
+                        <i class="fas fa-clock mr-1"></i>
+                        Started: {{ active_session.opened_at|date:"M d, Y H:i" }}
+                    </p>
+                    <p class="text-sm text-amber-700">
+                        <i class="fas fa-user mr-1"></i>
+                        Cashier: {{ active_session.cashier.get_full_name|default:active_session.cashier.username }}
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+                <div class="text-center sm:text-right">
+                    <p class="text-sm font-semibold text-amber-700 mb-1">Session Sales</p>
+                    <p class="text-2xl font-bold text-amber-900">KSh {{ active_session.total_sales|floatformat:0|intcomma }}</p>
+                </div>
+                <div class="text-center sm:text-right">
+                    <p class="text-sm font-semibold text-amber-700 mb-1">Transactions</p>
+                    <p class="text-2xl font-bold text-amber-900">{{ active_session.total_transactions|intcomma }}</p>
+                </div>
+                <a href="{% url 'pos:sale_create' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-white rounded-lg hover:from-yellow-600 hover:to-amber-700 transition-all transform hover:scale-105 shadow-lg font-semibold">
+                    <i class="fas fa-plus mr-2"></i>
+                    New Sale
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card sales">
+            <div class="icon-wrapper">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-value">KSh {{ today_total|floatformat:0|intcomma }}</div>
+            <div class="stat-label">Today's Sales</div>
+        </div>
         
-        // Remove any problematic body classes
-        document.body.classList.remove('page-enter', 'page-enter-active');
+        <div class="stat-card transactions">
+            <div class="icon-wrapper">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-value">{{ today_transactions|intcomma }}</div>
+            <div class="stat-label">Today's Transactions</div>
+        </div>
         
-        // Set up continuous monitoring
-        setInterval(() => {
-            const posElements = document.querySelectorAll('.pos-dashboard, .pos-dashboard *');
-            posElements.forEach(element => {
-                if (element.style.opacity === '0' || element.style.visibility === 'hidden') {
-                    element.style.opacity = '1';
-                    element.style.visibility = 'visible';
-                }
-            });
-        }, 500);
-    })();
-</script>
+        <div class="stat-card tax">
+            <div class="icon-wrapper">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-value">KSh {{ today_tax|floatformat:0|intcomma }}</div>
+            <div class="stat-label">Tax Collected</div>
+        </div>
+        
+        <div class="stat-card discounts">
+            <div class="icon-wrapper">
+                <i class="fas fa-tag"></i>
+            </div>
+            <div class="stat-value">KSh {{ today_discounts|floatformat:0|intcomma }}</div>
+            <div class="stat-label">Discounts Given</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>
+                <i class="fas fa-bolt text-agro-green"></i>
+                Quick Actions
+            </h2>
+        </div>
+        <div class="section-body">
+            <div class="actions-grid">
+                <a href="{% url 'pos:sale_create' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h3>New Sale</h3>
+                    <p>Start a new point of sale transaction</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Start Sale
+                    </span>
+                </a>
+                
+                <a href="{% url 'pos:sales_list' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h3>Sales History</h3>
+                    <p>View all sales and transactions</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        View Sales
+                    </span>
+                </a>
+                
+                <a href="{% url 'pos:analytics' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Analytics</h3>
+                    <p>View sales analytics and reports</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        View Analytics
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sales -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>
+                <i class="fas fa-history text-blue-600"></i>
+                Recent Sales
+            </h2>
+        </div>
+        <div class="section-body">
+            {% if recent_sales %}
+                <div class="overflow-x-auto">
+                    <table class="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Sale #</th>
+                                <th>Date & Time</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in recent_sales %}
+                            <tr>
+                                <td>
+                                    <div class="font-semibold text-gray-900 font-mono text-sm">{{ sale.sale_number|truncatechars:15 }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-sm text-gray-900">{{ sale.created_at|date:"M d, Y" }}</div>
+                                    <div class="text-xs text-gray-500">{{ sale.created_at|date:"H:i" }}</div>
+                                </td>
+                                <td>
+                                    <span class="text-sm text-gray-600">{{ sale.items.count }} item{{ sale.items.count|pluralize }}</span>
+                                </td>
+                                <td>
+                                    <span class="font-semibold text-agro-green">KSh {{ sale.total_amount|floatformat:0|intcomma }}</span>
+                                </td>
+                                <td>
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold 
+                                        {% if sale.payment_method == 'cash' %}bg-green-100 text-green-800
+                                        {% elif sale.payment_method == 'card' %}bg-blue-100 text-blue-800
+                                        {% else %}bg-purple-100 text-purple-800{% endif %}">
+                                        {{ sale.get_payment_method_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge badge-{{ sale.status }}">
+                                        {{ sale.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <a href="{% url 'pos:sale_detail' sale.id %}" class="text-blue-600 hover:text-blue-800" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if sale.status == 'completed' %}
+                                        <a href="{% url 'pos:receipt_download' sale.id %}" class="text-green-600 hover:text-green-800" title="Download Receipt">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="{% url 'pos:sales_list' %}" class="inline-flex items-center px-4 py-2 bg-agro-green text-white rounded-lg hover:bg-agro-dark transition-colors font-semibold">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        View All Sales
+                    </a>
+                </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                    <i class="fas fa-shopping-cart text-3xl text-gray-400"></i>
+                </div>
+                <p class="text-lg font-semibold text-gray-700 mb-2">No Sales Yet</p>
+                <p class="text-sm text-gray-500 mb-4">Start your first sale to see it here!</p>
+                <a href="{% url 'pos:sale_create' %}" class="inline-flex items-center px-6 py-3 bg-agro-green text-white rounded-lg hover:bg-agro-dark transition-colors font-semibold">
+                    <i class="fas fa-plus mr-2"></i>
+                    Create First Sale
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

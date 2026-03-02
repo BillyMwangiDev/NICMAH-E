@@ -6,20 +6,38 @@
 
 {% block extra_css %}
 <style>
-    .dashboard-container {
-        max-width: 1200px;
+    .inventory-dashboard {
+        max-width: 1400px;
         margin: 0 auto;
         padding: 20px;
     }
     
-    .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .page-header {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
         color: white;
-        padding: 30px;
-        border-radius: 15px;
+        padding: 40px;
+        border-radius: 20px;
         text-align: center;
         margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 30px rgba(22, 163, 74, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
     }
     
     .stats-grid {
@@ -32,129 +50,221 @@
     .stat-card {
         background: white;
         padding: 25px;
-        border-radius: 12px;
+        border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        transition: all 0.3s ease;
         border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--card-color, #16a34a), transparent);
     }
     
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     }
     
-    .stat-card .icon {
+    .stat-card.products { --card-color: #16a34a; }
+    .stat-card.low-stock { --card-color: #f59e0b; }
+    .stat-card.out-of-stock { --card-color: #ef4444; }
+    .stat-card.value { --card-color: #3b82f6; }
+    .stat-card.in-stock { --card-color: #10b981; }
+    .stat-card.categories { --card-color: #8b5cf6; }
+    
+    .stat-card .icon-wrapper {
         width: 60px;
         height: 60px;
-        border-radius: 50%;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 15px;
-        font-size: 1.5rem;
-        color: white;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--card-color, #16a34a), var(--card-color-dark, #059669));
     }
     
-    .stat-card.products .icon { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-    .stat-card.low-stock .icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-    .stat-card.out-of-stock .icon { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-    .stat-card.value .icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+    .stat-card .icon-wrapper i {
+        color: white;
+        font-size: 24px;
+    }
     
-    .stat-card .number {
+    .stat-card .stat-value {
         font-size: 2rem;
         font-weight: 700;
         color: #1f2937;
-        margin-bottom: 5px;
+        margin: 10px 0;
     }
     
-    .stat-card .label {
+    .stat-card .stat-label {
+        font-size: 0.875rem;
         color: #6b7280;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
+        font-weight: 500;
     }
     
-    .quick-actions {
+    .stat-card .stat-change {
+        font-size: 0.75rem;
+        color: #059669;
+        margin-top: 5px;
+    }
+    
+    .section-card {
         background: white;
-        padding: 25px;
-        border-radius: 12px;
+        border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
         border: 1px solid #e5e7eb;
+        margin-bottom: 30px;
+        overflow: hidden;
     }
     
-    .quick-actions h2 {
-        color: #1f2937;
+    .section-header {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        padding: 20px 25px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .section-header h2 {
+        color: #14532d;
         font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 3px solid #667eea;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-body {
+        padding: 25px;
     }
     
     .actions-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .action-card {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        padding: 25px;
+        border-radius: 12px;
+        border: 2px solid #bbf7d0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(22, 163, 74, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .action-card:hover::before {
+        opacity: 1;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.2);
+        border-color: #16a34a;
+    }
+    
+    .action-card .icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+    
+    .action-card .icon-wrapper i {
+        color: white;
+        font-size: 28px;
+    }
+    
+    .action-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+    
+    .action-card p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 15px;
     }
     
     .action-btn {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        padding: 15px 20px;
-        background: #f8fafc;
-        border: 2px solid #e5e7eb;
+        gap: 8px;
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        color: white;
+        padding: 10px 20px;
         border-radius: 8px;
-        text-decoration: none;
-        color: #374151;
         font-weight: 600;
+        font-size: 0.875rem;
         transition: all 0.3s ease;
     }
     
-    .action-btn:hover {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    .action-card:hover .action-btn {
+        background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        transform: scale(1.05);
     }
     
-    .action-btn .icon {
-        margin-right: 12px;
-        font-size: 1.2rem;
-        width: 20px;
-        text-align: center;
-    }
-    
-    .alerts-section {
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e5e7eb;
-    }
-    
-    .alerts-section h2 {
-        color: #1f2937;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 3px solid #667eea;
-    }
+    /* Different colors for action cards */
+    .action-card:nth-child(1) { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #bbf7d0; }
+    .action-card:nth-child(2) { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #bfdbfe; }
+    .action-card:nth-child(2) .icon-wrapper { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .action-card:nth-child(2) .action-btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .action-card:nth-child(3) { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #fde047; }
+    .action-card:nth-child(3) .icon-wrapper { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .action-card:nth-child(3) .action-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .action-card:nth-child(4) { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-color: #d8b4fe; }
+    .action-card:nth-child(4) .icon-wrapper { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
+    .action-card:nth-child(4) .action-btn { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
+    .action-card:nth-child(5) { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #bbf7d0; }
+    .action-card:nth-child(6) { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #bfdbfe; }
+    .action-card:nth-child(6) .icon-wrapper { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .action-card:nth-child(6) .action-btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .action-card:nth-child(7) { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #fde047; }
+    .action-card:nth-child(7) .icon-wrapper { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .action-card:nth-child(7) .action-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .action-card:nth-child(8) { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-color: #d8b4fe; }
+    .action-card:nth-child(8) .icon-wrapper { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
+    .action-card:nth-child(8) .action-btn { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
     
     .alert-item {
-        padding: 15px;
+        padding: 20px;
         border-bottom: 1px solid #f3f4f6;
         display: flex;
         align-items: center;
+        gap: 15px;
         transition: background-color 0.2s ease;
     }
     
     .alert-item:hover {
-        background-color: #f8fafc;
+        background-color: #f9fafb;
     }
     
     .alert-item:last-child {
@@ -162,15 +272,15 @@
     }
     
     .alert-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
         color: white;
-        font-size: 1.2rem;
+        font-size: 20px;
+        flex-shrink: 0;
     }
     
     .alert-icon.low-stock {
@@ -189,116 +299,393 @@
         font-weight: 600;
         color: #1f2937;
         margin-bottom: 5px;
+        font-size: 1rem;
     }
     
     .alert-details {
         font-size: 0.875rem;
         color: #6b7280;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .alert-details span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .movements-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .movements-table thead {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    }
+    
+    .movements-table thead th {
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #14532d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .movements-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s ease;
+    }
+    
+    .movements-table tbody tr:hover {
+        background-color: #f0fdf4;
+    }
+    
+    .movements-table tbody td {
+        padding: 15px;
+        color: #374151;
+    }
+    
+    .movement-badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .badge-purchase { background: #d1fae5; color: #065f46; }
+    .badge-sale { background: #fee2e2; color: #991b1b; }
+    .badge-adjustment { background: #fef3c7; color: #92400e; }
+    .badge-transfer { background: #dbeafe; color: #1e40af; }
+    .badge-return { background: #e0e7ff; color: #3730a3; }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .movements-table {
+            font-size: 0.875rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-        <h1 class="text-4xl font-bold mb-2">
-            <i class="fas fa-boxes mr-3"></i>
+<div class="inventory-dashboard">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="mb-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4 shadow-lg">
+                <i class="fas fa-warehouse text-4xl text-white"></i>
+            </div>
+        </div>
+        <h1 class="text-4xl sm:text-5xl font-display font-bold mb-3">
             Inventory Dashboard
         </h1>
-        <p class="text-xl opacity-90">
-            Manage your stock levels and track inventory movements
+        <p class="text-xl opacity-95 max-w-2xl mx-auto">
+            Manage your stock levels, track movements, and monitor inventory health
         </p>
     </div>
 
     <!-- Quick Stats -->
     <div class="stats-grid">
         <div class="stat-card products">
-            <div class="icon">📦</div>
-            <div class="number">{{ total_products|intcomma }}</div>
-            <div class="label">Total Products</div>
+            <div class="icon-wrapper">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="stat-value">{{ total_products|intcomma }}</div>
+            <div class="stat-label">Total Products</div>
         </div>
+        
+        <div class="stat-card in-stock">
+            <div class="icon-wrapper">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ in_stock_products|intcomma }}</div>
+            <div class="stat-label">In Stock</div>
+        </div>
+        
         <div class="stat-card low-stock">
-            <div class="icon">⚠️</div>
-            <div class="number">{{ low_stock_products|intcomma }}</div>
-            <div class="label">Low Stock Items</div>
+            <div class="icon-wrapper">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value">{{ low_stock_products|intcomma }}</div>
+            <div class="stat-label">Low Stock Items</div>
         </div>
+        
         <div class="stat-card out-of-stock">
-            <div class="icon">🚫</div>
-            <div class="number">{{ out_of_stock|intcomma }}</div>
-            <div class="label">Out of Stock</div>
+            <div class="icon-wrapper">
+                <i class="fas fa-ban"></i>
+            </div>
+            <div class="stat-value">{{ out_of_stock|intcomma }}</div>
+            <div class="stat-label">Out of Stock</div>
         </div>
+        
         <div class="stat-card value">
-            <div class="icon">💰</div>
-                         <div class="number">KSh {{ total_stock_value|floatformat:0|intcomma }}</div>
-            <div class="label">Total Stock Value</div>
+            <div class="icon-wrapper">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="stat-value">KSh {{ total_stock_value|floatformat:0|intcomma }}</div>
+            <div class="stat-label">Total Stock Value</div>
+        </div>
+        
+        <div class="stat-card categories">
+            <div class="icon-wrapper">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stat-value">{{ total_categories|intcomma }}</div>
+            <div class="stat-label">Categories</div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="quick-actions">
-        <h2>🚀 Quick Actions</h2>
-        <div class="actions-grid">
-            <a href="{% url 'inventory:sku_scanner' %}" class="action-btn">
-                <span class="icon">📱</span>
-                SKU Scanner
-            </a>
-            <a href="{% url 'inventory:record_purchase' %}" class="action-btn">
-                <span class="icon">💰</span>
-                Record Purchase
-            </a>
-            <a href="{% url 'inventory:quick_stock_receiving' %}" class="action-btn">
-                <span class="icon">📦</span>
-                Quick Receiving
-            </a>
-            <a href="{% url 'inventory:import_stock_data' %}" class="action-btn">
-                <span class="icon">📥</span>
-                Import Stock
-            </a>
-            <a href="{% url 'inventory:export_stock_data' %}" class="action-btn">
-                <span class="icon">📤</span>
-                Export Stock
-            </a>
-            <a href="{% url 'inventory:stock_movements' %}" class="action-btn">
-                <span class="icon">📊</span>
-                Stock Movements
-            </a>
-            <a href="{% url 'inventory:stock_management' %}" class="action-btn">
-                <span class="icon">✏️</span>
-                Edit Stock Data
-            </a>
-            <a href="{% url 'inventory:documents' %}" class="action-btn">
-                <span class="icon">📄</span>
-                Documents
-            </a>
+    <div class="section-card">
+        <div class="section-header">
+            <h2>
+                <i class="fas fa-bolt text-agro-green"></i>
+                Quick Actions
+            </h2>
+        </div>
+        <div class="section-body">
+            <div class="actions-grid">
+                <a href="{% url 'inventory:sku_scanner' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3>SKU Scanner</h3>
+                    <p>Scan and search products by SKU or barcode</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Open Scanner
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:record_purchase' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-cart-plus"></i>
+                    </div>
+                    <h3>Record Purchase</h3>
+                    <p>Record new product purchases and stock additions</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Record Purchase
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:quick_stock_receiving' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-truck-fast"></i>
+                    </div>
+                    <h3>Quick Receiving</h3>
+                    <p>Fast stock receiving operations</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Quick Receive
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:stock_movements' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>Stock Movements</h3>
+                    <p>Track all inventory movements and changes</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        View Movements
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:stock_management' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3>Stock Management</h3>
+                    <p>Edit prices, quantities, and manage inventory</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Manage Stock
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:import_stock_data' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-file-import"></i>
+                    </div>
+                    <h3>Import Stock</h3>
+                    <p>Bulk import stock data from Excel files</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Import Data
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:export_stock_data' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <h3>Export Stock</h3>
+                    <p>Export stock data to Excel for reporting</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        Export Data
+                    </span>
+                </a>
+                
+                <a href="{% url 'inventory:documents' %}" class="action-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3>Documents</h3>
+                    <p>View invoices, receipts, and purchase orders</p>
+                    <span class="action-btn">
+                        <i class="fas fa-arrow-right"></i>
+                        View Documents
+                    </span>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Stock Alerts -->
-    <div class="alerts-section">
-        <h2>⚠️ Stock Alerts</h2>
-        {% if low_stock_alerts %}
-            {% for product in low_stock_alerts %}
-            <div class="alert-item">
-                <div class="alert-icon {% if product.stock_quantity == 0 %}out-of-stock{% else %}low-stock{% endif %}">
-                    {% if product.stock_quantity == 0 %}🚫{% else %}⚠️{% endif %}
-                </div>
-                <div class="alert-content">
-                    <div class="alert-title">{{ product.name }}</div>
-                    <div class="alert-details">
-                        Current Stock: {{ product.stock_quantity|intcomma }} | 
-                        Min Required: {{ product.min_stock_level|intcomma }} | 
-                        Category: {{ product.category.name|default:"Uncategorized" }}
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Stock Alerts -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-bell text-yellow-600"></i>
+                    Stock Alerts
+                    {% if low_stock_alerts %}
+                    <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                        {{ low_stock_alerts|length }}
+                    </span>
+                    {% endif %}
+                </h2>
+            </div>
+            <div class="section-body">
+                {% if low_stock_alerts %}
+                    {% for product in low_stock_alerts %}
+                    <div class="alert-item">
+                        <div class="alert-icon {% if product.stock_quantity == 0 %}out-of-stock{% else %}low-stock{% endif %}">
+                            {% if product.stock_quantity == 0 %}
+                                <i class="fas fa-times-circle"></i>
+                            {% else %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">{{ product.name }}</div>
+                            <div class="alert-details">
+                                <span>
+                                    <i class="fas fa-box text-gray-400"></i>
+                                    Stock: <strong>{{ product.stock_quantity|intcomma }}</strong>
+                                </span>
+                                <span>
+                                    <i class="fas fa-arrow-down text-gray-400"></i>
+                                    Min: <strong>{{ product.min_stock_level|intcomma }}</strong>
+                                </span>
+                                <span>
+                                    <i class="fas fa-tag text-gray-400"></i>
+                                    {{ product.category.name|default:"Uncategorized" }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
+                    {% endfor %}
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'inventory:stock_alerts' %}" class="inline-flex items-center px-4 py-2 bg-agro-green text-white rounded-lg hover:bg-agro-dark transition-colors font-semibold">
+                            <i class="fas fa-eye mr-2"></i>
+                            View All Alerts
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                            <i class="fas fa-check-circle text-3xl text-green-600"></i>
+                        </div>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">All Good!</p>
+                        <p class="text-sm text-gray-500">All products have sufficient stock levels</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Stock Movements -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-history text-blue-600"></i>
+                    Recent Stock Movements
+                    <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                        {{ today_movements }} today
+                    </span>
+                </h2>
+            </div>
+            <div class="section-body">
+                {% if recent_movements %}
+                <div class="overflow-x-auto">
+                    <table class="movements-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movement in recent_movements %}
+                            <tr>
+                                <td>
+                                    <div class="font-semibold text-gray-900">{{ movement.product.name|truncatechars:25 }}</div>
+                                    <div class="text-xs text-gray-500">{{ movement.product.sku|default:"No SKU" }}</div>
+                                </td>
+                                <td>
+                                    <span class="movement-badge badge-{{ movement.movement_type }}">
+                                        {{ movement.get_movement_type_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="font-semibold {% if movement.quantity > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                        {% if movement.quantity > 0 %}+{% endif %}{{ movement.quantity|intcomma }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="text-sm text-gray-600">{{ movement.created_at|date:"M d" }}</div>
+                                    <div class="text-xs text-gray-500">{{ movement.created_at|date:"H:i" }}</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
+                <div class="mt-4 text-center">
+                    <a href="{% url 'inventory:stock_movements' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        View All Movements
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                        <i class="fas fa-inbox text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-lg font-semibold text-gray-700 mb-2">No Recent Movements</p>
+                    <p class="text-sm text-gray-500">Stock movements will appear here</p>
+                </div>
+                {% endif %}
             </div>
-            {% endfor %}
-        {% else %}
-            <div class="text-center text-gray-500 py-8">
-                <i class="fas fa-check-circle text-4xl mb-4 text-green-500"></i>
-                <p>All products have sufficient stock levels!</p>
-            </div>
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

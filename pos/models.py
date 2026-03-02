@@ -1,25 +1,24 @@
 """
-POS (Point of Sale) models for Nicmah Agrovet application.
+POS (Point of Sale) models for NICMAH application.
 """
 
 from django.db import models
+from django.db.models import Sum
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 import uuid
 from django.utils import timezone
 from catalog.models import Product
-import random
-import string
+import json
 
 User = get_user_model()
 
 
 def generate_session_id():
-    """Generate a shorter session ID."""
-    timestamp = timezone.now().strftime('%m%d%H')  # Only month, day, hour
-    random_char = ''.join(random.choices(string.ascii_uppercase + string.digits, k=1))
-    return f"S{timestamp}{random_char}"
+    """Generate a placeholder session ID - will be replaced in save method.
+    Kept for migration compatibility."""
+    return "TEMP-SESS"
 
 
 class Barcode(models.Model):
@@ -171,7 +170,7 @@ class Discount(models.Model):
 class POSSession(models.Model):
     """POS session for tracking cashier activities."""
 
-    session_id = models.CharField(max_length=20, unique=True, default=generate_session_id)
+    session_id = models.CharField(max_length=20, unique=True, blank=True)
     cashier = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pos_sessions")
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller_sessions", null=True, blank=True)
 
@@ -214,7 +213,33 @@ class POSSession(models.Model):
         ],
         default="synced",
     )
-    local_transactions = models.JSONField(default=list, blank=True)
+    local_transactions = models.TextField(default='[]', blank=True, help_text="JSON array of offline transactions")
+    
+    def get_local_transactions(self):
+        """Get local_transactions as a Python list."""
+        if not self.local_transactions:
+            return []
+        try:
+            return json.loads(self.local_transactions)
+        except (json.JSONDecodeError, TypeError):
+            return []
+    
+    def set_local_transactions(self, value):
+        """Set local_transactions from a Python list/dict."""
+        if value is None:
+            self.local_transactions = '[]'
+        else:
+            self.local_transactions = json.dumps(value)
+    
+    @property
+    def local_transactions_list(self):
+        """Property to access local_transactions as a list."""
+        return self.get_local_transactions()
+    
+    @local_transactions_list.setter
+    def local_transactions_list(self, value):
+        """Property setter for local_transactions."""
+        self.set_local_transactions(value)
 
     class Meta:
         verbose_name = "POS Session"
@@ -224,6 +249,38 @@ class POSSession(models.Model):
     def __str__(self):
         seller_name = f" - {self.seller.get_full_name()}" if self.seller else ""
         return f"Session {self.session_id} by {self.cashier.get_full_name()}{seller_name}"
+
+    def save(self, *args, **kwargs):
+        """Override save to generate session ID if not set."""
+        if not self.session_id or self.session_id == "TEMP-SESS":
+            from django.db.models import Max
+            
+            # Get the maximum session ID from existing sessions (exclude this one)
+            max_session = POSSession.objects.exclude(pk=self.pk).aggregate(Max('session_id'))
+            max_id = max_session.get('session_id__max')
+            
+            if max_id:
+                # Extract number from existing session IDs (format: SESS-001)
+                try:
+                    if max_id.startswith('SESS-'):
+                        number = int(max_id.split('-')[1])
+                        new_number = number + 1
+                    else:
+                        # If it's an old format, start fresh from current count
+                        existing_sessions_count = POSSession.objects.filter(session_id__startswith='SESS-').count()
+                        new_number = existing_sessions_count + 1
+                except (ValueError, IndexError):
+                    # If parsing fails, count existing SESS- sessions
+                    existing_sessions_count = POSSession.objects.filter(session_id__startswith='SESS-').count()
+                    new_number = existing_sessions_count + 1
+            else:
+                # First session
+                new_number = 1
+            
+            # Format as SESS-001, SESS-002, etc.
+            self.session_id = f"SESS-{new_number:03d}"
+        
+        super().save(*args, **kwargs)
 
     def close_session(self):
         """Close the POS session."""
@@ -251,21 +308,24 @@ class POSSession(models.Model):
         if self.is_offline:
             transaction_data["local_id"] = str(uuid.uuid4())
             transaction_data["timestamp"] = timezone.now().isoformat()
-            self.local_transactions.append(transaction_data)
+            transactions = self.get_local_transactions()
+            transactions.append(transaction_data)
+            self.set_local_transactions(transactions)
             self.save()
             return transaction_data["local_id"]
         return None
 
     def sync_offline_transactions(self):
         """Sync offline transactions when connection is restored"""
-        if not self.is_offline and self.local_transactions:
+        transactions = self.get_local_transactions()
+        if not self.is_offline and transactions:
             # Process offline transactions
-            for transaction in self.local_transactions:
+            for transaction in transactions:
                 # Create actual POSSale records
                 self._create_sale_from_offline(transaction)
 
             # Clear local transactions and update sync status
-            self.local_transactions = []
+            self.set_local_transactions([])
             self.sync_status = "synced"
             self.last_sync_time = timezone.now()
             self.save()
@@ -335,7 +395,7 @@ class POSSession(models.Model):
             "offline_info": {
                 "is_offline": self.is_offline,
                 "sync_status": self.sync_status,
-                "offline_transactions_count": len(self.local_transactions),
+                "offline_transactions_count": len(self.get_local_transactions()),
                 "last_sync_time": self.last_sync_time,
             },
         }
@@ -344,7 +404,7 @@ class POSSession(models.Model):
 class POSSale(models.Model):
     """Individual POS sale transaction."""
 
-    sale_number = models.CharField(max_length=50, unique=True, default=uuid.uuid4)
+    sale_number = models.CharField(max_length=50, unique=True, blank=True)
     session = models.ForeignKey(POSSession, on_delete=models.CASCADE, related_name="sales", null=True, blank=True)
     cashier = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pos_sales")
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller_sales", null=True, blank=True)
@@ -398,7 +458,7 @@ class POSSale(models.Model):
 
     # Additional information
     notes = models.TextField(blank=True)
-    receipt_number = models.CharField(max_length=50, unique=True, default=uuid.uuid4)
+    receipt_number = models.CharField(max_length=50, unique=True, blank=True)
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -424,13 +484,90 @@ class POSSale(models.Model):
 
     def save(self, *args, **kwargs):
         """Override save to calculate totals and update session."""
-        if not self.pk:  # New sale
-            # Set seller from session if not specified
+        is_new = self.pk is None
+
+        if is_new:
+            # Generate auto-incrementing sale number if not set
+            if not self.sale_number:
+                from django.db.models import Max
+                
+                # Get the maximum sale number from existing sales (exclude this one if it exists)
+                max_sale = POSSale.objects.exclude(pk=self.pk).aggregate(Max('sale_number'))
+                max_number = max_sale.get('sale_number__max')
+                
+                if max_number:
+                    # Extract number from existing sale numbers (format: SALE-00001)
+                    try:
+                        # If it's already in format SALE-XXXXX, extract the number
+                        if max_number.startswith('SALE-'):
+                            number = int(max_number.split('-')[1])
+                            new_number = number + 1
+                        else:
+                            # If it's a UUID or other format, start fresh from current count
+                            # Count existing sales with SALE- format
+                            existing_sales_count = POSSale.objects.filter(sale_number__startswith='SALE-').count()
+                            new_number = existing_sales_count + 1
+                    except (ValueError, IndexError):
+                        # If parsing fails, count existing SALE- sales
+                        existing_sales_count = POSSale.objects.filter(sale_number__startswith='SALE-').count()
+                        new_number = existing_sales_count + 1
+                else:
+                    # First sale
+                    new_number = 1
+                
+                # Format as SALE-00001, SALE-00002, etc.
+                self.sale_number = f"SALE-{new_number:05d}"
+            
+            # Generate receipt number if not set
+            if not self.receipt_number:
+                from django.db.models import Max
+                
+                # Get the maximum receipt number from existing receipts/sales
+                max_receipt_sale = POSSale.objects.exclude(pk=self.pk).exclude(receipt_number__isnull=True).exclude(receipt_number='').aggregate(Max('receipt_number'))
+                max_receipt_receipt = Receipt.objects.aggregate(Max('receipt_number'))
+                
+                max_number = max_receipt_sale.get('receipt_number__max') or max_receipt_receipt.get('receipt_number__max')
+                
+                if max_number:
+                    try:
+                        if max_number.startswith('RCP-'):
+                            number = int(max_number.split('-')[1])
+                            new_receipt_number = number + 1
+                        else:
+                            existing_receipts_count = (POSSale.objects.filter(receipt_number__startswith='RCP-').count() + 
+                                                       Receipt.objects.filter(receipt_number__startswith='RCP-').count())
+                            new_receipt_number = existing_receipts_count + 1
+                    except (ValueError, IndexError):
+                        existing_receipts_count = (POSSale.objects.filter(receipt_number__startswith='RCP-').count() + 
+                                                   Receipt.objects.filter(receipt_number__startswith='RCP-').count())
+                        new_receipt_number = existing_receipts_count + 1
+                else:
+                    new_receipt_number = 1
+                
+                self.receipt_number = f"RCP-{new_receipt_number:05d}"
+            
+            # Assign seller from session before first save
             if not self.seller and self.session and self.session.seller:
                 self.seller = self.session.seller
+            # First save just to obtain a primary key; totals are calculated after items/discounts exist
+            # Set default values for calculated fields
+            if self.subtotal is None:
+                self.subtotal = Decimal("0.00")
+            if self.tax_amount is None:
+                self.tax_amount = Decimal("0.00")
+            if self.discount_amount is None:
+                self.discount_amount = Decimal("0.00")
+            if self.total_amount is None:
+                self.total_amount = Decimal("0.00")
+            super().save(*args, **kwargs)
+            return
 
-        # Calculate totals
-        self.subtotal = sum(item.total_price for item in self.items.all())
+        # Calculate totals (safe because pk now exists and M2M can be accessed)
+        # Calculate subtotal from items
+        try:
+            self.subtotal = sum(item.total_price for item in self.items.all())
+        except (AttributeError, TypeError):
+            self.subtotal = Decimal("0.00")
 
         # Calculate tax
         if self.tax_rate:
@@ -438,16 +575,20 @@ class POSSale(models.Model):
         else:
             self.tax_amount = Decimal("0.00")
 
-        # Calculate discount
-        self.discount_amount = self._calculate_total_discount()
+        # Calculate discount (only if sale has been saved and has a PK)
+        try:
+            self.discount_amount = self._calculate_total_discount()
+        except (AttributeError, ValueError) as e:
+            # If M2M can't be accessed yet, set discount to 0
+            self.discount_amount = Decimal("0.00")
 
         # Calculate final total
         self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
 
         super().save(*args, **kwargs)
 
-        # Update session totals
-        if self.session:
+        # Update session totals (only if sale is completed to avoid double counting)
+        if self.session and self.status == "completed":
             self._update_session_totals()
 
     def _calculate_total_discount(self):
@@ -459,20 +600,28 @@ class POSSale(models.Model):
         return total_discount
 
     def _update_session_totals(self):
-        """Update session totals with this sale."""
+        """Update session totals with this sale. Only updates if sale is completed and not already counted."""
+        # Only update if sale is completed
+        if self.status != "completed":
+            return
+        
+        # Check if this sale has already been counted by checking if it was created before the last session update
+        # We'll use a simple approach: only update if this is the first time we're saving as completed
         session = self.session
-        session.total_sales += self.total_amount
-        session.total_transactions += 1
-        session.total_tax_collected += self.tax_amount
-        session.total_discounts_given += self.discount_amount
-
+        if not session:
+            return
+        
+        # Recalculate session totals from all completed sales to avoid double counting
+        completed_sales = POSSale.objects.filter(session=session, status="completed")
+        session.total_sales = completed_sales.aggregate(total=Sum("total_amount"))["total"] or Decimal("0.00")
+        session.total_transactions = completed_sales.count()
+        session.total_tax_collected = completed_sales.aggregate(total=Sum("tax_amount"))["total"] or Decimal("0.00")
+        session.total_discounts_given = completed_sales.aggregate(total=Sum("discount_amount"))["total"] or Decimal("0.00")
+        
         # Update payment method totals
-        if self.payment_method == "cash":
-            session.total_cash_sales += self.total_amount
-        elif self.payment_method == "card":
-            session.total_card_sales += self.total_amount
-        elif self.payment_method == "mobile_money":
-            session.total_mobile_money_sales += self.total_amount
+        session.total_cash_sales = completed_sales.filter(payment_method="cash").aggregate(total=Sum("total_amount"))["total"] or Decimal("0.00")
+        session.total_card_sales = completed_sales.filter(payment_method="card").aggregate(total=Sum("total_amount"))["total"] or Decimal("0.00")
+        session.total_mobile_money_sales = completed_sales.filter(payment_method="mobile_money").aggregate(total=Sum("total_amount"))["total"] or Decimal("0.00")
 
         session.save()
 
@@ -557,20 +706,46 @@ class POSSaleItem(models.Model):
         verbose_name_plural = "POS Sale Items"
 
     def __str__(self):
-        return f"{self.quantity}x {self.product.name} - ${self.total_price}"
+        return f"{self.quantity}x {self.product.name} - KSh {self.total_price}"
 
     def save(self, *args, **kwargs):
         """Override save to calculate total price and update stock."""
-        if not self.pk:  # New item
+        from inventory.models import StockMovement
+        
+        is_new = not self.pk
+        previous_stock = self.product.stock_quantity if not is_new else self.product.stock_quantity
+        
+        if is_new:  # New item
             # Update product stock
             if self.product.stock_quantity >= self.quantity:
+                previous_stock = self.product.stock_quantity
                 self.product.stock_quantity -= self.quantity
                 self.product.save()
+                
+                # Create stock movement record for sale
+                StockMovement.objects.create(
+                    product=self.product,
+                    movement_type=StockMovement.MovementType.SALE,
+                    quantity=-self.quantity,  # Negative for sale
+                    previous_stock=previous_stock,
+                    new_stock=self.product.stock_quantity,
+                    reference_number=self.sale.sale_number,
+                    reference_type='POSSale',
+                    user=self.sale.cashier,
+                    notes=f"Sale {self.sale.sale_number} - {self.quantity} units sold"
+                )
             else:
                 raise ValueError(f"Insufficient stock for {self.product.name}")
 
-        # Calculate total price
-        self.total_price = (self.quantity * self.unit_price) - self.item_discount + self.item_tax
+        # Ensure all values are Decimal before calculation
+        quantity = Decimal(str(self.quantity))
+        unit_price = Decimal(str(self.unit_price))
+        item_discount = Decimal(str(self.item_discount or 0))
+        
+        # Calculate total price: (quantity * unit_price) - item_discount
+        # Note: Tax is calculated at sale level, not item level, to avoid double taxation
+        # item_tax field is kept for backward compatibility but should not be used
+        self.total_price = (quantity * unit_price) - item_discount
 
         super().save(*args, **kwargs)
 
@@ -578,11 +753,18 @@ class POSSaleItem(models.Model):
         """Apply a discount to this specific item."""
         if discount.is_valid():
             self.applied_discounts.add(discount)
-            # Calculate item discount
+            # Calculate item discount - ensure all values are Decimal
+            quantity = Decimal(str(self.quantity))
+            unit_price = Decimal(str(self.unit_price))
+            
             if discount.discount_type == "percentage" and discount.percentage_rate:
-                self.item_discount = (self.quantity * self.unit_price * discount.percentage_rate) / 100
+                percentage_rate = Decimal(str(discount.percentage_rate))
+                self.item_discount = (quantity * unit_price * percentage_rate) / 100
             elif discount.discount_type == "fixed_amount" and discount.fixed_amount:
-                self.item_discount = min(discount.fixed_amount, self.quantity * self.unit_price)
+                fixed_amount = Decimal(str(discount.fixed_amount))
+                self.item_discount = min(fixed_amount, quantity * unit_price)
+            else:
+                self.item_discount = Decimal("0.00")
 
             self.save()
             return True
@@ -592,7 +774,7 @@ class POSSaleItem(models.Model):
 class Receipt(models.Model):
     """Receipt for POS sales."""
 
-    receipt_number = models.CharField(max_length=50, unique=True)
+    receipt_number = models.CharField(max_length=50, unique=True, blank=True)
     sale = models.OneToOneField(POSSale, on_delete=models.CASCADE, related_name="receipt")
 
     receipt_type = models.CharField(
@@ -612,6 +794,41 @@ class Receipt(models.Model):
 
     def __str__(self):
         return f"Receipt {self.receipt_number} for Sale {self.sale.sale_number}"
+
+    def save(self, *args, **kwargs):
+        """Override save to generate receipt number if not set."""
+        if not self.receipt_number:
+            # Use sale's receipt_number if available (it's already generated)
+            if self.sale and self.sale.receipt_number:
+                self.receipt_number = self.sale.receipt_number
+            else:
+                # Generate new receipt number (fallback if sale doesn't have one)
+                from django.db.models import Max
+                
+                max_receipt = Receipt.objects.exclude(pk=self.pk).aggregate(Max('receipt_number'))
+                max_receipt_sale = POSSale.objects.exclude(receipt_number__isnull=True).exclude(receipt_number='').aggregate(Max('receipt_number'))
+                
+                max_number = max_receipt.get('receipt_number__max') or max_receipt_sale.get('receipt_number__max')
+                
+                if max_number:
+                    try:
+                        if max_number.startswith('RCP-'):
+                            number = int(max_number.split('-')[1])
+                            new_receipt_number = number + 1
+                        else:
+                            existing_count = (Receipt.objects.filter(receipt_number__startswith='RCP-').count() + 
+                                             POSSale.objects.filter(receipt_number__startswith='RCP-').count())
+                            new_receipt_number = existing_count + 1
+                    except (ValueError, IndexError):
+                        existing_count = (Receipt.objects.filter(receipt_number__startswith='RCP-').count() + 
+                                         POSSale.objects.filter(receipt_number__startswith='RCP-').count())
+                        new_receipt_number = existing_count + 1
+                else:
+                    new_receipt_number = 1
+                
+                self.receipt_number = f"RCP-{new_receipt_number:05d}"
+        
+        super().save(*args, **kwargs)
 
     def generate_pdf(self):
         """Generate PDF receipt using ReportLab."""
@@ -634,7 +851,7 @@ class Receipt(models.Model):
         )
 
         # Header
-        story.append(Paragraph("NICMAH AGROVET", title_style))
+        story.append(Paragraph("NICMAH", title_style))
         story.append(Paragraph("Receipt", styles["Heading2"]))
         story.append(Spacer(1, 20))
 
@@ -667,7 +884,7 @@ class Receipt(models.Model):
         # Items table
         items_data = [["Item", "Qty", "Price", "Total"]]
         for item in self.sale.items.all():
-            items_data.append([item.product.name, str(item.quantity), f"${item.unit_price}", f"${item.total_price}"])
+            items_data.append([item.product.name, str(item.quantity), f"KSh {item.unit_price}", f"KSh {item.total_price}"])
 
         items_table = Table(items_data, colWidths=[3 * inch, 1 * inch, 1 * inch, 1 * inch])
         items_table.setStyle(
@@ -687,10 +904,10 @@ class Receipt(models.Model):
 
         # Totals
         totals_data = [
-            ["Subtotal:", f"${self.sale.subtotal}"],
-            ["Tax:", f"${self.sale.tax_amount}"],
-            ["Discount:", f"${self.sale.discount_amount}"],
-            ["Total:", f"${self.sale.total_amount}"],
+            ["Subtotal:", f"KSh {self.sale.subtotal}"],
+            ["Tax:", f"KSh {self.sale.tax_amount}"],
+            ["Discount:", f"KSh {self.sale.discount_amount}"],
+            ["Total:", f"KSh {self.sale.total_amount}"],
         ]
 
         totals_table = Table(totals_data, colWidths=[2 * inch, 1 * inch])
@@ -711,7 +928,7 @@ class Receipt(models.Model):
 
         # Footer
         story.append(Paragraph("Thank you for your business!", styles["Normal"]))
-        story.append(Paragraph("NICMAH AGROVET - Quality Agricultural Solutions", styles["Normal"]))
+        story.append(Paragraph("NICMAH - Quality Agricultural Solutions", styles["Normal"]))
 
         # Build PDF
         doc.build(story)
@@ -737,7 +954,33 @@ class OfflineTransaction(models.Model):
     customer_email = models.EmailField(blank=True)
 
     # Sale details
-    items_data = models.JSONField(help_text="Stored items data for offline transactions")
+    items_data = models.TextField(help_text="Stored items data for offline transactions (JSON)")
+    
+    def get_items_data(self):
+        """Get items_data as a Python list/dict."""
+        if not self.items_data:
+            return []
+        try:
+            return json.loads(self.items_data)
+        except (json.JSONDecodeError, TypeError):
+            return []
+    
+    def set_items_data(self, value):
+        """Set items_data from a Python list/dict."""
+        if value is None:
+            self.items_data = '[]'
+        else:
+            self.items_data = json.dumps(value)
+    
+    @property
+    def items_data_list(self):
+        """Property to access items_data as a list."""
+        return self.get_items_data()
+    
+    @items_data_list.setter
+    def items_data_list(self, value):
+        """Property setter for items_data."""
+        self.set_items_data(value)
     payment_method = models.CharField(max_length=20, default="cash")
     payment_status = models.CharField(max_length=20, default="paid")
 
@@ -759,7 +1002,33 @@ class OfflineTransaction(models.Model):
     sync_error = models.TextField(blank=True)
 
     # Metadata
-    device_info = models.JSONField(default=dict, blank=True)
+    device_info = models.TextField(default='{}', blank=True, help_text="Device metadata (JSON)")
+    
+    def get_device_info(self):
+        """Get device_info as a Python dict."""
+        if not self.device_info:
+            return {}
+        try:
+            return json.loads(self.device_info)
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    
+    def set_device_info(self, value):
+        """Set device_info from a Python dict."""
+        if value is None:
+            self.device_info = '{}'
+        else:
+            self.device_info = json.dumps(value)
+    
+    @property
+    def device_info_dict(self):
+        """Property to access device_info as a dict."""
+        return self.get_device_info()
+    
+    @device_info_dict.setter
+    def device_info_dict(self, value):
+        """Property setter for device_info."""
+        self.set_device_info(value)
     app_version = models.CharField(max_length=20, blank=True)
 
     class Meta:
@@ -799,5 +1068,5 @@ class OfflineTransaction(models.Model):
             "payment_method": self.payment_method,
             "created_at": self.created_offline_at,
             "sync_status": self.sync_status,
-            "items_count": len(self.items_data) if self.items_data else 0,
+            "items_count": len(self.get_items_data()) if self.get_items_data() else 0,
         }

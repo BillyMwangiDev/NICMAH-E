@@ -1,5 +1,5 @@
 """
-Stock notification service for Nichmah Agrovet application.
+Stock notification service for NICMAH application.
 Handles email, SMS, and in-app notifications for stock alerts.
 """
 
@@ -108,7 +108,7 @@ class StockNotificationService:
                 "user": user,
                 "stock_alert": stock_alert,
                 "product": stock_alert.product,
-                "site_name": getattr(settings, "SITE_NAME", "Nichmah Agrovet"),
+                "site_name": getattr(settings, "SITE_NAME", "NICMAH"),
                 "alert_date": timezone.now().strftime("%B %d, %Y at %I:%M %p"),
             }
 
@@ -209,7 +209,7 @@ class StockNotificationService:
             context = {
                 "user": user,
                 "alerts": alerts,
-                "site_name": getattr(settings, "SITE_NAME", "Nichmah Agrovet"),
+                "site_name": getattr(settings, "SITE_NAME", "NICMAH"),
                 "date": timezone.now().strftime("%B %d, %Y"),
             }
 

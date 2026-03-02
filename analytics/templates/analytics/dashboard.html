@@ -6,508 +6,755 @@
 
 {% block extra_css %}
 <style>
-    .chart-container {
-        position: relative;
-        height: 400px;
-        margin: 20px 0;
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background: #f5f7fa;
     }
     
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e5e7eb;
+        padding: 24px;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .sidebar-logo {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 32px;
+    }
+    
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        margin: 4px 0;
+        border-radius: 8px;
+        color: #6b7280;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .nav-item:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+    
+    .nav-item.active {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+    
+    .nav-item i {
+        width: 20px;
+        margin-right: 12px;
+    }
+    
+    .main-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 24px;
+    }
+    
+    .top-nav {
+        background: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .welcome-text {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .top-nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .metric-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+    
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
         color: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
     }
     
-    .stats-card:hover {
-        transform: translateY(-5px);
+    .metric-icon.blue { background: #3b82f6; }
+    .metric-icon.purple { background: #8b5cf6; }
+    .metric-icon.yellow { background: #eab308; }
+    .metric-icon.red { background: #ef4444; }
+    
+    .metric-title {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 8px;
     }
     
-    .stats-card.green {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    .metric-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
     }
     
-    .stats-card.blue {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .metric-change {
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
     
-    .stats-card.purple {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
+    .metric-change.positive { color: #16a34a; }
+    .metric-change.negative { color: #dc2626; }
     
-    .stats-card.orange {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        color: #333;
+    .metric-chart {
+        margin-top: 16px;
+        height: 60px;
     }
     
     .chart-card {
         background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
-        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 24px;
     }
     
     .chart-title {
-        font-size: 1.5rem;
+        font-size: 18px;
         font-weight: 600;
         color: #1f2937;
-        margin-bottom: 20px;
-        text-align: center;
+        margin-bottom: 8px;
     }
     
-    .top-products-table {
-        background: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e5e7eb;
+    .chart-subtitle {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 24px;
     }
     
-    .top-products-table thead th {
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    
+    .top-products-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .top-products-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .top-products-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .product-name {
+        font-weight: 500;
+        color: #1f2937;
+    }
+    
+    .product-price {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .conversion-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 15px;
-        font-weight: 600;
-        border: none;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
-    .top-products-table tbody tr {
+    .conversion-value {
+        font-size: 48px;
+        font-weight: 700;
+        margin: 16px 0;
+    }
+    
+    .recent-activity-item {
+        padding: 12px 0;
         border-bottom: 1px solid #f3f4f6;
-        transition: background-color 0.2s ease;
-    }
-    
-    .top-products-table tbody tr:hover {
-        background-color: #f8fafc;
-    }
-    
-    .top-products-table tbody td {
-        padding: 15px;
-        border: none;
-    }
-    
-    .growth-indicator {
-        display: inline-flex;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        padding: 4px 8px;
-        border-radius: 20px;
-        font-size: 0.875rem;
+    }
+    
+    .recent-activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-info {
+        flex: 1;
+    }
+    
+    .activity-title {
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+    
+    .activity-meta {
+        font-size: 12px;
+        color: #6b7280;
+    }
+    
+    .activity-amount {
         font-weight: 600;
-    }
-    
-    .growth-positive {
-        background-color: #dcfce7;
-        color: #166534;
-    }
-    
-    .growth-negative {
-        background-color: #fee2e2;
-        color: #991b1b;
-    }
-    
-    .growth-neutral {
-        background-color: #f3f4f6;
-        color: #374151;
+        color: #16a34a;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Analytics Dashboard Header -->
-<section class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center animate-on-load stagger-item">
-            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
-                <i class="fas fa-chart-line mr-4"></i>
-                Analytics Dashboard
-            </h1>
-            <p class="text-xl text-blue-100 max-w-2xl mx-auto">
-                Comprehensive business insights and performance metrics
-            </p>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">NICMAH</div>
+        
+        <div style="margin-bottom: 24px; padding: 12px; background: #f3f4f6; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <div style="width: 24px; height: 24px; background: #8b5cf6; border-radius: 4px;"></div>
+                <span style="font-weight: 600; color: #1f2937;">Team 1</span>
+            </div>
+            <div style="font-size: 12px; color: #6b7280;">Free</div>
         </div>
+        
+        <nav>
+            <a href="{% url 'analytics:dashboard' %}" class="nav-item active">
+                <i class="fas fa-chart-bar"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'users:profile' %}" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>User</span>
+            </a>
+            <a href="{% url 'catalog:product_list' %}" class="nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Product</span>
+            </a>
+            <a href="{% url 'educational:article_list' %}" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Blog</span>
+            </a>
+        </nav>
     </div>
-</section>
-
-<!-- Summary Statistics -->
-<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Revenue -->
-            <div class="stats-card green">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm font-medium">Total Revenue</p>
-                        <p class="text-3xl font-bold">KSh {{ total_revenue|floatformat:2|intcomma }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-dollar-sign text-2xl"></i>
-                    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="welcome-text">Hi, Welcome back 👋</div>
+            <div class="top-nav-actions">
+                <i class="fas fa-search" style="color: #6b7280; cursor: pointer;"></i>
+                <i class="fas fa-bell" style="color: #6b7280; cursor: pointer; position: relative;">
+                    <span style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center;">2</span>
+                </i>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; cursor: pointer;">
+                    {{ user.first_name|first|default:"U" }}
                 </div>
             </div>
-
-            <!-- Total Transactions -->
-            <div class="stats-card blue">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm font-medium">Total Transactions</p>
-                        <p class="text-3xl font-bold">{{ total_transactions|intcomma }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-shopping-cart text-2xl"></i>
+        </div>
+        
+        <!-- Period Selector and Report Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 8px;">
+                <a href="?period=daily" style="padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.2s; {% if period == 'daily' %}background: #3b82f6; color: white;{% else %}background: #f3f4f6; color: #6b7280;{% endif %}">
+                    Daily
+                </a>
+                <a href="?period=weekly" style="padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.2s; {% if period == 'weekly' %}background: #3b82f6; color: white;{% else %}background: #f3f4f6; color: #6b7280;{% endif %}">
+                    Weekly
+                </a>
+                <a href="?period=monthly" style="padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.2s; {% if period == 'monthly' %}background: #3b82f6; color: white;{% else %}background: #f3f4f6; color: #6b7280;{% endif %}">
+                    Monthly
+                </a>
+                <a href="?period=annual" style="padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.2s; {% if period == 'annual' %}background: #3b82f6; color: white;{% else %}background: #f3f4f6; color: #6b7280;{% endif %}">
+                    Annual
+                </a>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <a href="{% url 'analytics:sales_report' %}?period={{ period }}" class="view-report-btn" style="text-decoration: none;">
+                    <i class="fas fa-file-alt" style="margin-right: 8px;"></i>View Report
+                </a>
+                <a href="{% url 'analytics:export_sales_data' %}?period={{ period }}" class="view-report-btn" style="text-decoration: none; background: #16a34a;">
+                    <i class="fas fa-download" style="margin-right: 8px;"></i>Export Data
+                </a>
+            </div>
+        </div>
+        
+        <!-- Period Summary Card -->
+        <div class="metric-card" style="margin-bottom: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">{{ period|capfirst }} Sales Summary</div>
+                    <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;">KSh {{ period_revenue|floatformat:0|intcomma }}</div>
+                    <div style="font-size: 14px; opacity: 0.9;">
+                        <span style="margin-right: 16px;">{{ period_transactions|intcomma }} transactions</span>
+                        <span class="metric-change {% if period_growth >= 0 %}positive{% else %}negative{% endif %}" style="{% if period_growth >= 0 %}color: #86efac;{% else %}color: #fca5a5;{% endif %}">
+                            {% if period_growth >= 0 %}↑{% else %}↓{% endif %} {{ period_growth_abs|floatformat:1 }}% vs previous {{ period }}
+                        </span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Average Transaction Value -->
-            <div class="stats-card purple">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm font-medium">Avg Transaction</p>
-                        <p class="text-3xl font-bold">KSh {{ avg_transaction_value|floatformat:2|intcomma }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-chart-line text-2xl"></i>
-                    </div>
+                <div style="font-size: 48px; opacity: 0.3;">
+                    <i class="fas fa-chart-line"></i>
                 </div>
             </div>
-
-            <!-- Weekly Growth -->
-            <div class="stats-card orange">
-                <div class="flex items-center justify-between">
+        </div>
+        
+        <!-- Metric Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px;">
+            <!-- Weekly Sales -->
+            <div class="metric-card">
+                <div class="metric-header">
                     <div>
-                        <p class="text-gray-700 text-sm font-medium">Weekly Growth</p>
-                        <div class="flex items-center space-x-2">
-                            <p class="text-3xl font-bold">{{ weekly_growth|floatformat:1 }}%</p>
-                            <span class="growth-indicator {% if weekly_growth > 0 %}growth-positive{% elif weekly_growth < 0 %}growth-negative{% else %}growth-neutral{% endif %}">
-                                {% if weekly_growth > 0 %}
-                                    <i class="fas fa-arrow-up mr-1"></i>
-                                {% elif weekly_growth < 0 %}
-                                    <i class="fas fa-arrow-down mr-1"></i>
-                                {% else %}
-                                    <i class="fas fa-minus mr-1"></i>
-                                {% endif %}
-                            </span>
+                        <div class="metric-title">Weekly sales</div>
+                        <div class="metric-value">{{ weekly_sales.formatted }}</div>
+                        <div class="metric-change {% if weekly_sales.growth >= 0 %}positive{% else %}negative{% endif %}">
+                            {% if weekly_sales.growth >= 0 %}↑{% else %}↓{% endif %} {{ weekly_sales.growth_abs|floatformat:1 }}%
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
-                        <i class="fas fa-trending-up text-2xl text-white"></i>
+                    <div class="metric-icon blue">
+                        <i class="fas fa-shopping-bag"></i>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Sales Charts -->
-<section class="py-12 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Daily Sales Chart -->
-            <div class="chart-card">
-                <h2 class="chart-title">Daily Sales (Last 30 Days)</h2>
-                <div class="chart-container">
-                    <canvas id="dailySalesChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Weekly Sales Chart -->
-            <div class="chart-card">
-                <h2 class="chart-title">Weekly Sales (Last 12 Weeks)</h2>
-                <div class="chart-container">
+                <div class="metric-chart">
                     <canvas id="weeklySalesChart"></canvas>
                 </div>
             </div>
-
-            <!-- Sales by Category -->
-            <div class="chart-card">
-                <h2 class="chart-title">Sales by Category</h2>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
+            
+            <!-- New Users -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-title">New users</div>
+                        <div class="metric-value">{{ new_users.formatted }}</div>
+                        <div class="metric-change {% if new_users.growth >= 0 %}positive{% else %}negative{% endif %}">
+                            {% if new_users.growth >= 0 %}↑{% else %}↓{% endif %} {{ new_users.growth_abs|floatformat:1 }}%
+                        </div>
+                    </div>
+                    <div class="metric-icon purple">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="newUsersChart"></canvas>
                 </div>
             </div>
-
-            <!-- Payment Methods -->
+            
+            <!-- Purchase Orders -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-title">Purchase orders</div>
+                        <div class="metric-value">{{ purchase_orders.formatted }}</div>
+                        <div class="metric-change {% if purchase_orders.growth >= 0 %}positive{% else %}negative{% endif %}">
+                            {% if purchase_orders.growth >= 0 %}↑{% else %}↓{% endif %} {{ purchase_orders.growth_abs|floatformat:1 }}%
+                        </div>
+                    </div>
+                    <div class="metric-icon yellow">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Products Sold -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div>
+                        <div class="metric-title">Products sold</div>
+                        <div class="metric-value">{{ products_sold.formatted }}</div>
+                        <div class="metric-change {% if products_sold.growth >= 0 %}positive{% else %}negative{% endif %}">
+                            {% if products_sold.growth >= 0 %}↑{% else %}↓{% endif %} {{ products_sold.growth_abs|floatformat:1 }}%
+                        </div>
+                    </div>
+                    <div class="metric-icon red">
+                        <i class="fas fa-box"></i>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- Period-based Sales Chart -->
             <div class="chart-card">
-                <h2 class="chart-title">Payment Methods Distribution</h2>
+                <div class="chart-title">{{ period|capfirst }} Sales Trend</div>
+                <div class="chart-subtitle">Sales performance over time</div>
+                <div class="chart-container">
+                    <canvas id="periodChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Sales by Category (Pie Chart) -->
+            <div class="chart-card">
+                <div class="chart-title">Sales by Category</div>
+                <div class="chart-subtitle">Product category distribution</div>
+                <div class="chart-container">
+                    <canvas id="categoryPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Charts Row -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- Monthly Sales (Bar Chart) -->
+            <div class="chart-card">
+                <div class="chart-title">Monthly Sales Comparison</div>
+                <div class="chart-subtitle">({{ year_growth_abs|floatformat:0 }}%) than last year</div>
+                <div class="chart-container">
+                    <canvas id="monthlyBarChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Payment Methods Distribution -->
+            <div class="chart-card">
+                <div class="chart-title">Payment Methods</div>
+                <div class="chart-subtitle">Payment method breakdown</div>
                 <div class="chart-container">
                     <canvas id="paymentChart"></canvas>
                 </div>
             </div>
-
-            <!-- Monthly Sales Chart -->
-            <div class="chart-card">
-                <h2 class="chart-title">Monthly Sales (Last 12 Months)</h2>
-                <div class="chart-container">
-                    <canvas id="monthlySalesChart"></canvas>
-                </div>
+        </div>
+        
+        <!-- Bottom Row -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Conversion Rates -->
+            <div class="conversion-card">
+                <div class="chart-title" style="color: rgba(255,255,255,0.9);">Conversion rates</div>
+                <div class="chart-subtitle" style="color: rgba(255,255,255,0.7);">({{ conversion_growth_abs|floatformat:1 }}%) than last month</div>
+                <div class="conversion-value">{{ conversion_rate|floatformat:1 }}%</div>
             </div>
-
-            <!-- Sales by Weekday -->
+            
+            <!-- Top Products / Current Activity -->
             <div class="chart-card">
-                <h2 class="chart-title">Sales by Weekday</h2>
-                <div class="chart-container">
-                    <canvas id="weekdayChart"></canvas>
-                </div>
+                <div class="chart-title">Most ordered products</div>
+                <ul class="top-products-list">
+                    {% for product in top_products|slice:":5" %}
+                    <li>
+                        <span class="product-name">{{ product.product__name }}</span>
+                        <span class="product-price">KSh {{ product.product__price|floatformat:0|intcomma }}</span>
+                    </li>
+                    {% empty %}
+                    <li style="color: #6b7280; text-align: center; padding: 24px;">No products data available</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- Top Products and Sellers -->
-<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Top Products -->
-            <div class="lg:col-span-2">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Top Selling Products</h2>
-                <div class="top-products-table">
-                    <table class="w-full">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Quantity Sold</th>
-                                <th>Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for product in top_products %}
-                            <tr>
-                                <td class="font-medium">{{ product.product__name }}</td>
-                                <td>{{ product.total_quantity|intcomma }}</td>
-                                <td class="font-semibold text-green-600">KSh {{ product.total_revenue|floatformat:2|intcomma }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center text-gray-500 py-8">No sales data available</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Low Stock Products -->
+        
+        <!-- Recent Activity -->
+        <div class="chart-card" style="margin-top: 24px;">
+            <div class="chart-title">Recent sales</div>
             <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Low Stock Products</h2>
-                <div class="top-products-table">
-                    <table class="w-full">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Stock</th>
-                                <th>Min</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for p in low_stock_products %}
-                            <tr>
-                                <td class="font-medium">{{ p.name }}</td>
-                                <td>{{ p.stock_quantity }}</td>
-                                <td>{{ p.min_stock_level }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center text-gray-500 py-8">No low stock items 🎉</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                {% for sale in recent_sales %}
+                <div class="recent-activity-item">
+                    <div class="activity-info">
+                        <div class="activity-title">Sale #{{ sale.sale_number|truncatechars:12 }}</div>
+                        <div class="activity-meta">
+                            {% if sale.cashier.get_full_name %}{{ sale.cashier.get_full_name }}{% else %}{{ sale.cashier.username }}{% endif %} • {{ sale.created_at|date:"M d, Y H:i" }}
+                        </div>
+                    </div>
+                    <div class="activity-amount">KSh {{ sale.total_amount|floatformat:0|intcomma }}</div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 24px; color: #6b7280;">No recent sales</div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Period Breakdown Summary -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px;">
+            <!-- Daily Summary -->
+            <div class="chart-card">
+                <div class="chart-title">Daily Summary</div>
+                <div style="margin-top: 16px;">
+                    {% for item in daily_sales_data|slice:":7" %}
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #6b7280;">{{ item.date|date:"M d" }}</span>
+                        <span style="font-weight: 600;">KSh {{ item.total|floatformat:0|intcomma }}</span>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 24px; color: #6b7280;">No daily data</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Weekly Summary -->
+            <div class="chart-card">
+                <div class="chart-title">Weekly Summary</div>
+                <div style="margin-top: 16px;">
+                    {% for item in weekly_sales_data|slice:":7" %}
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #6b7280;">{{ item.week|date:"M d, Y" }}</span>
+                        <span style="font-weight: 600;">KSh {{ item.total|floatformat:0|intcomma }}</span>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 24px; color: #6b7280;">No weekly data</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Monthly Summary -->
+            <div class="chart-card">
+                <div class="chart-title">Monthly Summary</div>
+                <div style="margin-top: 16px;">
+                    {% for item in monthly_sales_data|slice:":7" %}
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #6b7280;">{{ item.month|date:"M Y" }}</span>
+                        <span style="font-weight: 600;">KSh {{ item.total|floatformat:0|intcomma }}</span>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 24px; color: #6b7280;">No monthly data</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Annual Summary -->
+            <div class="chart-card">
+                <div class="chart-title">Annual Summary</div>
+                <div style="margin-top: 16px;">
+                    {% for item in annual_sales_data %}
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #6b7280;">{{ item.year }}</span>
+                        <span style="font-weight: 600;">KSh {{ item.total|floatformat:0|intcomma }}</span>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 24px; color: #6b7280;">No annual data</div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-</section>
-
-<!-- Quick Actions -->
-<section class="py-12 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Quick Actions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="{% url 'analytics:sales_report' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl text-center hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
-                <i class="fas fa-file-alt text-3xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Sales Report</h3>
-                <p class="text-blue-100">Detailed sales analysis and filtering</p>
-            </a>
-            
-            <a href="{% url 'analytics:export_sales_data' %}" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl text-center hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg">
-                <i class="fas fa-download text-3xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Export Data</h3>
-                <p class="text-green-100">Download sales data to Excel</p>
-            </a>
-            
-            <a href="{% url 'inventory:export_stock_data' %}" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl text-center hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
-                <i class="fas fa-boxes text-3xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Stock Export</h3>
-                <p class="text-purple-100">Export inventory data to Excel</p>
-            </a>
-        </div>
-    </div>
-</section>
+</div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// Parse chart data from Django context
-const dailyChartData = JSON.parse('{{ daily_chart_data|safe }}');
-const weeklyChartData = JSON.parse('{{ weekly_chart_data|safe }}');
-const monthlyChartData = JSON.parse('{{ monthly_chart_data|safe }}');
-const categoryChartData = JSON.parse('{{ category_chart_data|safe }}');
-const paymentChartData = JSON.parse('{{ payment_chart_data|safe }}');
-const weekdayChartData = JSON.parse('{{ weekday_chart_data|safe }}');
-
-// Chart.js configuration
-const chartConfig = {
+// Mini trend charts for metric cards
+const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: {
-            position: 'top',
-        },
-        tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-                label: function(ctx) {
-                    const label = ctx.dataset.label ? ctx.dataset.label + ': ' : '';
-                    const v = ctx.parsed.y !== undefined ? ctx.parsed.y : ctx.parsed;
-                    return label + 'KSh ' + (v || 0).toLocaleString();
-                }
-            }
-        }
+        legend: { display: false },
+        tooltip: { enabled: false }
     },
     scales: {
-        y: {
-            beginAtZero: true,
-            ticks: {
-                callback: function(value) {
-                    return 'KSh ' + value.toLocaleString();
+        x: { display: false },
+        y: { display: false }
+    },
+    elements: {
+        point: { radius: 0 },
+        line: { tension: 0.4, borderWidth: 2 }
+    }
+};
+
+// Weekly Sales Trend
+new Chart(document.getElementById('weeklySalesChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ weekly_sales.trend }},
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true
+        }]
+    },
+    options: chartOptions
+});
+
+// New Users Trend
+new Chart(document.getElementById('newUsersChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ new_users.trend }},
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            fill: true
+        }]
+    },
+    options: chartOptions
+});
+
+// Orders Trend
+new Chart(document.getElementById('ordersChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ purchase_orders.trend }},
+            borderColor: '#eab308',
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            fill: true
+        }]
+    },
+    options: chartOptions
+});
+
+// Products Sold Trend
+new Chart(document.getElementById('productsChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ products_sold.trend }},
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true
+        }]
+    },
+    options: chartOptions
+});
+
+// Category Pie Chart
+const categoryPieData = {{ category_pie_data }};
+new Chart(document.getElementById('categoryPieChart'), {
+    type: 'pie',
+    data: categoryPieData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Period-based Chart
+const periodChartData = {{ period_chart }};
+new Chart(document.getElementById('periodChart'), {
+    type: 'line',
+    data: periodChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'KSh ' + context.parsed.y.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
+                    }
                 }
             }
         }
     }
-};
+});
 
-// Initialize charts
-document.addEventListener('DOMContentLoaded', function() {
-    // Daily Sales Chart
-    new Chart(document.getElementById('dailySalesChart'), {
-        type: 'line',
-        data: dailyChartData,
-        options: {
-            ...chartConfig,
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Daily Sales Trend'
-                }
-            }
-        }
-    });
-
-    // Weekly Sales Chart
-    new Chart(document.getElementById('weeklySalesChart'), {
-        type: 'line',
-        data: weeklyChartData,
-        options: {
-            ...chartConfig,
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Weekly Sales Trend'
-                }
-            }
-        }
-    });
-
-    // Monthly Sales Chart
-    new Chart(document.getElementById('monthlySalesChart'), {
-        type: 'line',
-        data: monthlyChartData,
-        options: {
-            ...chartConfig,
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Monthly Sales Trend'
-                }
-            }
-        }
-    });
-
-    // Category Chart
-    new Chart(document.getElementById('categoryChart'), {
-        type: 'doughnut',
-        data: categoryChartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                title: {
-                    display: true,
-                    text: 'Sales Distribution by Category'
-                }
-            }
-        }
-    });
-
-    // Payment Methods Chart
-    new Chart(document.getElementById('paymentChart'), {
-        type: 'doughnut',
-        data: paymentChartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                title: {
-                    display: true,
-                    text: 'Payment Methods Distribution'
-                }
-            }
-        }
-    });
-
-    // Sales by Weekday Chart
-    new Chart(document.getElementById('weekdayChart'), {
-        type: 'bar',
-        data: weekdayChartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                title: { display: true, text: 'Sales by Weekday' },
-                tooltip: {
-                    callbacks: {
-                        label: function(ctx){
-                            const v = ctx.parsed.y || 0;
-                            return 'KSh ' + v.toLocaleString();
-                        }
+// Monthly Bar Chart
+const monthlyBarData = {{ monthly_bar_data }};
+new Chart(document.getElementById('monthlyBarChart'), {
+    type: 'bar',
+    data: monthlyBarData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
                     }
                 }
+            }
+        }
+    }
+});
+
+// Payment Methods Chart
+const paymentChartData = {{ payment_chart_data }};
+new Chart(document.getElementById('paymentChart'), {
+    type: 'doughnut',
+    data: paymentChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) { return 'KSh ' + value.toLocaleString(); }
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.parsed || 0;
+                        return label + ': KSh ' + value.toLocaleString();
                     }
                 }
             }
         }
-    });
+    }
 });
 </script>
 {% endblock %}

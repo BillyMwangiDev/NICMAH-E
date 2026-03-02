@@ -6,258 +6,578 @@
 
 {% block extra_css %}
 <style>
+    /* Override Tabler colors with Agro theme */
+    :root {
+        --tblr-primary: #16a34a;
+        --tblr-primary-rgb: 22, 163, 74;
+        --tblr-primary-dark: #14532d;
+        --tblr-success: #059669;
+        --tblr-info: #0ea5e9;
+        --tblr-warning: #f59e0b;
+        --tblr-danger: #ef4444;
+    }
+    
+    /* Scoped card styling for analytics pages only */
+    .analytics-content .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        background: white;
+        margin-bottom: 1.5rem;
+    }
+    
+    .analytics-content .card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+    
+    .analytics-content .card-header {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .analytics-content .card-title {
+        color: #14532d;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin: 0;
+    }
+    
+    .analytics-content .card-body {
+        padding: 1.5rem;
+    }
+    
+    .metric-card {
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
     .chart-container {
         position: relative;
-        height: 400px;
-        margin: 20px 0;
+        height: 300px;
     }
     
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+    .mini-chart {
+        height: 60px;
     }
     
-    .stats-card:hover {
-        transform: translateY(-5px);
+    .subheader {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
     }
     
-    .stats-card.green {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    .h1 {
+        color: #14532d;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
     }
     
-    .stats-card.blue {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .stats-card.purple {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .stats-card.orange {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        color: #333;
-    }
-    
-    .chart-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .chart-title {
-        font-size: 1.5rem;
+    .badge {
+        border-radius: 6px;
         font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 20px;
-        text-align: center;
+        padding: 0.375rem 0.75rem;
     }
     
-    .top-products-table {
-        background: white;
-        border-radius: 15px;
+    .bg-primary {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%) !important;
+    }
+    
+    .analytics-content .table {
+        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e5e7eb;
     }
     
-    .top-products-table thead th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px;
+    .analytics-content .table thead {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    }
+    
+    .analytics-content .table thead th {
+        color: #14532d;
         font-weight: 600;
-        border: none;
+        font-family: 'Poppins', sans-serif;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
     }
     
-    .top-products-table tbody tr {
-        border-bottom: 1px solid #f3f4f6;
-        transition: background-color 0.2s ease;
+    .analytics-content .table tbody tr {
+        transition: all 0.2s ease;
     }
     
-    .top-products-table tbody tr:hover {
-        background-color: #f8fafc;
+    .analytics-content .table tbody tr:hover {
+        background: #f0fdf4;
     }
     
-    .top-products-table tbody td {
-        padding: 15px;
-        border: none;
+    .analytics-content .table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Period selector styling */
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .btn-group .btn {
+        border-radius: 8px;
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    /* Summary card gradient */
+    .analytics-content .card.bg-primary {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%) !important;
+        color: white;
+    }
+    
+    .analytics-content .card.bg-primary .h1,
+    .analytics-content .card.bg-primary .text-white {
+        color: white !important;
+    }
+    
+    /* Conversion rate card */
+    .analytics-content .card.bg-gradient {
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Row cards spacing */
+    .row-cards {
+        margin-bottom: 1.5rem;
+    }
+    
+    .row-cards > [class*="col-"] {
+        margin-bottom: 1rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 250px;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .btn-group .btn {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- POS Analytics Header -->
-<section class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white py-16">
+<!-- Analytics Dashboard Header -->
+<section class="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 text-white py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center">
+        <div class="text-center animate-on-load stagger-item">
             <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
                 <i class="fas fa-chart-line mr-4"></i>
-                POS Analytics
+                POS Analytics Dashboard
             </h1>
-            <p class="text-xl text-green-100 max-w-2xl mx-auto">
-                Point of Sale performance insights and reporting
+            <p class="text-xl text-green-50 max-w-2xl mx-auto">
+                Welcome back, {{ user.first_name|default:user.username }}! 
+                Track your POS sales performance and business insights.
             </p>
         </div>
     </div>
 </section>
 
-<!-- Date Filter -->
-<section class="py-8 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <form method="get" class="flex flex-wrap items-center gap-4">
+<div class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 analytics-content">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header with Actions -->
+        <div class="bg-white rounded-xl shadow-lg border border-green-200 p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-                    <input type="date" id="date_from" name="date_from" value="{{ date_from|date:'Y-m-d' }}" 
-                           class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <div class="text-sm font-semibold text-agro-green uppercase tracking-wide mb-1">POS Analytics</div>
+                    <h2 class="text-2xl font-display font-bold text-agro-dark">Dashboard</h2>
                 </div>
-                <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-                    <input type="date" id="date_to" name="date_to" value="{{ date_to|date:'Y-m-d' }}" 
-                           class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                <div class="flex flex-wrap gap-2">
+                    <a href="{% url 'pos:dashboard' %}" class="inline-flex items-center px-4 py-2 bg-agro-green text-white rounded-lg hover:bg-agro-dark transition-colors font-semibold">
+                        <i class="fas fa-cash-register mr-2"></i>POS Dashboard
+                    </a>
+                    <a href="{% url 'analytics:dashboard' %}?period={{ period }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-colors font-semibold">
+                        <i class="fas fa-chart-simple mr-2"></i>Full Analytics
+                    </a>
                 </div>
-                <div class="flex items-end">
-                    <button type="submit" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all">
-                        <i class="fas fa-filter mr-2"></i>Filter
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-</section>
 
-<!-- Summary Statistics -->
-<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Sales -->
-            <div class="stats-card green">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-green-100 text-sm font-medium">Total Sales</p>
-                        <p class="text-3xl font-bold">KSh {{ total_sales|floatformat:2|intcomma }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-money-bill text-2xl"></i>
-                    </div>
+        <!-- Period Selector -->
+        <div class="card mb-6">
+            <div class="card-body">
+                <div class="flex flex-wrap gap-2" role="group">
+                    <a href="?period=daily" class="px-4 py-2 rounded-lg font-semibold transition-colors {% if period == 'daily' %}bg-agro-green text-white hover:bg-agro-dark{% else %}bg-white text-agro-green border-2 border-agro-green hover:bg-agro-green hover:text-white{% endif %}">
+                        <i class="fas fa-calendar-day mr-2"></i>Daily
+                    </a>
+                    <a href="?period=weekly" class="px-4 py-2 rounded-lg font-semibold transition-colors {% if period == 'weekly' %}bg-agro-green text-white hover:bg-agro-dark{% else %}bg-white text-agro-green border-2 border-agro-green hover:bg-agro-green hover:text-white{% endif %}">
+                        <i class="fas fa-calendar-week mr-2"></i>Weekly
+                    </a>
+                    <a href="?period=monthly" class="px-4 py-2 rounded-lg font-semibold transition-colors {% if period == 'monthly' %}bg-agro-green text-white hover:bg-agro-dark{% else %}bg-white text-agro-green border-2 border-agro-green hover:bg-agro-green hover:text-white{% endif %}">
+                        <i class="fas fa-calendar-alt mr-2"></i>Monthly
+                    </a>
+                    <a href="?period=annual" class="px-4 py-2 rounded-lg font-semibold transition-colors {% if period == 'annual' %}bg-agro-green text-white hover:bg-agro-dark{% else %}bg-white text-agro-green border-2 border-agro-green hover:bg-agro-green hover:text-white{% endif %}">
+                        <i class="fas fa-calendar mr-2"></i>Annual
+                    </a>
                 </div>
             </div>
+        </div>
 
-            <!-- Total Transactions -->
-            <div class="stats-card blue">
-                <div class="flex items-center justify-between">
+        <!-- Period Summary Card -->
+        <div class="card bg-primary text-white mb-6">
+            <div class="card-body">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <p class="text-blue-100 text-sm font-medium">Transactions</p>
-                        <p class="text-3xl font-bold">{{ total_transactions|intcomma }}</p>
+                        <div class="text-white text-opacity-75 mb-1 text-sm font-semibold uppercase tracking-wide">{{ period|capfirst }} Sales Summary</div>
+                        <div class="h1 mb-0">KSh {{ period_revenue|floatformat:0|intcomma }}</div>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white text-agro-green">{{ period_transactions|intcomma }} transactions</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold {% if period_growth >= 0 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if period_growth >= 0 %}↑{% else %}↓{% endif %} {{ period_growth_abs|floatformat:1 }}% vs previous {{ period }}
+                            </span>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-shopping-cart text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Tax -->
-            <div class="stats-card purple">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm font-medium">Tax Collected</p>
-                        <p class="text-3xl font-bold">KSh {{ total_tax|floatformat:2|intcomma }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-percentage text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Discounts -->
-            <div class="stats-card orange">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-700 text-sm font-medium">Discounts Given</p>
-                        <p class="text-3xl font-bold">KSh {{ total_discounts|floatformat:2|intcomma }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
-                        <i class="fas fa-tag text-2xl text-white"></i>
+                    <div class="mt-4 sm:mt-0">
+                        <i class="fas fa-chart-line fa-3x text-white text-opacity-25"></i>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Daily Sales Chart -->
-<section class="py-12 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="chart-card">
-            <h2 class="chart-title">Daily Sales Trend</h2>
+        <!-- Metric Cards -->
+        <div class="row-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Weekly sales</div>
+                        <i class="fas fa-money-bill-1-wave text-primary"></i>
+                    </div>
+                    <div class="h1 mb-3">{{ weekly_sales.formatted }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div>{% if weekly_sales.growth >= 0 %}↑{% else %}↓{% endif %} {{ weekly_sales.growth_abs|floatformat:1 }}%</div>
+                        <span class="text-{% if weekly_sales.growth >= 0 %}success{% else %}danger{% endif %} text-sm">vs last week</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1">
+                        <div class="h-1 rounded-full {% if weekly_sales.growth >= 0 %}bg-green-600{% else %}bg-red-600{% endif %}" style="width: {{ weekly_sales.growth_abs|floatformat:0 }}%"></div>
+                    </div>
+                    <div class="mini-chart mt-3">
+                        <canvas id="weeklySalesMiniChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Total transactions</div>
+                        <i class="fas fa-shopping-cart text-info"></i>
+                    </div>
+                    <div class="h1 mb-3">{{ total_transactions|intcomma }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-muted text-sm">Completed sales</div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1">
+                        <div class="h-1 rounded-full bg-blue-600" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Tax collected</div>
+                        <i class="fas fa-percentage text-warning"></i>
+                    </div>
+                    <div class="h1 mb-3">KSh {{ total_tax|floatformat:0|intcomma }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-muted text-sm">Total tax revenue</div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1">
+                        <div class="h-1 rounded-full bg-yellow-600" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Discounts given</div>
+                        <i class="fas fa-tag text-danger"></i>
+                    </div>
+                    <div class="h1 mb-3">KSh {{ total_discounts|floatformat:0|intcomma }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-muted text-sm">Total discounts</div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1">
+                        <div class="h-1 rounded-full bg-red-600" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row-cards grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ period|capfirst }} Sales Trend</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="periodChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sales by Category</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="categoryPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Charts -->
+        <div class="row-cards grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Monthly Sales Comparison</h3>
+                    <div class="text-sm text-muted">({{ year_growth_abs|floatformat:0 }}%) than last year</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="monthlyBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Payment Methods Distribution</h3>
+                </div>
+                <div class="card-body">
             <div class="chart-container">
-                <canvas id="dailySalesChart"></canvas>
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="row-cards grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
+            <div class="lg:col-span-4">
+                <div class="card bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body text-white">
+                        <div class="card-title text-white mb-2">Conversion rates</div>
+                        <div class="h1 mb-3">{{ conversion_rate|floatformat:1 }}%</div>
+                        <div class="text-white text-opacity-75 text-sm">({{ conversion_growth_abs|floatformat:1 }}%) than last month</div>
             </div>
         </div>
     </div>
-</section>
 
-<!-- Top Products and Payment Methods -->
-<section class="py-12 bg-gradient-to-br from-gray-50 to-slate-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Top Products -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Top Selling Products</h2>
-                <div class="top-products-table">
-                    <table class="w-full">
+            <div class="lg:col-span-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Most Ordered Products</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="overflow-x-auto">
+                            <table class="table">
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Quantity</th>
+                                        <th>Category</th>
+                                        <th>Quantity Sold</th>
                                 <th>Revenue</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for product in top_products %}
-                            <tr>
-                                <td class="font-medium">{{ product.items__product__name|default:"Unknown Product" }}</td>
-                                <td>{{ product.quantity|intcomma }}</td>
-                                <td class="font-semibold text-green-600">KSh {{ product.revenue|floatformat:2|intcomma }}</td>
+                                    {% for product in top_products|slice:":5" %}
+                                    <tr>
+                                        <td>{{ product.product__name|default:"Unknown Product" }}</td>
+                                        <td class="text-muted">{{ product.product__category__name|default:"Uncategorized" }}</td>
+                                        <td>{{ product.total_quantity|intcomma }}</td>
+                                        <td>KSh {{ product.total_revenue|floatformat:0|intcomma }}</td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center text-gray-500 py-8">No sales data available</td>
+                                        <td colspan="4" class="text-center text-muted">No product data available</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period Breakdown Tables -->
+        <div class="row-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Daily Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in daily_sales_data|slice:":7" %}
+                                <tr>
+                                    <td>{{ item.date|date:"M d" }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Payment Methods -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Payment Methods</h2>
-                <div class="top-products-table">
-                    <table class="w-full">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Weekly Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Week</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in weekly_sales_data|slice:":7" %}
+                                <tr>
+                                    <td>{{ item.week|date:"M d" }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Monthly Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in monthly_sales_data|slice:":7" %}
+                                <tr>
+                                    <td>{{ item.month|date:"M Y" }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Annual Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in annual_sales_data %}
+                                <tr>
+                                    <td>{{ item.year }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+        <!-- Recent Sales -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Sales</h3>
+            </div>
+            <div class="card-body">
+                <div class="overflow-x-auto">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th>Method</th>
-                                <th>Count</th>
-                                <th>Total</th>
+                                <th>Sale #</th>
+                                <th>Cashier</th>
+                                <th>Seller</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for payment in payment_breakdown %}
+                            {% for sale in recent_sales %}
                             <tr>
-                                <td class="font-medium">{{ payment.payment_method|default:"Unknown" }}</td>
-                                <td>{{ payment.count|intcomma }}</td>
-                                <td class="font-semibold text-green-600">KSh {{ payment.total|floatformat:2|intcomma }}</td>
+                                <td>{{ sale.sale_number|truncatechars:12 }}</td>
+                                <td>{% if sale.cashier.get_full_name %}{{ sale.cashier.get_full_name }}{% else %}{{ sale.cashier.username }}{% endif %}</td>
+                                <td>{% if sale.seller %}{% if sale.seller.get_full_name %}{{ sale.seller.get_full_name }}{% else %}{{ sale.seller.username }}{% endif %}{% else %}<span class="text-muted">N/A</span>{% endif %}</td>
+                                <td>KSh {{ sale.total_amount|floatformat:0|intcomma }}</td>
+                                <td>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold {% if sale.payment_method == 'cash' %}bg-green-100 text-green-800{% elif sale.payment_method == 'card' %}bg-blue-100 text-blue-800{% else %}bg-purple-100 text-purple-800{% endif %}">
+                                        {{ sale.get_payment_method_display }}
+                                    </span>
+                                </td>
+                                <td class="text-muted">{{ sale.created_at|date:"M d, Y H:i" }}</td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center text-gray-500 py-8">No payment data available</td>
+                                <td colspan="6" class="text-center text-muted">No recent sales</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -266,66 +586,53 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Quick Actions -->
-<section class="py-12 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Quick Actions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="{% url 'pos:dashboard' %}" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl text-center hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg">
-                <i class="fas fa-cash-register text-3xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">POS Dashboard</h3>
-                <p class="text-green-100">Return to POS system</p>
-            </a>
-            
-            <a href="{% url 'analytics:dashboard' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl text-center hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
-                <i class="fas fa-chart-line text-3xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Full Analytics</h3>
-                <p class="text-blue-100">View comprehensive analytics</p>
-            </a>
-            
-            <a href="{% url 'analytics:export_sales_data' %}" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl text-center hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
-                <i class="fas fa-download text-3xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Export Data</h3>
-                <p class="text-purple-100">Download sales reports</p>
-            </a>
-        </div>
-    </div>
-</section>
+{% endblock %}
 
+{% block extra_js %}
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-// Prepare chart data from Django context
-const dailySalesData = {
-    labels: [{% for day in daily_sales %}'{{ day.day }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
-    datasets: [{
-        label: 'Daily Sales',
-        data: [{% for day in daily_sales %}{{ day.sales|floatformat:2 }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-        borderColor: 'rgb(34, 197, 94)',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        tension: 0.4,
-        fill: true
-    }]
+// Mini trend charts
+const miniChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: { x: { display: false }, y: { display: false } },
+    elements: { point: { radius: 0 }, line: { tension: 0.4, borderWidth: 2 } }
 };
 
-// Initialize chart
-document.addEventListener('DOMContentLoaded', function() {
-    new Chart(document.getElementById('dailySalesChart'), {
+new Chart(document.getElementById('weeklySalesMiniChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+    datasets: [{
+            data: {{ weekly_sales.trend|safe }},
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+        fill: true
+    }]
+    },
+    options: miniChartOptions
+});
+
+// Period Chart
+const periodChartData = {{ period_chart|safe }};
+new Chart(document.getElementById('periodChart'), {
         type: 'line',
-        data: dailySalesData,
+    data: periodChartData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Daily Sales Trend'
+            legend: { position: 'top' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'KSh ' + context.parsed.y.toLocaleString();
+                    }
+                }
                 }
             },
             scales: {
@@ -333,13 +640,78 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return 'KSh ' + value.toLocaleString();
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Category Pie Chart
+const categoryPieData = {{ category_pie_data|safe }};
+new Chart(document.getElementById('categoryPieChart'), {
+    type: 'pie',
+    data: categoryPieData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.parsed || 0;
+                        return label + ': KSh ' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Monthly Bar Chart
+const monthlyBarData = {{ monthly_bar_data|safe }};
+new Chart(document.getElementById('monthlyBarChart'), {
+    type: 'bar',
+    data: monthlyBarData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
                         }
                     }
                 }
             }
         }
     });
+
+// Payment Chart
+const paymentChartData = {{ payment_chart_data|safe }};
+new Chart(document.getElementById('paymentChart'), {
+    type: 'doughnut',
+    data: paymentChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': KSh ' + context.parsed.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
 });
 </script>
 {% endblock %}

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"robocopy \"\"C:\\\\Users\\\\USER\\\\Desktop\\\\PROJECTS\\\\NICMAH-E\"\" \"\"C:\\\\Users\\\\USER\\\\Desktop\\\\PROJECTS\\\\NICMAH-E-1\"\" /E /XD .git venv __pycache__ staticfiles logs /XF db.sqlite3 *.pyc *.pyo /NP\")",
+      "Bash(echo \"EXIT:$?\")"
+    ]
+  }
+}

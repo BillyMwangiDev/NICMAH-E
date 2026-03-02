@@ -1,7 +1,33 @@
+# Development Dependencies
+# Include all production dependencies
 -r requirements.txt
-pytest
-pytest-django
-coverage
-flake8
-black
-pip-audit
+
+# Testing
+pytest==8.4.1
+pytest-django==4.11.1
+coverage==7.10.5
+
+# Code Quality
+flake8==7.1.1
+black==24.10.0
+mypy-extensions==1.1.0
+pathspec==0.12.1
+pycodestyle==2.12.1
+pyflakes==3.2.0
+mccabe==0.7.0
+
+# Security Auditing
+pip-audit==2.7.3
+pip-api==0.0.34
+pip-requirements-parser==32.0.1
+cyclonedx-python-lib==7.6.2
+license-expression==30.4.4
+packageurl-python==0.17.5
+
+# Development Tools
+click==8.2.1
+colorama==0.4.6
+iniconfig==2.1.0
+pluggy==1.6.0
+filelock==3.19.1
+CacheControl==0.14.3

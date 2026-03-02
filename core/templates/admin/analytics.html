@@ -259,7 +259,7 @@
 <div class="analytics-container">
     <div class="analytics-header">
         <div class="container">
-            <h1>📊 Analytics Dashboard</h1>
+            <h1>Analytics Dashboard</h1>
             <p>Comprehensive insights into your business performance and growth trends</p>
         </div>
     </div>
@@ -272,7 +272,7 @@
         <!-- Metrics Summary -->
         <div class="metrics-summary">
             <div class="metric-card">
-                <div class="metric-title">💰 Total Revenue</div>
+                <div class="metric-title">Total Revenue</div>
                 <div class="metric-value">${{ total_revenue|floatformat:0 }}</div>
                 <div class="metric-change">
                     <span class="trend-indicator trend-up">↗ +18.5%</span>
@@ -281,7 +281,7 @@
             </div>
             
             <div class="metric-card">
-                <div class="metric-title">🛒 Total Transactions</div>
+                <div class="metric-title">Total Transactions</div>
                 <div class="metric-value">{{ total_transactions }}</div>
                 <div class="metric-change">
                     <span class="trend-indicator trend-up">↗ +12.3%</span>
@@ -290,7 +290,7 @@
             </div>
             
             <div class="metric-card">
-                <div class="metric-title">📦 Active Products</div>
+                <div class="metric-title">Active Products</div>
                 <div class="metric-value">{{ top_products|length }}</div>
                 <div class="metric-change">
                     <span class="trend-indicator trend-up">↗ +8.7%</span>
@@ -299,7 +299,7 @@
             </div>
             
             <div class="metric-card">
-                <div class="metric-title">🏷️ Categories</div>
+                <div class="metric-title">Categories</div>
                 <div class="metric-value">{{ category_performance|length }}</div>
                 <div class="metric-change">
                     <span class="trend-indicator trend-up">↗ +5.2%</span>
@@ -311,25 +311,25 @@
         <!-- Quick Insights -->
         <div class="insights-grid">
             <div class="insight-card">
-                <div class="insight-title">🚀 Growth Rate</div>
+                <div class="insight-title">Growth Rate</div>
                 <div class="insight-value">+24.7%</div>
                 <div class="insight-description">Year-over-year revenue growth</div>
             </div>
             
             <div class="insight-card">
-                <div class="insight-title">📈 Conversion Rate</div>
+                <div class="insight-title">Conversion Rate</div>
                 <div class="insight-value">68.3%</div>
                 <div class="insight-description">Visitor to customer conversion</div>
             </div>
             
             <div class="insight-card">
-                <div class="insight-title">⏱️ Average Order Value</div>
+                <div class="insight-title">Average Order Value</div>
                 <div class="insight-value">$127.50</div>
                 <div class="insight-description">Per transaction average</div>
             </div>
             
             <div class="insight-card">
-                <div class="insight-title">🔄 Customer Retention</div>
+                <div class="insight-title">Customer Retention</div>
                 <div class="insight-value">89.2%</div>
                 <div class="insight-description">Repeat customer rate</div>
             </div>
@@ -339,7 +339,7 @@
         <div class="charts-grid">
             <!-- Sales Trend Chart -->
             <div class="chart-card">
-                <div class="chart-title">📈 Sales Trend Analysis</div>
+                <div class="chart-title">Sales Trend Analysis</div>
                 <div class="chart-container">
                     <canvas id="salesTrendChart"></canvas>
                 </div>
@@ -351,7 +351,7 @@
             
             <!-- Category Performance Chart -->
             <div class="chart-card">
-                <div class="chart-title">🏷️ Category Performance</div>
+                <div class="chart-title">Category Performance</div>
                 <div class="chart-container">
                     <canvas id="categoryTrendChart"></canvas>
                 </div>
@@ -363,7 +363,7 @@
             
             <!-- Revenue Distribution Chart -->
             <div class="chart-card">
-                <div class="chart-title">💰 Revenue Distribution</div>
+                <div class="chart-title">Revenue Distribution</div>
                 <div class="chart-container">
                     <canvas id="revenueAreaChart"></canvas>
                 </div>
@@ -375,7 +375,7 @@
             
             <!-- Top Products Chart -->
             <div class="chart-card">
-                <div class="chart-title">🏆 Top Products Performance</div>
+                <div class="chart-title">Top Products Performance</div>
                 <div class="chart-container">
                     <canvas id="topProductsChart"></canvas>
                 </div>
@@ -387,7 +387,7 @@
             
             <!-- Payment Methods Chart -->
             <div class="chart-card">
-                <div class="chart-title">💳 Payment Methods Distribution</div>
+                <div class="chart-title">Payment Methods Distribution</div>
                 <div class="chart-container">
                     <canvas id="paymentMethodsChart"></canvas>
                 </div>
@@ -399,7 +399,7 @@
             
             <!-- Weekly Performance Chart -->
             <div class="chart-card">
-                <div class="chart-title">📅 Weekly Performance Trends</div>
+                <div class="chart-title">Weekly Performance Trends</div>
                 <div class="chart-container">
                     <canvas id="weeklyChart"></canvas>
                 </div>
@@ -414,7 +414,7 @@
         <div class="charts-grid">
             <!-- Customer Demographics -->
             <div class="chart-card">
-                <div class="chart-title">👥 Customer Demographics</div>
+                <div class="chart-title">Customer Demographics</div>
                 <div class="chart-container">
                     <canvas id="customerDemographicsChart"></canvas>
                 </div>
@@ -426,7 +426,7 @@
             
             <!-- Seasonal Trends -->
             <div class="chart-card">
-                <div class="chart-title">🌱 Seasonal Business Trends</div>
+                <div class="chart-title">Seasonal Business Trends</div>
                 <div class="chart-container">
                     <canvas id="seasonalTrendsChart"></canvas>
                 </div>
@@ -512,80 +512,32 @@
         }
     };
     
-    // Enhanced sample data for testing
-    const sampleData = {
-        sales: [
-            { date: '2025-01-01', total: 12500, count: 45 },
-            { date: '2025-01-02', total: 13800, count: 52 },
-            { date: '2025-01-03', total: 14200, count: 48 },
-            { date: '2025-01-04', total: 15600, count: 61 },
-            { date: '2025-01-05', total: 16800, count: 58 },
-            { date: '2025-01-06', total: 17500, count: 65 },
-            { date: '2025-01-07', total: 18900, count: 72 },
-            { date: '2025-01-08', total: 18200, count: 68 },
-            { date: '2025-01-09', total: 19500, count: 75 },
-            { date: '2025-01-10', total: 20800, count: 82 },
-            { date: '2025-01-11', total: 21500, count: 79 },
-            { date: '2025-01-12', total: 22800, count: 86 },
-            { date: '2025-01-13', total: 23500, count: 89 },
-            { date: '2025-01-14', total: 24200, count: 92 },
-            { date: '2025-01-15', total: 24800, count: 95 }
-        ],
-        categories: [
-            { name: 'Poultry & Livestock', revenue: 45000, growth: 15.2, color: '#7c3aed' },
-            { name: 'Dairy Products', revenue: 38000, growth: 12.8, color: '#10b981' },
-            { name: 'Crop Supplies', revenue: 32000, growth: 8.5, color: '#f59e0b' },
-            { name: 'Farm Equipment', revenue: 28000, growth: 22.1, color: '#ef4444' },
-            { name: 'Seeds & Fertilizers', revenue: 25000, growth: 18.7, color: '#06b6d4' },
-            { name: 'Veterinary Supplies', revenue: 22000, growth: 25.3, color: '#8b5cf6' }
-        ],
-        products: [
-            { name: 'Premium Chicken Feed', sales: 12500, growth: 12.5, category: 'Poultry' },
-            { name: 'Dairy Nutrition Mix', sales: 9800, growth: 8.3, category: 'Dairy' },
-            { name: 'Organic Fertilizer', sales: 8700, growth: 15.7, category: 'Crops' },
-            { name: 'Animal Vaccines', sales: 7200, growth: 22.1, category: 'Veterinary' },
-            { name: 'Farm Tools Set', sales: 6500, growth: 18.9, category: 'Equipment' },
-            { name: 'Hybrid Seeds Pack', sales: 5800, growth: 14.2, category: 'Seeds' },
-            { name: 'Pest Control Spray', sales: 5200, growth: 16.8, category: 'Crops' },
-            { name: 'Milking Equipment', sales: 4800, growth: 11.5, category: 'Equipment' }
-        ],
-        payments: [
-            { method: 'Cash', percentage: 45, color: '#7c3aed', growth: 8.2 },
-            { method: 'M-Pesa', percentage: 35, color: '#10b981', growth: 15.7 },
-            { method: 'Bank Transfer', percentage: 15, color: '#f59e0b', growth: 12.3 },
-            { method: 'Credit Card', percentage: 5, color: '#ef4444', growth: 22.1 }
-        ],
-        weekly: [
-            { day: 'Monday', revenue: 18500, transactions: 68, growth: 12.5 },
-            { day: 'Tuesday', revenue: 19200, transactions: 72, growth: 8.3 },
-            { day: 'Wednesday', revenue: 20800, transactions: 78, growth: 15.7 },
-            { day: 'Thursday', revenue: 21500, transactions: 81, growth: 18.9 },
-            { day: 'Friday', revenue: 22800, transactions: 85, growth: 22.1 },
-            { day: 'Saturday', revenue: 23500, transactions: 88, growth: 25.3 },
-            { day: 'Sunday', revenue: 21800, transactions: 82, growth: 19.7 }
-        ],
-        demographics: [
-            { age: '18-25', percentage: 15, color: '#7c3aed' },
-            { age: '26-35', percentage: 28, color: '#10b981' },
-            { age: '36-45', percentage: 32, color: '#f59e0b' },
-            { age: '46-55', percentage: 18, color: '#ef4444' },
-            { age: '55+', percentage: 7, color: '#06b6d4' }
-        ],
-        seasonal: [
-            { month: 'Jan', revenue: 42000, trend: 'up' },
-            { month: 'Feb', revenue: 45000, trend: 'up' },
-            { month: 'Mar', revenue: 48000, trend: 'up' },
-            { month: 'Apr', revenue: 52000, trend: 'up' },
-            { month: 'May', revenue: 58000, trend: 'up' },
-            { month: 'Jun', revenue: 62000, trend: 'up' },
-            { month: 'Jul', revenue: 68000, trend: 'up' },
-            { month: 'Aug', revenue: 72000, trend: 'up' },
-            { month: 'Sep', revenue: 78000, trend: 'up' },
-            { month: 'Oct', revenue: 82000, trend: 'up' },
-            { month: 'Nov', revenue: 88000, trend: 'up' },
-            { month: 'Dec', revenue: 95000, trend: 'up' }
-        ]
+    // Use real data from database - passed from backend
+    const salesData = {{ sales_data_json|safe|default:"[]" }};
+    const topProductsData = {{ products_data_json|safe|default:"[]" }};
+    const categoryPerformanceData = {{ category_performance_json|safe|default:"[]" }};
+    const paymentMethodsData = {{ payment_methods_json|safe|default:"[]" }};
+    
+    // Transform backend data to chart format
+    const chartData = {
+        sales: Array.isArray(salesData) && salesData.length > 0 ? salesData : [],
+        products: Array.isArray(topProductsData) && topProductsData.length > 0 ? topProductsData.map(p => ({
+            name: p.product__name || p.name || 'Unknown',
+            sales: parseFloat(p.total_revenue || p.revenue || 0),
+            category: p.product__category__name || p.category || 'Uncategorized'
+        })) : [],
+        categories: Array.isArray(categoryPerformanceData) && categoryPerformanceData.length > 0 ? categoryPerformanceData.map(c => ({
+            name: c.product__category__name || c.category__name || c.name || 'Unknown',
+            revenue: parseFloat(c.total_revenue || c.revenue || 0)
+        })) : [],
+        payments: Array.isArray(paymentMethodsData) && paymentMethodsData.length > 0 ? paymentMethodsData : [],
+        weekly: [], // Will be populated from database if available
+        demographics: [], // Will be populated from database if available
+        seasonal: [] // Will be populated from database if available
     };
+    
+    // Use chartData instead of sampleData
+    const sampleData = chartData;
     
     // Sales Trend Chart (Enhanced Line Chart)
     const salesCtx = document.getElementById('salesTrendChart').getContext('2d');

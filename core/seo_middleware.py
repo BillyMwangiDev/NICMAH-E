@@ -1,5 +1,5 @@
 """
-SEO Middleware for Nicmah Agrovet website.
+SEO Middleware for NICMAH website.
 Handles basic SEO headers and security headers.
 """
 

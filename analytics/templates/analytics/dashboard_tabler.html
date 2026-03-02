@@ -1,0 +1,828 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Analytics Dashboard - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Override Tabler colors with Agro theme */
+    :root {
+        --tblr-primary: #16a34a;
+        --tblr-primary-rgb: 22, 163, 74;
+        --tblr-primary-dark: #14532d;
+        --tblr-success: #059669;
+        --tblr-info: #0ea5e9;
+        --tblr-warning: #f59e0b;
+        --tblr-danger: #ef4444;
+    }
+    
+    /* Ensure base template styles take precedence */
+    .analytics-dashboard {
+        background: transparent;
+    }
+    
+    /* Scoped card styling for analytics pages only */
+    .analytics-content .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        background: white;
+        margin-bottom: 1.5rem;
+    }
+    
+    .analytics-content .card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+    
+    .analytics-content .card-header {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .analytics-content .card-title {
+        color: #14532d;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin: 0;
+    }
+    
+    .analytics-content .card-body {
+        padding: 1.5rem;
+    }
+    
+    .analytics-content .btn-primary {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1.5rem;
+        color: white;
+    }
+    
+    .analytics-content .btn-primary:hover {
+        background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        color: white;
+    }
+    
+    .analytics-content .btn-success {
+        background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+        color: white;
+    }
+    
+    .analytics-content .btn-success:hover {
+        background: linear-gradient(135deg, #047857 0%, #059669 100%);
+        transform: translateY(-1px);
+        color: white;
+    }
+    
+    .analytics-content .btn-outline-primary {
+        border: 2px solid #16a34a;
+        color: #16a34a;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        background: transparent;
+        font-weight: 600;
+    }
+    
+    .analytics-content .btn-outline-primary:hover {
+        background: #16a34a;
+        color: white;
+    }
+    
+    .metric-card {
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    
+    .mini-chart {
+        height: 60px;
+    }
+    
+    .subheader {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .h1 {
+        color: #14532d;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+    
+    .badge {
+        border-radius: 6px;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .bg-primary {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%) !important;
+    }
+    
+    .analytics-content .table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .analytics-content .table thead {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    }
+    
+    .analytics-content .table thead th {
+        color: #14532d;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
+    }
+    
+    .analytics-content .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .analytics-content .table tbody tr:hover {
+        background: #f0fdf4;
+    }
+    
+    .analytics-content .table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 250px;
+        }
+        
+        .btn-list {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .btn-list .btn {
+            width: 100%;
+        }
+        
+        .row-cards {
+            margin-bottom: 1rem;
+        }
+    }
+    
+    /* Period selector styling */
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .btn-group .btn {
+        border-radius: 8px;
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    /* Summary card gradient */
+    .analytics-content .card.bg-primary {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%) !important;
+        color: white;
+    }
+    
+    .analytics-content .card.bg-primary .h1,
+    .analytics-content .card.bg-primary .text-white {
+        color: white !important;
+    }
+    
+    /* Conversion rate card */
+    .analytics-content .card.bg-gradient {
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Row cards spacing */
+    .row-cards {
+        margin-bottom: 1.5rem;
+    }
+    
+    .row-cards > [class*="col-"] {
+        margin-bottom: 1rem;
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Analytics Dashboard Header -->
+<section class="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl font-display font-bold mb-4">
+                <i class="fas fa-chart-simple mr-4"></i>
+                Analytics Dashboard
+            </h1>
+            <p class="text-xl text-green-50 max-w-2xl mx-auto">
+                Welcome back, {{ user.first_name|default:user.username }}! 
+                Track your sales performance and business insights.
+            </p>
+        </div>
+    </div>
+</section>
+
+<div class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 analytics-content">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header with Actions -->
+        <div class="bg-white rounded-xl shadow-lg border border-green-200 p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <div class="text-sm font-semibold text-agro-green uppercase tracking-wide mb-1">Analytics</div>
+                    <h2 class="text-2xl font-display font-bold text-agro-dark">Dashboard</h2>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{% url 'analytics:sales_report' %}?period={{ period }}" class="inline-flex items-center px-4 py-2 bg-agro-green text-white rounded-lg hover:bg-agro-dark transition-colors font-semibold">
+                        <i class="fas fa-file-lines mr-2"></i>View Report
+                    </a>
+                    <a href="{% url 'analytics:export_sales_data' %}?period={{ period }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-colors font-semibold">
+                        <i class="fas fa-download mr-2"></i>Export Data
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period Selector -->
+        <div class="card mb-6">
+            <div class="card-body">
+                <div class="btn-group" role="group">
+                    <a href="?period=daily" class="btn {% if period == 'daily' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-day me-2"></i>Daily
+                    </a>
+                    <a href="?period=weekly" class="btn {% if period == 'weekly' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-week me-2"></i>Weekly
+                    </a>
+                    <a href="?period=monthly" class="btn {% if period == 'monthly' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-alt me-2"></i>Monthly
+                    </a>
+                    <a href="?period=annual" class="btn {% if period == 'annual' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar me-2"></i>Annual
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period Summary Card -->
+        <div class="card bg-primary text-white mb-6">
+            <div class="card-body">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <div class="text-white text-opacity-75 mb-1 text-sm font-semibold uppercase tracking-wide">{{ period|capfirst }} Sales Summary</div>
+                        <div class="h1 mb-0">KSh {{ period_revenue|floatformat:0|intcomma }}</div>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="badge bg-white text-primary">{{ period_transactions|intcomma }} transactions</span>
+                            <span class="badge {% if period_growth >= 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if period_growth >= 0 %}↑{% else %}↓{% endif %} {{ period_growth_abs|floatformat:1 }}% vs previous {{ period }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-4 sm:mt-0">
+                        <i class="fas fa-chart-simple fa-3x text-white text-opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="row-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Weekly sales</div>
+                        <i class="fas fa-money-bill-1-wave text-primary"></i>
+                    </div>
+                    <div class="h1 mb-3">{{ weekly_sales.formatted }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div>{% if weekly_sales.growth >= 0 %}↑{% else %}↓{% endif %} {{ weekly_sales.growth_abs|floatformat:1 }}%</div>
+                        <span class="text-{% if weekly_sales.growth >= 0 %}success{% else %}danger{% endif %} text-sm">vs last week</span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-{% if weekly_sales.growth >= 0 %}success{% else %}danger{% endif %}" style="width: {{ weekly_sales.growth_abs }}%"></div>
+                    </div>
+                    <div class="mini-chart mt-3">
+                        <canvas id="weeklySalesMiniChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">New users</div>
+                        <i class="fas fa-users text-info"></i>
+                    </div>
+                    <div class="h1 mb-3">{{ new_users.formatted }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div>{% if new_users.growth >= 0 %}↑{% else %}↓{% endif %} {{ new_users.growth_abs|floatformat:1 }}%</div>
+                        <span class="text-{% if new_users.growth >= 0 %}success{% else %}danger{% endif %} text-sm">vs last week</span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-{% if new_users.growth >= 0 %}success{% else %}danger{% endif %}" style="width: {{ new_users.growth_abs }}%"></div>
+                    </div>
+                    <div class="mini-chart mt-3">
+                        <canvas id="newUsersMiniChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Purchase orders</div>
+                        <i class="fas fa-cart-shopping text-warning"></i>
+                    </div>
+                    <div class="h1 mb-3">{{ purchase_orders.formatted }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div>{% if purchase_orders.growth >= 0 %}↑{% else %}↓{% endif %} {{ purchase_orders.growth_abs|floatformat:1 }}%</div>
+                        <span class="text-{% if purchase_orders.growth >= 0 %}success{% else %}danger{% endif %} text-sm">vs last week</span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-{% if purchase_orders.growth >= 0 %}success{% else %}danger{% endif %}" style="width: {{ purchase_orders.growth_abs }}%"></div>
+                    </div>
+                    <div class="mini-chart mt-3">
+                        <canvas id="ordersMiniChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="card-body">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="subheader">Products sold</div>
+                        <i class="fas fa-box text-danger"></i>
+                    </div>
+                    <div class="h1 mb-3">{{ products_sold.formatted }}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div>{% if products_sold.growth >= 0 %}↑{% else %}↓{% endif %} {{ products_sold.growth_abs|floatformat:1 }}%</div>
+                        <span class="text-{% if products_sold.growth >= 0 %}success{% else %}danger{% endif %} text-sm">vs last week</span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-{% if products_sold.growth >= 0 %}success{% else %}danger{% endif %}" style="width: {{ products_sold.growth_abs }}%"></div>
+                    </div>
+                    <div class="mini-chart mt-3">
+                        <canvas id="productsMiniChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row-cards grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ period|capfirst }} Sales Trend</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="periodChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sales by Category</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="categoryPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Charts -->
+        <div class="row-cards grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Monthly Sales Comparison</h3>
+                    <div class="text-sm text-muted">({{ year_growth_abs|floatformat:0 }}%) than last year</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="monthlyBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Payment Methods Distribution</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="row-cards grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
+            <div class="lg:col-span-4">
+                <div class="card bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body text-white">
+                        <div class="card-title text-white mb-2">Conversion rates</div>
+                        <div class="h1 mb-3">{{ conversion_rate|floatformat:1 }}%</div>
+                        <div class="text-white text-opacity-75 text-sm">({{ conversion_growth_abs|floatformat:1 }}%) than last month</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Most Ordered Products</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="overflow-x-auto">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Quantity Sold</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in top_products|slice:":5" %}
+                                    <tr>
+                                        <td>{{ product.product__name }}</td>
+                                        <td class="text-muted">{{ product.product__category__name|default:"Uncategorized" }}</td>
+                                        <td>{{ product.total_quantity|intcomma }}</td>
+                                        <td>KSh {{ product.total_revenue|floatformat:0|intcomma }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No product data available</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period Breakdown Tables -->
+        <div class="row-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Daily Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in daily_sales_data|slice:":7" %}
+                                <tr>
+                                    <td>{{ item.date|date:"M d" }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Weekly Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Week</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in weekly_sales_data|slice:":7" %}
+                                <tr>
+                                    <td>{{ item.week|date:"M d" }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Monthly Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in monthly_sales_data|slice:":7" %}
+                                <tr>
+                                    <td>{{ item.month|date:"M Y" }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Annual Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in annual_sales_data %}
+                                <tr>
+                                    <td>{{ item.year }}</td>
+                                    <td>KSh {{ item.total|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Sales -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Sales</h3>
+            </div>
+            <div class="card-body">
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sale #</th>
+                                <th>Cashier</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in recent_sales %}
+                            <tr>
+                                <td>{{ sale.sale_number|truncatechars:12 }}</td>
+                                <td>{% if sale.cashier.get_full_name %}{{ sale.cashier.get_full_name }}{% else %}{{ sale.cashier.username }}{% endif %}</td>
+                                <td class="text-muted">{{ sale.customer_name|default:"Walk-in" }}</td>
+                                <td>KSh {{ sale.total_amount|floatformat:0|intcomma }}</td>
+                                <td>
+                                    <span class="badge bg-{% if sale.payment_method == 'cash' %}primary{% elif sale.payment_method == 'card' %}info{% else %}success{% endif %}">
+                                        {{ sale.payment_method|capfirst }}
+                                    </span>
+                                </td>
+                                <td class="text-muted">{{ sale.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No recent sales</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Mini trend charts
+const miniChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: { x: { display: false }, y: { display: false } },
+    elements: { point: { radius: 0 }, line: { tension: 0.4, borderWidth: 2 } }
+};
+
+new Chart(document.getElementById('weeklySalesMiniChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ weekly_sales.trend|safe }},
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+            fill: true
+        }]
+    },
+    options: miniChartOptions
+});
+
+new Chart(document.getElementById('newUsersMiniChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ new_users.trend|safe }},
+            borderColor: '#0ea5e9',
+            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            fill: true
+        }]
+    },
+    options: miniChartOptions
+});
+
+new Chart(document.getElementById('ordersMiniChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ purchase_orders.trend|safe }},
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            fill: true
+        }]
+    },
+    options: miniChartOptions
+});
+
+new Chart(document.getElementById('productsMiniChart'), {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', '', '', ''],
+        datasets: [{
+            data: {{ products_sold.trend|safe }},
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true
+        }]
+    },
+    options: miniChartOptions
+});
+
+// Period Chart
+const periodChartData = {{ period_chart|safe }};
+new Chart(document.getElementById('periodChart'), {
+    type: 'line',
+    data: periodChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'KSh ' + context.parsed.y.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Category Pie Chart
+const categoryPieData = {{ category_pie_data|safe }};
+new Chart(document.getElementById('categoryPieChart'), {
+    type: 'pie',
+    data: categoryPieData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.parsed || 0;
+                        return label + ': KSh ' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Monthly Bar Chart
+const monthlyBarData = {{ monthly_bar_data|safe }};
+new Chart(document.getElementById('monthlyBarChart'), {
+    type: 'bar',
+    data: monthlyBarData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'KSh ' + (value / 1000).toFixed(0) + 'k';
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Payment Chart
+const paymentChartData = {{ payment_chart_data|safe }};
+new Chart(document.getElementById('paymentChart'), {
+    type: 'doughnut',
+    data: paymentChartData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': KSh ' + context.parsed.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

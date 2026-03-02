@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 (
                     "site_name",
                     models.CharField(
-                        default="Nicmah Agrovet",
+                        default="NICMAH",
                         help_text="Name of the business/site",
                         max_length=100,
                     ),
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                     "business_description",
                     models.TextField(
                         blank=True,
-                        default="Nicmah Agrovet is a farmers focused business that majors on livestock farming and crop farming for over two decades. We provide comprehensive agricultural solutions including AI services, quality seeds, and expert farming guidance.",
+                        default="NICMAH is a farmers focused business that majors on livestock farming and crop farming for over two decades. We provide comprehensive agricultural solutions including AI services, quality seeds, and expert farming guidance.",
                         help_text="Detailed business description and history",
                     ),
                 ),

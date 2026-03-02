@@ -1,5 +1,5 @@
 """
-Custom user forms for Nicmah Agrovet application.
+Custom user forms for NICMAH application.
 """
 
 from django import forms

@@ -28,6 +28,7 @@ urlpatterns = [
     path("admin/catalog/", include("catalog.urls", namespace="admin_catalog")),
     path("", include("core.urls")),
     path("users/", include("users.urls")),
+    path("api/auth/", include("users.api_urls")),  # JWT Authentication API
     path("catalog/", include("catalog.urls", namespace="catalog")),
     path("orders/", include("orders.urls")),
     path("pos/", include("pos.urls")),

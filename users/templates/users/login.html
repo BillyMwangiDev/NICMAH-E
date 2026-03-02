@@ -30,7 +30,10 @@
                         <i class="fas fa-user mr-2 text-agro-green"></i>
                         Username or Email
                     </label>
-                    {{ form.username }}
+                    <div class="relative">
+                        {{ form.username }}
+                        <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    </div>
                     {% if form.username.errors %}
                         <div class="mt-1 text-red-600 text-sm">
                             {% for error in form.username.errors %}
@@ -46,7 +49,10 @@
                         <i class="fas fa-lock mr-2 text-agro-green"></i>
                         Password
                     </label>
-                    {{ form.password }}
+                    <div class="relative">
+                        {{ form.password }}
+                        <i class="fas fa-lock absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    </div>
                     {% if form.password.errors %}
                         <div class="mt-1 text-red-600 text-sm">
                             {% for error in form.password.errors %}
@@ -75,11 +81,9 @@
                 <!-- Submit Button -->
                 <div>
                     <button type="submit" 
-                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-agro-green to-agro-dark hover:from-agro-dark hover:to-agro-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-agro-green transition-all duration-300 transform hover:scale-105">
-                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                            <i class="fas fa-sign-in-alt text-agro-light group-hover:text-white transition-colors"></i>
-                        </span>
-                        Sign In
+                            class="w-full bg-agro-green text-white px-6 py-4 rounded-full font-semibold hover:bg-agro-dark transition-colors shadow-lg transform hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Sign In</span>
                     </button>
                 </div>
 
@@ -90,10 +94,12 @@
                             <i class="fas fa-info-circle text-blue-400"></i>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-sm font-medium text-blue-800">Demo Account</h3>
+                            <h3 class="text-sm font-medium text-blue-800">Demo Accounts</h3>
                             <div class="mt-2 text-sm text-blue-700">
-                                <p><strong>Username:</strong> admin</p>
-                                <p><strong>Password:</strong> admin123</p>
+                                <p><strong>Admin:</strong> admin@nichmahagrovet.com</p>
+                                <p><strong>Seller:</strong> seller@nicmah.com</p>
+                                <p><strong>Customer:</strong> customer1@example.com</p>
+                                <p class="mt-1"><strong>Password (all):</strong> Admin@1234</p>
                             </div>
                         </div>
                     </div>
@@ -175,24 +181,63 @@
         }
     }
     
-    /* Form input focus effects */
-    .form-input:focus {
+    /* Form input styling to match theme */
+    #id_username,
+    #id_password {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        padding-right: 3rem; /* Space for icon */
+        border: 2px solid #bbf7d0; /* border-green-200 */
+        border-radius: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+        line-height: 1.5;
+        background-color: white;
+    }
+    
+    #id_username:focus,
+    #id_password:focus {
+        outline: none;
+        border-color: var(--agro-green);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1);
+    }
+    
+    #id_username::placeholder,
+    #id_password::placeholder {
+        color: #9ca3af;
     }
     
     /* Button hover effects */
     button[type="submit"]:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 15px 30px rgba(22, 163, 74, 0.2);
+        transform: scale(1.02);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    button[type="submit"]:active {
+        transform: scale(0.98);
     }
 </style>
 
 <!-- Enhanced JavaScript for form interactions -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Apply form-input class and styling to Django form fields
+    const usernameField = document.getElementById('id_username');
+    const passwordField = document.getElementById('id_password');
+    
+    if (usernameField) {
+        usernameField.classList.add('form-input');
+        usernameField.setAttribute('placeholder', 'Enter your username or email');
+    }
+    
+    if (passwordField) {
+        passwordField.classList.add('form-input');
+        passwordField.setAttribute('placeholder', 'Enter your password');
+    }
+    
     // Form input animations
-    const inputs = document.querySelectorAll('.form-input');
+    const inputs = document.querySelectorAll('#id_username, #id_password, .form-input');
     inputs.forEach(input => {
         input.addEventListener('focus', function() {
             this.parentElement.classList.add('scale-105');
@@ -207,21 +252,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const submitBtn = document.querySelector('button[type="submit"]');
     
-    form.addEventListener('submit', function(e) {
-        // Add loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing In...';
-        submitBtn.disabled = true;
-        
-        // Simulate loading delay (remove in production)
-        setTimeout(() => {
-            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Success!';
-            submitBtn.classList.add('bg-green-600');
-        }, 1000);
-    });
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            // Add loading state
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Signing In...</span>';
+            submitBtn.disabled = true;
+            
+            // Note: Don't prevent actual form submission
+            // The form will submit normally, and if there's an error, the page will reload
+        });
+    }
     
     // Auto-focus first input
-    if (inputs.length > 0) {
-        inputs[0].focus();
+    if (usernameField) {
+        usernameField.focus();
     }
 });
 </script>

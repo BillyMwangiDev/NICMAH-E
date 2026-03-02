@@ -175,7 +175,7 @@ class Command(BaseCommand):
         
         self.stdout.write(f"\nNew Organized Category Structure:")
         for main_slug, main_cat in new_categories.items():
-            self.stdout.write(f"\n📁 {main_cat['name']}")
+            self.stdout.write(f"\n{main_cat['name']}")
             self.stdout.write(f"   Description: {main_cat['description']}")
             
             for sub_slug, sub_cat in main_cat['subcategories'].items():
@@ -269,7 +269,7 @@ class Command(BaseCommand):
             for main_slug, main_cat in new_categories.items():
                 main_category = category_objects[main_slug]
                 main_count = main_category.products.count()
-                self.stdout.write(f"\n📁 {main_category.name}: {main_count} products")
+                self.stdout.write(f"\n{main_category.name}: {main_count} products")
                 
                 for sub_slug, sub_cat in main_cat['subcategories'].items():
                     full_slug = f"{main_slug}_{sub_slug}"

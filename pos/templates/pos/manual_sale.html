@@ -103,18 +103,22 @@
                                 <i class="fas fa-search me-2 text-success"></i>
                                 Add Products
                             </h6>
-                            <div class="input-group input-group-lg mb-3">
+                            <div class="input-group input-group-lg mb-3 position-relative">
                                 <span class="input-group-text bg-light border-end-0">
                                     <i class="fas fa-search text-muted"></i>
                                 </span>
                                 <input type="text" 
                                        class="form-control border-start-0 ps-0" 
                                        id="productSearch" 
-                                       placeholder="Search products by name, SKU, or barcode..."
+                                       placeholder="Start typing product name, SKU, or barcode..."
                                        autocomplete="off">
                                 <button class="btn btn-success px-4" type="button" onclick="searchProducts()">
                                     <i class="fas fa-search me-2"></i>Search
                                 </button>
+                                <!-- Autocomplete Dropdown -->
+                                <div id="autocompleteDropdown" class="position-absolute top-100 start-0 w-100 mt-1 bg-white border border-2 border-gray-200 rounded shadow-lg z-50" style="display: none; max-height: 400px; overflow-y: auto;">
+                                    <div id="autocompleteResults" class="py-2"></div>
+                                </div>
                             </div>
                             
                             <!-- Product Search Results -->
@@ -404,16 +408,234 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('taxRate').addEventListener('change', updateTotals);
     document.getElementById('discountAmount').addEventListener('input', updateTotals);
     
-    // Enter key support for product search
-    document.getElementById('productSearch').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchProducts();
+    // Enhanced autocomplete with debouncing
+    const productSearchInput = document.getElementById('productSearch');
+    let autocompleteTimeout = null;
+    let currentAutocompleteQuery = '';
+    let selectedAutocompleteIndex = -1;
+    
+    productSearchInput.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        
+        // Clear previous timeout
+        if (autocompleteTimeout) {
+            clearTimeout(autocompleteTimeout);
+        }
+        
+        // Hide autocomplete if input is cleared
+        if (query.length === 0) {
+            hideAutocomplete();
+            return;
+        }
+        
+        // Debounce autocomplete search (300ms delay)
+        autocompleteTimeout = setTimeout(() => {
+            searchAutocomplete(query);
+        }, 300);
+    });
+    
+    // Keyboard navigation for autocomplete
+    productSearchInput.addEventListener('keydown', function(e) {
+        const dropdown = document.getElementById('autocompleteDropdown');
+        const items = dropdown && dropdown.style.display !== 'none' ? dropdown.querySelectorAll('.autocomplete-item') : [];
+        
+        if (items.length === 0) {
+            // If no autocomplete items, allow Enter to search
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchProducts();
+            }
+            return;
+        }
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, items.length - 1);
+            updateAutocompleteSelection(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+            updateAutocompleteSelection(items);
+        } else if (e.key === 'Enter' && selectedAutocompleteIndex >= 0) {
+            e.preventDefault();
+            const item = items[selectedAutocompleteIndex];
+            const productId = parseInt(item.dataset.productId);
+            const productName = item.dataset.productName;
+            const productPrice = parseFloat(item.dataset.productPrice);
+            const productStock = parseInt(item.dataset.productStock);
+            selectAutocompleteProduct(productId, productName, productPrice, productStock);
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            hideAutocomplete();
+            productSearchInput.focus();
         }
     });
+    
+    // Hide autocomplete when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('autocompleteDropdown');
+        const input = document.getElementById('productSearch');
+        if (dropdown && !dropdown.contains(e.target) && e.target !== input && !input.contains(e.target)) {
+            hideAutocomplete();
+        }
+    });
+    
+    // Autocomplete functions
+    window.searchAutocomplete = function(query) {
+        if (query.length < 1) {
+            hideAutocomplete();
+            return;
+        }
+        
+        currentAutocompleteQuery = query;
+        selectedAutocompleteIndex = -1;
+        
+        const dropdown = document.getElementById('autocompleteDropdown');
+        const results = document.getElementById('autocompleteResults');
+        if (dropdown && results) {
+            results.innerHTML = `
+                <div class="px-4 py-3 text-center text-muted">
+                    <i class="fas fa-spinner fa-spin text-success mb-2"></i>
+                    <p class="small mb-0">Searching products...</p>
+                </div>
+            `;
+            dropdown.style.display = 'block';
+        }
+        
+        fetch(`{% url 'pos:product_search' %}?q=${encodeURIComponent(query)}&limit=10&include_out_of_stock=true`)
+            .then(response => response.json())
+            .then(data => {
+                if (query === currentAutocompleteQuery) {
+                    displayAutocomplete(data.products, query);
+                }
+            })
+            .catch(error => {
+                console.error('Error in autocomplete:', error);
+                if (query === currentAutocompleteQuery) {
+                    hideAutocomplete();
+                }
+            });
+    };
+    
+    window.displayAutocomplete = function(products, query) {
+        const dropdown = document.getElementById('autocompleteDropdown');
+        const results = document.getElementById('autocompleteResults');
+        
+        if (!dropdown || !results) return;
+        
+        if (products.length === 0) {
+            results.innerHTML = `
+                <div class="px-4 py-3 text-center text-muted">
+                    <i class="fas fa-search text-muted mb-2"></i>
+                    <p class="small mb-0">No products found for "${query}"</p>
+                </div>
+            `;
+            dropdown.style.display = 'block';
+            return;
+        }
+        
+        results.innerHTML = products.map((product, index) => {
+            const stockClass = product.stock_status === 'in_stock' ? 'bg-success text-white' :
+                              product.stock_status === 'low_stock' ? 'bg-warning text-dark' :
+                              'bg-danger text-white';
+            const stockIcon = product.stock_status === 'in_stock' ? 'fa-check-circle' :
+                             product.stock_status === 'low_stock' ? 'fa-exclamation-triangle' :
+                             'fa-times-circle';
+            
+            return `
+                <div class="autocomplete-item px-3 py-2 border-bottom cursor-pointer ${index === 0 ? 'bg-light' : ''}" 
+                     data-product-id="${product.id}"
+                     data-product-name="${product.name.replace(/'/g, "\\'")}"
+                     data-product-price="${product.price}"
+                     data-product-stock="${product.stock_quantity}"
+                     onclick="selectAutocompleteProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price}, ${product.stock_quantity})"
+                     onmouseover="this.classList.add('bg-light'); this.classList.remove('bg-white');"
+                     onmouseout="if(${index} !== ${selectedAutocompleteIndex}) { this.classList.remove('bg-light'); }">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <div class="me-3">
+                                ${product.image_url ? 
+                                    `<img src="${product.image_url}" alt="${product.name}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">` :
+                                    `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-box text-muted"></i>
+                                    </div>`
+                                }
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold text-dark">${product.name}</div>
+                                <div class="small text-muted">
+                                    <span class="font-monospace">${product.sku || 'No SKU'}</span>
+                                    <span class="mx-2">•</span>
+                                    <span class="fw-semibold text-success">KSh ${parseFloat(product.price).toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <span class="badge ${stockClass}">
+                                <i class="fas ${stockIcon} me-1"></i>
+                                ${product.stock_label}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        dropdown.style.display = 'block';
+    };
+    
+    window.selectAutocompleteProduct = function(productId, productName, productPrice, productStock) {
+        if (productStock <= 0) {
+            alert(`${productName} is out of stock.`);
+            hideAutocomplete();
+            return;
+        }
+        
+        // Add to cart using the existing addToCart function
+        if (typeof addToCart === 'function') {
+            addToCart(productId, productName, productPrice);
+        } else {
+            // Fallback: add product manually
+            addProductToSale(productId, productName, productPrice);
+        }
+        
+        // Clear input and hide autocomplete
+        document.getElementById('productSearch').value = '';
+        hideAutocomplete();
+        document.getElementById('productSearch').focus();
+    };
+    
+    window.hideAutocomplete = function() {
+        const dropdown = document.getElementById('autocompleteDropdown');
+        if (dropdown) {
+            dropdown.style.display = 'none';
+        }
+        currentAutocompleteQuery = '';
+        selectedAutocompleteIndex = -1;
+        
+        if (autocompleteTimeout) {
+            clearTimeout(autocompleteTimeout);
+            autocompleteTimeout = null;
+        }
+    };
+    
+    window.updateAutocompleteSelection = function(items) {
+        items.forEach((item, index) => {
+            if (index === selectedAutocompleteIndex) {
+                item.classList.add('bg-light');
+                item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            } else {
+                item.classList.remove('bg-light');
+            }
+        });
+    };
 });
 
 function searchProducts() {
     const query = document.getElementById('productSearch').value.trim();
+    
+    // Hide autocomplete when doing full search
+    hideAutocomplete();
     
     if (!query) {
         alert('Please enter a search term');
@@ -764,7 +986,7 @@ function saveManualSale() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
+            'X-CSRFToken': window.NICMAH.getCSRFToken()
         },
         body: JSON.stringify(saleData)
     })

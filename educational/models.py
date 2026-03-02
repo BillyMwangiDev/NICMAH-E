@@ -1,5 +1,5 @@
 """
-Educational content models for Nichmah Agrovet application.
+Educational content models for NICMAH application.
 """
 
 from django.db import models

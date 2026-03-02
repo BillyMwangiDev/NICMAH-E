@@ -1,5 +1,5 @@
 """
-User authentication and profile views for Nicmah Agrovet application.
+User authentication and profile views for NICMAH application.
 """
 
 from django.shortcuts import render, redirect

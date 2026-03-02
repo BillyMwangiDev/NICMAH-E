@@ -1,8 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q, F
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from .models import Product, Category
+
+def is_admin_user(request):
+    """Check if the current user is an authenticated admin/staff user."""
+    return request.user.is_authenticated and request.user.is_staff
 
 
 def product_list(request):
@@ -20,6 +24,10 @@ def product_list(request):
     # Base queryset
     products = Product.objects.filter(is_active=True, is_available=True)
     
+    # Exclude admin-only category products for non-admin users
+    if not is_admin_user(request):
+        products = products.filter(category__is_admin_only=False)
+    
     # Apply search filters
     if query:
         products = products.filter(
@@ -31,7 +39,16 @@ def product_list(request):
     
     # Category filter
     if category_filter:
-        products = products.filter(category__slug=category_filter)
+        category_obj = Category.objects.filter(slug=category_filter, is_active=True).first()
+        # Check if trying to access admin-only category without admin privileges
+        if category_obj and category_obj.is_admin_only:
+            if not is_admin_user(request):
+                # Reset category filter if user is not admin
+                category_filter = ""
+            else:
+                products = products.filter(category__slug=category_filter)
+        elif category_obj:
+            products = products.filter(category__slug=category_filter)
     
     # Price range filter
     if price_min:
@@ -78,15 +95,24 @@ def product_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     
-    # Get categories for filter dropdown
-    categories = Category.objects.filter(is_active=True).order_by("name")
+    # Get categories for filter dropdown (exclude admin-only for non-admin users)
+    categories = Category.objects.filter(is_active=True)
+    if not is_admin_user(request):
+        categories = categories.filter(is_admin_only=False)
+    categories = categories.order_by("name")
     
     # Get search suggestions based on query
     search_suggestions = []
     if query and len(query) >= 2:
-        search_suggestions = Product.objects.filter(
+        products_qs = Product.objects.filter(
             Q(name__icontains=query) | Q(sku__icontains=query)
-        ).values_list('name', flat=True)[:5]
+        ).filter(is_active=True, is_available=True)
+        
+        # Exclude admin-only category products for non-admin users
+        if not is_admin_user(request):
+            products_qs = products_qs.filter(category__is_admin_only=False)
+        
+        search_suggestions = list(products_qs.values_list('name', flat=True)[:5])
     
     context = {
         "products": page_obj,
@@ -106,7 +132,16 @@ def product_list(request):
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
-    related_products = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)[:4]
+    
+    # Check if product belongs to admin-only category and user is not admin
+    if product.category.is_admin_only and not is_admin_user(request):
+        return HttpResponseForbidden("Access denied. This product is only available to admin users.")
+    
+    related_products = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)
+    # Exclude admin-only category products for non-admin users
+    if not is_admin_user(request):
+        related_products = related_products.filter(category__is_admin_only=False)
+    related_products = related_products[:4]
     context = {
         "product": product,
         "related_products": related_products,
@@ -116,6 +151,11 @@ def product_detail(request, slug):
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug, is_active=True)
+    
+    # Check if category is admin-only and user is not admin
+    if category.is_admin_only and not is_admin_user(request):
+        return HttpResponseForbidden("Access denied. This category is only available to admin users.")
+    
     products = category.products.filter(is_active=True)
     context = {
         "category": category,
@@ -138,7 +178,13 @@ def search_suggestions(request):
         Q(name__icontains=query) | 
         Q(sku__icontains=query) |
         Q(category__name__icontains=query)
-    ).filter(is_active=True, is_available=True)[:10]
+    ).filter(is_active=True, is_available=True)
+    
+    # Exclude admin-only category products for non-admin users
+    if not is_admin_user(request):
+        products = products.filter(category__is_admin_only=False)
+    
+    products = products[:10]
     
     suggestions = []
     for product in products:
@@ -168,7 +214,13 @@ def quick_search(request):
         Q(description__icontains=query) |
         Q(sku__icontains=query) |
         Q(category__name__icontains=query)
-    ).filter(is_active=True, is_available=True).order_by("-is_featured", "name")[:20]
+    ).filter(is_active=True, is_available=True)
+    
+    # Exclude admin-only category products for non-admin users
+    if not is_admin_user(request):
+        products = products.filter(category__is_admin_only=False)
+    
+    products = products.order_by("-is_featured", "name")[:20]
     
     context = {
         "products": products,
@@ -182,17 +234,45 @@ def api_product_search(request):
     """
     API endpoint for product search used by receipt generation.
     Returns JSON data for product selection.
+    Rate limited and protected against abuse.
     """
+    # Rate limiting check (basic implementation)
+    from django.core.cache import cache
+    from django.conf import settings
+    
+    client_ip = request.META.get('REMOTE_ADDR', 'unknown')
+    rate_limit_key = f"api_search:{client_ip}"
+    request_count = cache.get(rate_limit_key, 0)
+    
+    max_requests = settings.API_RATE_LIMIT
+    if request_count >= max_requests:
+        return JsonResponse(
+            {"error": "Rate limit exceeded. Please try again later."},
+            status=429
+        )
+    
+    cache.set(rate_limit_key, request_count + 1, 60)  # 1 minute window
+    
     query = request.GET.get("q", "")
     if len(query) < 1:
         return JsonResponse({"products": []})
+    
+    # Input validation - prevent SQL injection and XSS
+    if len(query) > 100:  # Limit query length
+        return JsonResponse({"error": "Query too long"}, status=400)
     
     # Get products matching the search query
     products = Product.objects.filter(
         Q(name__icontains=query) | 
         Q(sku__icontains=query) |
         Q(category__name__icontains=query)
-    ).filter(is_active=True, is_available=True).order_by("name")[:20]
+    ).filter(is_active=True, is_available=True)
+    
+    # Exclude admin-only category products for non-admin users
+    if not is_admin_user(request):
+        products = products.filter(category__is_admin_only=False)
+    
+    products = products.order_by("name")[:20]
     
     product_list = []
     for product in products:
@@ -203,8 +283,12 @@ def api_product_search(request):
             "category": product.category.name if product.category else "",
             "price": float(product.price),
             "stock": product.stock_quantity,
-            "unit": product.unit if hasattr(product, 'unit') else "piece",
+            "unit": "piece",
             "description": product.description[:100] if product.description else "",
         })
     
-    return JsonResponse({"products": product_list})
+    # Return both formats for compatibility
+    return JsonResponse({
+        "products": product_list,
+        "data": product_list  # Alternative format
+    })

@@ -59,7 +59,7 @@ and income for millions of people.
 4. **Record Keeping**: Maintain detailed farm records
 5. **Market Access**: Build relationships with buyers
 
-For more information, visit Nicmah Agrovet or contact our expert team.
+For more information, visit NICMAH or contact our expert team.
                     """,
                 },
                 {
@@ -83,7 +83,7 @@ yields and profitability, farmers need to adopt modern techniques.
 4. **Integrated Pest Management**: Sustainable pest control
 5. **High-Yield Varieties**: Choose the right seeds
 
-Contact Nicmah Agrovet for expert advice on crop farming.
+Contact NICMAH for expert advice on crop farming.
                     """,
                 },
             ]

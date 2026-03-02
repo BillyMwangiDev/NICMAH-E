@@ -268,9 +268,9 @@
             <div class="input-group">
                 <label for="action">Action</label>
                 <select id="action" name="action" onchange="toggleActionFields()">
-                    <option value="lookup">🔍 Lookup Product</option>
-                    <option value="receive_stock">📦 Receive Stock</option>
-                    <option value="adjust_stock">⚖️ Adjust Stock</option>
+                    <option value="lookup">Lookup Product</option>
+                    <option value="receive_stock">Receive Stock</option>
+                    <option value="adjust_stock">Adjust Stock</option>
                 </select>
             </div>
             
@@ -322,7 +322,7 @@
     <!-- Product Information Display -->
     {% if product %}
     <div class="product-info">
-        <h3>📦 Product Information</h3>
+        <h3>Product Information</h3>
         <div class="product-details">
             <div class="detail-item">
                 <div class="detail-label">Product Name</div>
@@ -362,28 +362,28 @@
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-        <h3>🚀 Quick Actions</h3>
+        <h3>Quick Actions</h3>
         <div class="action-grid">
             <a href="{% url 'inventory:record_purchase' %}" class="action-card">
-                <div class="icon">💰</div>
+                <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
                 <h4>Record Purchase</h4>
                 <p>Record when products are bought and add to stock</p>
             </a>
             
             <a href="{% url 'inventory:quick_stock_receiving' %}" class="action-card">
-                <div class="icon">📦</div>
+                <div class="icon"><i class="fas fa-box"></i></div>
                 <h4>Quick Receiving</h4>
                 <p>Fast stock receiving for high-volume operations</p>
             </a>
             
             <a href="{% url 'inventory:dashboard' %}" class="action-card">
-                <div class="icon">📊</div>
+                <div class="icon"><i class="fas fa-chart-bar"></i></div>
                 <h4>Inventory Dashboard</h4>
                 <p>View overall inventory status and analytics</p>
             </a>
             
             <a href="{% url 'inventory:import_stock_data' %}" class="action-card">
-                <div class="icon">📥</div>
+                <div class="icon"><i class="fas fa-file-upload"></i></div>
                 <h4>Import Stock</h4>
                 <p>Bulk import stock data from Excel files</p>
             </a>

@@ -70,79 +70,119 @@ def generate_pdf_from_html(html_content, title="Document"):
     return pdf_content
 
 
-def generate_receipt_pdf(receipt):
+def get_company_info(request=None):
+    """Get company information from SiteSettings."""
+    # Always use the official static logo from core/static/images/
+    logo_url = None
+    if request:
+        # Build absolute URL for static logo (try SVG first, then PNG)
+        try:
+            # Try SVG first
+            logo_url = request.build_absolute_uri('/static/images/logo.svg')
+        except:
+            # Fallback to PNG
+            logo_url = request.build_absolute_uri('/static/images/logo.png')
+    else:
+        # Fallback: use STATIC_URL
+        logo_url = '/static/images/logo.png'
+    
+    try:
+        from core.models import SiteSettings
+        site_settings = SiteSettings.objects.first()
+        if site_settings:
+            return {
+                'company_name': site_settings.site_name or 'NICMAH',
+                'company_tagline': site_settings.tagline or 'Quality Agricultural Solutions',
+                'company_address': site_settings.address or 'Naromoru town, Timberland building near KFA',
+                'company_phone': site_settings.phone_number or '0726476128/0740368581',
+                'company_email': site_settings.contact_email or 'nicmahagrovet@gmail.com',
+                'company_logo': logo_url,
+            }
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Error loading company info: {str(e)}")
+    
+    # Fallback values
+    return {
+        'company_name': 'NICMAH',
+        'company_tagline': 'Quality Agricultural Solutions',
+        'company_address': 'Naromoru town, Timberland building near KFA',
+        'company_phone': '0726476128/0740368581',
+        'company_email': 'nicmahagrovet@gmail.com',
+        'company_logo': logo_url,
+    }
+
+
+def generate_receipt_pdf(receipt, request=None):
     """Generate PDF for receipt."""
     if not DOCUMENTS_AVAILABLE:
         return None
+    
+    company_info = get_company_info(request)
     
     # Create HTML content for receipt
     html_content = render_to_string('inventory/receipt_pdf.html', {
         'receipt': receipt,
         'items': receipt.documentitem_set.all(),
-        'company_name': 'Nicmah Agrovet',
-        'company_address': 'Naromoru town, Timberland building near KFA',
-        'company_phone': '0726476128/0740368581',
-        'company_email': 'nicmahagrovet@gmail.com',
+        **company_info,
     })
     
     return generate_pdf_from_html(html_content, f"Receipt {receipt.document_number}")
 
 
-def generate_quotation_pdf(quotation):
+def generate_quotation_pdf(quotation, request=None):
     """Generate PDF for quotation."""
     if not DOCUMENTS_AVAILABLE:
         return None
+    
+    company_info = get_company_info(request)
     
     # Create HTML content for quotation
     html_content = render_to_string('inventory/quotation_pdf.html', {
         'quotation': quotation,
         'items': quotation.documentitem_set.all(),
-        'company_name': 'Nicmah Agrovet',
-        'company_address': 'Naromoru town, Timberland building near KFA',
-        'company_phone': '0726476128/0740368581',
-        'company_email': 'nicmahagrovet@gmail.com',
+        **company_info,
     })
     
     return generate_pdf_from_html(html_content, f"Quotation {quotation.document_number}")
 
 
-def generate_invoice_pdf(invoice):
+def generate_invoice_pdf(invoice, request=None):
     """Generate PDF for invoice."""
     if not DOCUMENTS_AVAILABLE:
         return None
+    
+    company_info = get_company_info(request)
     
     # Create HTML content for invoice
     html_content = render_to_string('inventory/invoice_pdf.html', {
         'invoice': invoice,
         'items': invoice.documentitem_set.all(),
-        'company_name': 'Nicmah Agrovet',
-        'company_address': 'Naromoru town, Timberland building near KFA',
-        'company_phone': '0726476128/0740368581',
-        'company_email': 'nicmahagrovet@gmail.com',
+        **company_info,
     })
     
     return generate_pdf_from_html(html_content, f"Invoice {invoice.document_number}")
 
 
-def generate_purchase_order_pdf(po):
+def generate_purchase_order_pdf(po, request=None):
     """Generate PDF for purchase order."""
     if not DOCUMENTS_AVAILABLE:
         return None
+    
+    company_info = get_company_info(request)
     
     # Create HTML content for purchase order
     html_content = render_to_string('inventory/purchase_order_pdf.html', {
         'po': po,
         'items': po.documentitem_set.all(),
-        'company_name': 'Nicmah Agrovet',
-        'company_address': 'Naromoru town, Timberland building near KFA',
-        'company_phone': '0726476128/0740368581',
-        'company_email': 'nicmahagrovet@gmail.com',
+        **company_info,
     })
     
     return generate_pdf_from_html(html_content, f"Purchase Order {po.document_number}")
 
 
-def send_document_email(document, email_address, subject, message=""):
+def send_document_email(document, email_address, subject, message="", request=None):
     """Send document via email."""
     if not DOCUMENTS_AVAILABLE:
         return False
@@ -150,11 +190,13 @@ def send_document_email(document, email_address, subject, message=""):
     try:
         # Generate PDF
         if document.document_type == 'receipt':
-            pdf_content = generate_receipt_pdf(document)
+            pdf_content = generate_receipt_pdf(document, request)
         elif document.document_type == 'quotation':
-            pdf_content = generate_quotation_pdf(document)
+            pdf_content = generate_quotation_pdf(document, request)
         elif document.document_type == 'invoice':
-            pdf_content = generate_invoice_pdf(document)
+            pdf_content = generate_invoice_pdf(document, request)
+        elif document.document_type == 'purchase_order':
+            pdf_content = generate_purchase_order_pdf(document, request)
         else:
             return False
         
@@ -173,7 +215,7 @@ def send_document_email(document, email_address, subject, message=""):
         return False
 
 
-def print_document(document):
+def print_document(document, request=None):
     """Print document (placeholder for actual printing functionality)."""
     if not DOCUMENTS_AVAILABLE:
         return False
@@ -182,11 +224,13 @@ def print_document(document):
         # This is a placeholder - actual printing would require additional setup
         # For now, we'll just generate the PDF and return success
         if document.document_type == 'receipt':
-            pdf_content = generate_receipt_pdf(document)
+            pdf_content = generate_receipt_pdf(document, request)
         elif document.document_type == 'quotation':
-            pdf_content = generate_quotation_pdf(document)
+            pdf_content = generate_quotation_pdf(document, request)
         elif document.document_type == 'invoice':
-            pdf_content = generate_invoice_pdf(document)
+            pdf_content = generate_invoice_pdf(document, request)
+        elif document.document_type == 'purchase_order':
+            pdf_content = generate_purchase_order_pdf(document, request)
         else:
             return False
         

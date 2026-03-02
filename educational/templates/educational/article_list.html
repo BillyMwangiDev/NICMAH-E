@@ -1,116 +1,315 @@
 {% extends 'base.html' %}
-{% block title %}Education Blog - {{ site_name }}{% endblock %}
+{% load static %}
+
+{% block title %}Education Hub - {{ site_name }}{% endblock %}
+
 {% block content %}
-<div class="blog-page">
-  <div class="container py-4">
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="blog-hero mb-4">
-        <h2 class="mb-1">Latest Articles</h2>
-        <p class="text-muted mb-0">Curated insights on sustainable agriculture, livestock and crop management.</p>
-      </div>
-
-      <form method="get" class="row g-2 mb-3">
-        <div class="col-md-8">
-          <input type="text" class="form-control" name="q" placeholder="Search articles..." value="{{ q }}">
+<!-- Hero Section -->
+<section class="relative py-20 bg-gradient-to-br from-green-900/20 via-emerald-800/30 to-teal-900/20 overflow-hidden">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2316a34a" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+    
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="animate-on-load stagger-item">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-agro-dark mb-6">
+                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-agro-green to-agro-emerald mb-4">
+                    Education Hub
+                </span>
+            </h1>
+            <p class="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                Curated insights on sustainable agriculture, livestock management, and crop farming. 
+                Learn from experts and stay ahead with the latest farming techniques.
+            </p>
         </div>
-        <div class="col-md-3">
-          <select class="form-select" name="cat">
-            <option value="">All categories</option>
-            {% for c in categories %}
-            <option value="{{ c }}" {% if active_cat == c %}selected{% endif %}>{{ c }}</option>
-            {% endfor %}
-          </select>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 animate-float" style="animation-delay: 0s;">
+        <i class="fas fa-book-open text-4xl text-green-300/50"></i>
+    </div>
+    <div class="absolute top-40 right-20 animate-float" style="animation-delay: 1s;">
+        <i class="fas fa-graduation-cap text-3xl text-emerald-300/50"></i>
+    </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section class="py-8 bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <form method="get" class="flex flex-col md:flex-row gap-4 items-end">
+            <!-- Search Input with Icon -->
+            <div class="flex-1 w-full">
+                <div class="relative">
+                    <input type="text" 
+                           id="search"
+                           name="q" 
+                           value="{{ q }}"
+                           placeholder="Search articles by title, content, or keywords..."
+                           class="w-full px-6 py-4 pl-12 text-lg bg-white border-2 border-green-200 rounded-full focus:border-agro-green focus:outline-none shadow-lg transition-all">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="w-full md:w-64">
+                <div class="relative">
+                    <select id="category"
+                            name="cat" 
+                            class="w-full px-4 py-4 pl-10 text-lg border-2 border-green-200 rounded-full focus:border-agro-green focus:outline-none transition-colors bg-white shadow-lg appearance-none cursor-pointer">
+                        <option value="">All Categories</option>
+                        {% for c in categories %}
+                        <option value="{{ c }}" {% if active_cat == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                    <i class="fas fa-filter absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+            </div>
+            
+            <!-- Search Button -->
+            <div class="w-full md:w-auto">
+                <button type="submit" 
+                        class="w-full md:w-auto bg-agro-green text-white px-8 py-4 rounded-full font-semibold hover:bg-agro-dark transition-colors shadow-lg transform hover:scale-105">
+                    <i class="fas fa-search mr-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Featured Article Section -->
+{% if featured %}
+<section class="py-12 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden animate-on-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-2">
+                {% if featured.image %}
+                <div class="relative h-64 lg:h-auto overflow-hidden">
+                    <img src="{{ featured.image.url }}" 
+                         alt="{{ featured.title }}" 
+                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-agro-green text-white px-4 py-2 rounded-full text-sm font-semibold">
+                            <i class="fas fa-star mr-2"></i>Featured
+                        </span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                    <i class="fas fa-book-open text-6xl text-agro-green"></i>
+                </div>
+                {% endif %}
+                <div class="p-8 lg:p-12 flex flex-col justify-center">
+                    <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                        <span class="flex items-center">
+                            <i class="fas fa-calendar mr-2 text-agro-green"></i>
+                            {{ featured.published_at|date:'M d, Y' }}
+                        </span>
+                        <span class="flex items-center">
+                            <i class="fas fa-clock mr-2 text-agro-green"></i>
+                            {{ featured.reading_minutes|default:3 }} min read
+                        </span>
+                        {% if featured.category %}
+                        <span class="bg-green-100 text-agro-green px-3 py-1 rounded-full text-xs font-semibold">
+                            {{ featured.category }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-display font-bold text-agro-dark mb-4">
+                        {{ featured.title }}
+                    </h2>
+                    <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                        {{ featured.excerpt|default:featured.content|striptags|truncatechars:200 }}
+                    </p>
+                    <a href="{% url 'educational:article_detail' featured.slug %}" 
+                       class="inline-flex items-center bg-gradient-to-r from-agro-green to-agro-emerald text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all w-fit">
+                        <span>Read Full Article</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="col-md-1 d-grid">
-          <button class="btn btn-success">Go</button>
+    </div>
+</section>
+{% endif %}
+
+<!-- Articles Grid Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-12">
+            <div>
+                <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-2">
+                    {% if q or active_cat %}
+                        Search Results
+                    {% else %}
+                        Latest Articles
+                    {% endif %}
+                </h2>
+                <p class="text-gray-600">
+                    {% if q or active_cat %}
+                        Found {{ page_obj.paginator.count }} article{{ page_obj.paginator.count|pluralize }}
+                    {% else %}
+                        Discover our latest educational content
+                    {% endif %}
+                </p>
+            </div>
         </div>
-      </form>
 
-      {% if featured %}
-      <article class="card border-0 shadow-sm mb-4 article-card">
-        {% if featured.image %}
-        <img class="card-img-top blended-image" src="{{ featured.image.url }}" alt="{{ featured.title }}">
-        {% endif %}
-        <div class="card-body">
-          <div class="small text-muted mb-2">Featured · {{ featured.published_at|date:'M d, Y' }} · {{ featured.reading_minutes|default:3 }} min read</div>
-          <h3 class="h4">{{ featured.title }}</h3>
-          <p class="mb-3">{{ featured.excerpt|default:featured.content|striptags|truncatechars:180 }}</p>
-          <a href="{% url 'educational:article_detail' featured.slug %}" class="btn btn-success btn-sm">Read article</a>
+        <div id="article-container">
+            {% include 'educational/_article_cards.html' with articles=articles %}
         </div>
-      </article>
-      {% endif %}
 
-      <div id="article-container">
-        {% include 'educational/_article_cards.html' with articles=articles %}
-      </div>
+        <!-- Infinite Scroll Trigger -->
+        <div id="infinite-scroll-trigger" class="text-center py-8">
+            <div class="inline-block spinner-border text-agro-green" role="status" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-gray-500 mt-4" id="end-of-list" style="display: none;">
+                <i class="fas fa-check-circle text-agro-green mr-2"></i>
+                You've reached the end of the articles
+            </p>
+        </div>
+    </div>
+</section>
 
-      <div id="infinite-scroll-trigger" class="text-center py-4">
-        <div class="spinner-border text-success" role="status" style="display: none;"><span class="visually-hidden">Loading...</span></div>
-        <p class="text-muted small mb-0" id="end-of-list" style="display: none;">You have reached the end.</p>
-      </div>
+<!-- Sidebar Info Section -->
+<section class="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl transition-all hover:scale-105">
+                <div class="w-16 h-16 bg-gradient-to-r from-agro-green to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-book text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-agro-dark mb-2">Expert Knowledge</h3>
+                <p class="text-gray-600">
+                    Insights, guides, and tips on sustainable agriculture, livestock, crop management, and more.
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl transition-all hover:scale-105">
+                <div class="w-16 h-16 bg-gradient-to-r from-agro-sky to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-sync-alt text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-agro-dark mb-2">Regular Updates</h3>
+                <p class="text-gray-600">
+                    New articles are published regularly to keep you informed about the latest farming techniques.
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl transition-all hover:scale-105">
+                <div class="w-16 h-16 bg-gradient-to-r from-agro-gold to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-graduation-cap text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-agro-dark mb-2">Free Learning</h3>
+                <p class="text-gray-600">
+                    All our educational content is free to help farmers improve their agricultural practices.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 
-      <script>
-      (function() {
-        const trigger = document.getElementById('infinite-scroll-trigger');
-        const spinner = trigger.querySelector('.spinner-border');
-        const endText = document.getElementById('end-of-list');
-        const container = document.getElementById('article-container');
-        let nextPage = {% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}null{% endif %};
-        let loading = false;
+<style>
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .animate-on-scroll.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border 0.75s linear infinite;
+    }
+    
+    @keyframes spinner-border {
+        to { transform: rotate(360deg); }
+    }
+</style>
 
-        function loadMore() {
-          if (!nextPage || loading) return;
-          loading = true;
-          spinner.style.display = 'inline-block';
-          fetch(`?page=${nextPage}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
-            .then(r => r.json())
-            .then(data => {
-              container.insertAdjacentHTML('beforeend', data.html);
-              nextPage = data.has_next ? data.next_page : null;
-              if (!nextPage) {
-                endText.style.display = 'block';
-                observer.disconnect();
-              }
-            })
-            .catch(() => {})
-            .finally(() => {
-              spinner.style.display = 'none';
-              loading = false;
-            });
-        }
-
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll animation observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
             if (entry.isIntersecting) {
-              loadMore();
+                entry.target.classList.add('animate-in');
             }
-          });
-        }, { rootMargin: '200px' });
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+    
+    // Infinite scroll functionality
+    const trigger = document.getElementById('infinite-scroll-trigger');
+    const spinner = trigger.querySelector('.spinner-border');
+    const endText = document.getElementById('end-of-list');
+    const container = document.getElementById('article-container');
+    let nextPage = {% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}null{% endif %};
+    let loading = false;
 
-        observer.observe(trigger);
-      })();
-      </script>
-    </div>
+    function loadMore() {
+        if (!nextPage || loading) return;
+        loading = true;
+        spinner.style.display = 'inline-block';
+        
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', nextPage);
+        
+        fetch(url.toString(), { 
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            container.insertAdjacentHTML('beforeend', data.html);
+            nextPage = data.has_next ? data.next_page : null;
+            if (!nextPage) {
+                endText.style.display = 'block';
+                scrollObserver.disconnect();
+            }
+        })
+        .catch(() => {})
+        .finally(() => {
+            spinner.style.display = 'none';
+            loading = false;
+        });
+    }
 
-    <div class="col-lg-4">
-      <aside class="ps-lg-4 mt-4 mt-lg-0">
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <h5 class="card-title mb-3">About this blog</h5>
-            <p class="mb-0">Insights, guides, and tips on sustainable agriculture, livestock, crop management, and more.</p>
-          </div>
-        </div>
-        <div class="card border-0 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title mb-3">Stay updated</h5>
-            <p class="mb-2 small text-muted">New articles are published regularly.</p>
-            <a href="/educational/" class="btn btn-outline-success btn-sm">Refresh</a>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </div>
-  </div>
-</div>
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                loadMore();
+            }
+        });
+    }, { rootMargin: '200px' });
+
+    if (nextPage) {
+        scrollObserver.observe(trigger);
+    } else {
+        endText.style.display = 'block';
+    }
+});
+</script>
 {% endblock %}

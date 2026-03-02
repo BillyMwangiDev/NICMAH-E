@@ -1,5 +1,5 @@
 """
-Context processors for Nichmah Agrovet application.
+Context processors for NICMAH application.
 Provides global template variables.
 """
 
@@ -25,6 +25,7 @@ def site_settings(request):
                 "crop_services": settings_obj.crop_services,
                 "contact_email": settings_obj.contact_email,
                 "phone_number": settings_obj.phone_number,
+                "whatsapp_number": settings_obj.whatsapp_number,
                 "veterinary_phone": settings_obj.veterinary_phone,
                 "address": settings_obj.address,
                 "facebook_url": settings_obj.facebook_url,
@@ -47,7 +48,7 @@ def site_settings(request):
 
     # Fallback values if SiteSettings is not available
     return {
-        "site_name": "Nicmah Agrovet",
+        "site_name": "NICMAH",
         "site_tagline": "Your trusted partner in animal health and nutrition",
         "site_description": "Your trusted partner in animal health and nutrition",
         "business_description": (
@@ -71,6 +72,7 @@ def site_settings(request):
         ),
         "contact_email": "nicmahagrovet@gmail.com",
         "phone_number": "0726476128/0740368581",
+        "whatsapp_number": "254740368581",
         "veterinary_phone": "0721908023",
         "address": "Naromoru town, Timberland building near KFA",
         "facebook_url": "https://facebook.com/NicmahAgrovet",
@@ -93,13 +95,13 @@ def seo_meta_tags(request):
     # Basic SEO meta tags
     return {
         "seo_meta_tags": {
-            "title": "Nicmah Agrovet - Leading Agricultural Supplies & Services in Kenya",
+            "title": "NICMAH - Leading Agricultural Supplies & Services in Kenya",
             "description": "Quality agricultural supplies, livestock services, crop management solutions, and expert farming advice. Serving farmers across Kenya with trusted agrovet products and services.",
             "keywords": "agrovet, agricultural supplies, farming equipment, livestock services, crop management, fertilizers, pesticides, seeds, farming tools, Kenya agriculture",
-            "author": "Nicmah Agrovet",
+            "author": "NICMAH",
             "robots": "index, follow",
             "og_type": "website",
-            "og_title": "Nicmah Agrovet - Your Trusted Agricultural Partner",
+            "og_title": "NICMAH - Your Trusted Agricultural Partner",
             "og_description": "Quality agricultural supplies and expert farming services for Kenyan farmers.",
             "og_image": "/static/images/logo.png",
             "twitter_card": "summary_large_image",

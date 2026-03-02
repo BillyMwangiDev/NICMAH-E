@@ -1,237 +1,568 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
-{% block title %}Stock Movements - Inventory Management{% endblock %}
+{% block title %}Stock Movements - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stock-movements-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .filters-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: end;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 5px;
+        font-size: 0.875rem;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+        padding: 10px 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .filter-group input:focus,
+    .filter-group select:focus {
+        outline: none;
+        border-color: #16a34a;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+    
+    .filter-btn {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+        background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+    
+    .clear-btn {
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .clear-btn:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+    
+    .movements-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .movements-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .movements-table thead {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    }
+    
+    .movements-table thead th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #14532d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .movements-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s ease;
+    }
+    
+    .movements-table tbody tr:hover {
+        background-color: #f0fdf4;
+    }
+    
+    .movements-table tbody td {
+        padding: 15px;
+        color: #374151;
+    }
+    
+    .movement-badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .badge-purchase {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-sale {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .badge-adjustment {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-transfer {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .badge-return {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+    
+    .badge-damaged {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+    
+    .badge-expired {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    .quantity-positive {
+        color: #059669;
+        font-weight: 700;
+    }
+    
+    .quantity-negative {
+        color: #dc2626;
+        font-weight: 700;
+    }
+    
+    .product-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .product-image {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .product-image-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+    }
+    
+    .pagination a,
+    .pagination span {
+        padding: 10px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .pagination a {
+        color: #16a34a;
+        background: white;
+    }
+    
+    .pagination a:hover {
+        background: #f0fdf4;
+        border-color: #16a34a;
+        transform: translateY(-2px);
+    }
+    
+    .pagination .active {
+        background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        color: white;
+        border-color: #16a34a;
+    }
+    
+    @media (max-width: 768px) {
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .movements-table {
+            overflow-x: auto;
+        }
+        
+        .movements-table table {
+            min-width: 800px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-gradient-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">
-                            <i class="fas fa-exchange-alt me-2"></i>
-                            Stock Movements
-                        </h4>
-                        <a href="{% url 'inventory:stock_movements' %}" class="btn btn-light btn-sm">
-                            <i class="fas fa-sync-alt me-1"></i>
-                            Refresh
-                        </a>
-                    </div>
+<div class="stock-movements-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="text-4xl font-bold mb-2">
+            <i class="fas fa-exchange-alt mr-3"></i>
+            Stock Movements
+        </h1>
+        <p class="text-xl opacity-90">
+            Track all inventory changes, additions, and reductions in real-time
+        </p>
+    </div>
+
+    <!-- Summary Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-600 mb-1">Total Movements</p>
+                    <p class="text-3xl font-bold text-agro-green">{{ total_movements|intcomma }}</p>
                 </div>
-                <div class="card-body">
-                    <!-- Filters -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <label for="movement_type" class="form-label">Movement Type</label>
-                            <select class="form-select" id="movement_type">
-                                <option value="">All Types</option>
-                                <option value="purchase">Purchase</option>
-                                <option value="sale">Sale</option>
-                                <option value="adjustment">Adjustment</option>
-                                <option value="transfer">Transfer</option>
-                                <option value="return">Return</option>
-                                <option value="damaged">Damaged</option>
-                                <option value="expired">Expired</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="product_filter" class="form-label">Product</label>
-                            <select class="form-select" id="product_filter">
-                                <option value="">All Products</option>
-                                {% for product in products %}
-                                <option value="{{ product.id }}">{{ product.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="date_from" class="form-label">From Date</label>
-                            <input type="date" class="form-control" id="date_from">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="date_to" class="form-label">To Date</label>
-                            <input type="date" class="form-control" id="date_to">
-                        </div>
-                    </div>
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-exchange-alt text-2xl text-green-600"></i>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Stock Movements Table -->
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Product</th>
-                                    <th>Type</th>
-                                    <th>Quantity</th>
-                                    <th>Previous Stock</th>
-                                    <th>New Stock</th>
-                                    <th>Reference</th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for movement in stock_movements %}
-                                <tr>
-                                    <td>{{ movement.created_at|date:"M d, Y H:i" }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            {% if movement.product.image %}
-                                            <img src="{{ movement.product.image.url }}" alt="{{ movement.product.name }}" 
-                                                 class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
-                                            {% else %}
-                                            <div class="bg-secondary rounded me-2 d-flex align-items-center justify-content-center" 
-                                                 style="width: 32px; height: 32px;">
-                                                <i class="fas fa-box text-white"></i>
-                                            </div>
-                                            {% endif %}
-                                            <div>
-                                                <div class="fw-bold">{{ movement.product.name }}</div>
-                                                <small class="text-muted">{{ movement.product.sku }}</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if movement.movement_type == 'purchase' %}
-                                        <span class="badge bg-success">Purchase</span>
-                                        {% elif movement.movement_type == 'sale' %}
-                                        <span class="badge bg-danger">Sale</span>
-                                        {% elif movement.movement_type == 'adjustment' %}
-                                        <span class="badge bg-warning">Adjustment</span>
-                                        {% elif movement.movement_type == 'transfer' %}
-                                        <span class="badge bg-info">Transfer</span>
-                                        {% elif movement.movement_type == 'return' %}
-                                        <span class="badge bg-primary">Return</span>
-                                        {% elif movement.movement_type == 'damaged' %}
-                                        <span class="badge bg-dark">Damaged</span>
-                                        {% elif movement.movement_type == 'expired' %}
-                                        <span class="badge bg-secondary">Expired</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">{{ movement.movement_type|title }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold {% if movement.quantity > 0 %}text-success{% else %}text-danger{% endif %}">
-                                            {% if movement.quantity > 0 %}+{% endif %}{{ movement.quantity }}
-                                        </span>
-                                    </td>
-                                    <td>{{ movement.previous_stock }}</td>
-                                    <td>{{ movement.new_stock }}</td>
-                                    <td>
-                                        {% if movement.reference_number %}
-                                        <small class="text-muted">{{ movement.reference_number }}</small>
-                                        {% else %}
-                                        <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if movement.notes %}
-                                        <small class="text-muted">{{ movement.notes|truncatechars:30 }}</small>
-                                        {% else %}
-                                        <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="8" class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="fas fa-inbox fa-3x mb-3"></i>
-                                            <p>No stock movements found</p>
-                                            <small>Stock movements will appear here when inventory changes occur</small>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-600 mb-1">This Month</p>
+                    <p class="text-3xl font-bold text-blue-600">
+                        {% for movement in stock_movements|slice:":1" %}
+                            {{ movement.created_at|date:"M" }}
+                        {% empty %}
+                            N/A
+                        {% endfor %}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-2xl text-blue-600"></i>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Pagination -->
-                    {% if stock_movements.has_other_pages %}
-                    <nav aria-label="Stock movements pagination" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            {% if stock_movements.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ stock_movements.previous_page_number }}">Previous</a>
-                            </li>
-                            {% endif %}
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-600 mb-1">Active Products</p>
+                    <p class="text-3xl font-bold text-purple-600">{{ products|length|intcomma }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-box text-2xl text-purple-600"></i>
+                </div>
+            </div>
+        </div>
 
-                            {% for num in stock_movements.paginator.page_range %}
-                            {% if stock_movements.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                            {% elif num > stock_movements.number|add:'-3' and num < stock_movements.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                            {% endif %}
-                            {% endfor %}
-
-                            {% if stock_movements.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ stock_movements.next_page_number }}">Next</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                    {% endif %}
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-600 mb-1">Last Updated</p>
+                    <p class="text-lg font-bold text-gray-800">
+                        {% for movement in stock_movements|slice:":1" %}
+                            {{ movement.created_at|date:"M d, Y" }}
+                        {% empty %}
+                            No movements
+                        {% endfor %}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-clock text-2xl text-gray-600"></i>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">
+            <i class="fas fa-filter mr-2 text-agro-green"></i>
+            Filter Movements
+        </h3>
+        <form method="GET" class="filters-grid">
+            <div class="filter-group">
+                <label for="movement_type">Movement Type</label>
+                <select class="form-select" id="movement_type" name="type">
+                    <option value="">All Types</option>
+                    <option value="purchase" {% if request.GET.type == 'purchase' %}selected{% endif %}>Purchase</option>
+                    <option value="sale" {% if request.GET.type == 'sale' %}selected{% endif %}>Sale</option>
+                    <option value="adjustment" {% if request.GET.type == 'adjustment' %}selected{% endif %}>Adjustment</option>
+                    <option value="transfer" {% if request.GET.type == 'transfer' %}selected{% endif %}>Transfer</option>
+                    <option value="return" {% if request.GET.type == 'return' %}selected{% endif %}>Return</option>
+                    <option value="damaged" {% if request.GET.type == 'damaged' %}selected{% endif %}>Damaged</option>
+                    <option value="expired" {% if request.GET.type == 'expired' %}selected{% endif %}>Expired</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="product_filter">Product</label>
+                <select class="form-select" id="product_filter" name="product">
+                    <option value="">All Products</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}" {% if request.GET.product == product.id|stringformat:"s" %}selected{% endif %}>
+                        {{ product.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="date_from">From Date</label>
+                <input type="date" class="form-control" id="date_from" name="date_from" value="{{ request.GET.date_from }}">
+            </div>
+            
+            <div class="filter-group">
+                <label for="date_to">To Date</label>
+                <input type="date" class="form-control" id="date_to" name="date_to" value="{{ request.GET.date_to }}">
+            </div>
+            
+            <div class="filter-group">
+                <button type="submit" class="filter-btn">
+                    <i class="fas fa-search mr-2"></i>Apply Filters
+                </button>
+            </div>
+            
+            <div class="filter-group">
+                <a href="{% url 'inventory:stock_movements' %}" class="clear-btn text-center">
+                    <i class="fas fa-times mr-2"></i>Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stock Movements Table -->
+    <div class="movements-table">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Previous Stock</th>
+                        <th>New Stock</th>
+                        <th>Reference</th>
+                        <th>User</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in stock_movements %}
+                    <tr>
+                        <td>
+                            <div class="font-semibold text-gray-900">{{ movement.created_at|date:"M d, Y" }}</div>
+                            <div class="text-sm text-gray-500">{{ movement.created_at|date:"H:i" }}</div>
+                        </td>
+                        <td>
+                            <div class="product-info">
+                                {% if movement.product.image %}
+                                <img src="{{ movement.product.image.url }}" alt="{{ movement.product.name }}" 
+                                     class="product-image">
+                                {% else %}
+                                <div class="product-image-placeholder">
+                                    <i class="fas fa-box text-green-600"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <div class="font-semibold text-gray-900">{{ movement.product.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ movement.product.sku|default:"No SKU" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="movement-badge badge-{{ movement.movement_type }}">
+                                <i class="fas fa-{% if movement.movement_type == 'purchase' %}arrow-down{% elif movement.movement_type == 'sale' %}arrow-up{% elif movement.movement_type == 'adjustment' %}edit{% elif movement.movement_type == 'transfer' %}exchange-alt{% elif movement.movement_type == 'return' %}undo{% elif movement.movement_type == 'damaged' %}exclamation-triangle{% elif movement.movement_type == 'expired' %}calendar-times{% else %}circle{% endif %} mr-1"></i>
+                                {{ movement.get_movement_type_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="{% if movement.quantity > 0 %}quantity-positive{% else %}quantity-negative{% endif %}">
+                                {% if movement.quantity > 0 %}+{% endif %}{{ movement.quantity|intcomma }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="font-semibold text-gray-700">{{ movement.previous_stock|intcomma }}</span>
+                        </td>
+                        <td>
+                            <span class="font-semibold text-agro-green">{{ movement.new_stock|intcomma }}</span>
+                        </td>
+                        <td>
+                            {% if movement.reference_number %}
+                            <span class="text-sm text-gray-600 font-mono">{{ movement.reference_number|truncatechars:15 }}</span>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if movement.user %}
+                            <div class="text-sm">
+                                <div class="font-semibold text-gray-900">{{ movement.user.get_full_name|default:movement.user.username }}</div>
+                                <div class="text-gray-500">{{ movement.user.username }}</div>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400">System</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if movement.notes %}
+                            <span class="text-sm text-gray-600" title="{{ movement.notes }}">
+                                {{ movement.notes|truncatechars:30 }}
+                            </span>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-12">
+                            <div class="text-gray-400">
+                                <i class="fas fa-inbox fa-4x mb-4"></i>
+                                <p class="text-lg font-semibold text-gray-600 mb-2">No stock movements found</p>
+                                <p class="text-sm text-gray-500">Stock movements will appear here when inventory changes occur</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if stock_movements.has_other_pages %}
+    <div class="pagination">
+        {% if stock_movements.has_previous %}
+        <a href="?page={{ stock_movements.previous_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.product %}&product={{ request.GET.product }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" class="page-link">
+            <i class="fas fa-chevron-left mr-1"></i>Previous
+        </a>
+        {% endif %}
+
+        {% for num in stock_movements.paginator.page_range %}
+        {% if stock_movements.number == num %}
+        <span class="active">{{ num }}</span>
+        {% elif num > stock_movements.number|add:'-3' and num < stock_movements.number|add:'3' %}
+        <a href="?page={{ num }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.product %}&product={{ request.GET.product }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" class="page-link">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if stock_movements.has_next %}
+        <a href="?page={{ stock_movements.next_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.product %}&product={{ request.GET.product }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" class="page-link">
+            Next<i class="fas fa-chevron-right ml-1"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Filter functionality
-    const movementTypeFilter = document.getElementById('movement_type');
-    const productFilter = document.getElementById('product_filter');
-    const dateFromFilter = document.getElementById('date_from');
-    const dateToFilter = document.getElementById('date_to');
-
-    function applyFilters() {
-        const params = new URLSearchParams();
-        
-        if (movementTypeFilter.value) {
-            params.append('type', movementTypeFilter.value);
+    // Auto-submit form on filter change (optional - can be removed if you prefer manual submit)
+    // Uncomment the following if you want auto-submit on change:
+    /*
+    const filters = ['movement_type', 'product_filter', 'date_from', 'date_to'];
+    filters.forEach(filterId => {
+        const filter = document.getElementById(filterId);
+        if (filter) {
+            filter.addEventListener('change', function() {
+                // Small delay to allow all filters to update
+                setTimeout(() => {
+                    document.querySelector('form').submit();
+                }, 100);
+            });
         }
-        if (productFilter.value) {
-            params.append('product', productFilter.value);
-        }
-        if (dateFromFilter.value) {
-            params.append('date_from', dateFromFilter.value);
-        }
-        if (dateToFilter.value) {
-            params.append('date_to', dateToFilter.value);
-        }
-
-        const url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-        window.location.href = url;
-    }
-
-    // Add event listeners
-    [movementTypeFilter, productFilter, dateFromFilter, dateToFilter].forEach(filter => {
-        filter.addEventListener('change', applyFilters);
     });
-
-    // Set current filter values from URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('type')) {
-        movementTypeFilter.value = urlParams.get('type');
-    }
-    if (urlParams.get('product')) {
-        productFilter.value = urlParams.get('product');
-    }
-    if (urlParams.get('date_from')) {
-        dateFromFilter.value = urlParams.get('date_from');
-    }
-    if (urlParams.get('date_to')) {
-        dateToFilter.value = urlParams.get('date_to');
-    }
+    */
 });
 </script>
 {% endblock %}

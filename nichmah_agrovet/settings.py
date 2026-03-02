@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "django.contrib.sites",
     "django.contrib.sitemaps",
+    # Third-party apps
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",  # For token blacklisting and rotation
+    # Project app (for signal registration)
+    "nichmah_agrovet.apps.NichmahAgrovetConfig",
     # Custom apps
     "core",
     "users",
@@ -59,6 +65,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Security middleware (order matters - security checks before processing)
+    "nichmah_agrovet.security_middleware.SQLInjectionProtectionMiddleware",
+    "nichmah_agrovet.security_middleware.XSSProtectionMiddleware",
+    "nichmah_agrovet.security_middleware.RateLimitMiddleware",
+    "nichmah_agrovet.security_middleware.SecurityHeadersMiddleware",
+    "nichmah_agrovet.security_middleware.SecurityMonitoringMiddleware",
     # SEO middleware
     "core.seo_middleware.SEOMiddleware",
 ]
@@ -95,6 +107,11 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", default=""),
         "HOST": config("DB_HOST", default=""),
         "PORT": config("DB_PORT", default=""),
+        # SQLite-specific options
+        "OPTIONS": {
+            # Disable JSONField validation for SQLite (it stores as TEXT anyway)
+            # This is handled by our TextField conversion
+        },
     }
 }
 
@@ -167,3 +184,219 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Use standard Django session backend
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# ========== SECURITY SETTINGS ==========
+# Security headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# HTTPS settings (enable in production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# Session security
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+
+# ========== CORS CONFIGURATION ==========
+# Restrictive CORS settings - only allow specific origins
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours
+
+# ========== RATE LIMITING ==========
+RATE_LIMIT_ENABLED = config("RATE_LIMIT_ENABLED", default=True, cast=bool)
+RATE_LIMIT_REQUESTS = config("RATE_LIMIT_REQUESTS", default=100, cast=int)
+RATE_LIMIT_WINDOW = config("RATE_LIMIT_WINDOW", default=60, cast=int)  # seconds
+
+# API-specific rate limiting
+API_RATE_LIMIT = config("API_RATE_LIMIT", default=60, cast=int)  # requests per minute
+
+# ========== CACHING CONFIGURATION ==========
+# Use Redis for caching in production, local memory in development
+if not DEBUG:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+            "KEY_PREFIX": "nichmah_agrovet",
+            "TIMEOUT": 300,  # 5 minutes default
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake",
+        }
+    }
+
+# Cache specific settings
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 300  # 5 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = "nichmah_agrovet"
+
+# ========== REST FRAMEWORK & JWT CONFIGURATION ==========
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",  # Fallback for web views
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+    },
+}
+
+# JWT Settings with Token Rotation
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # Short-lived access tokens
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Longer-lived refresh tokens
+    "ROTATE_REFRESH_TOKENS": True,  # Enable refresh token rotation
+    "BLACKLIST_AFTER_ROTATION": True,  # Blacklist old refresh tokens after rotation
+    "UPDATE_LAST_LOGIN": True,  # Update user's last_login field
+    
+    # Algorithm
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": config("JWT_SECRET_KEY", default=SECRET_KEY),  # Use separate JWT secret or fallback to SECRET_KEY
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": "nicmah-api",
+    
+    # Token types
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    
+    # Token claims
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    
+    # JTI (JWT ID) claim for token blacklisting
+    "JTI_CLAIM": "jti",
+    
+    # Sliding token settings (if using sliding tokens)
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+}
+
+# ========== FILE UPLOAD SECURITY ==========
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+# ========== PASSWORD SECURITY ==========
+# Use PBKDF2 as primary (built-in, no dependencies)
+# Argon2 can be used if django[argon2] or argon2-cffi is installed
+try:
+    import argon2
+    # Argon2 is available, use it as primary
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.Argon2PasswordHasher",
+        "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+        "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+        "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    ]
+except ImportError:
+    # Argon2 not available, use PBKDF2 as primary (default Django hasher)
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+        "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+        "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+        "django.contrib.auth.hashers.Argon2PasswordHasher",  # Keep for when installed
+    ]
+
+# ========== LOGGING CONFIGURATION ==========
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "security": {
+            "format": "SECURITY: {levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "formatter": "verbose",
+        },
+        "security_file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "security.log",
+            "formatter": "security",
+        },
+        "console": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["security_file", "console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "nichmah_agrovet": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+# Create logs directory if it doesn't exist
+import os
+os.makedirs(BASE_DIR / "logs", exist_ok=True)

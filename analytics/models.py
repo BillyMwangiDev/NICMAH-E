@@ -1,11 +1,12 @@
 """
-Analytics and reporting models for Nichmah Agrovet application.
+Analytics and reporting models for NICMAH application.
 """
 
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from decimal import Decimal
+import json
 from catalog.models import Product
 
 User = get_user_model()
@@ -89,15 +90,27 @@ class Sales(models.Model):
             random_suffix = ''.join([str(timezone.now().microsecond)[-3:]])
             self.sale_number = f"SALE{timestamp}{random_suffix}"
         
-        # Calculate totals if not set
-        if not self.total_amount:
-            self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
+        # Ensure all financial fields are Decimal
+        self.subtotal = Decimal(str(self.subtotal or 0))
+        self.tax_amount = Decimal(str(self.tax_amount or 0))
+        self.discount_amount = Decimal(str(self.discount_amount or 0))
+        
+        # Calculate totals if not set or recalculate to ensure accuracy
+        self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
+        
+        # Validation: Ensure total_amount is not negative
+        if self.total_amount < Decimal("0.00"):
+            self.total_amount = Decimal("0.00")
         
         if not self.amount_paid:
             self.amount_paid = self.total_amount
+        else:
+            self.amount_paid = Decimal(str(self.amount_paid))
             
         if self.amount_paid > self.total_amount:
             self.change_given = self.amount_paid - self.total_amount
+        else:
+            self.change_given = Decimal("0.00")
             
         super().save(*args, **kwargs)
 
@@ -125,8 +138,17 @@ class SalesItem(models.Model):
         return f"{self.quantity}x {self.product.name} in {self.sale.sale_number}"
     
     def save(self, *args, **kwargs):
+        # Ensure all values are Decimal for accurate calculations
+        self.quantity = int(self.quantity)
+        self.unit_price = Decimal(str(self.unit_price))
+        
+        # Calculate total price
         if not self.total_price:
-            self.total_price = self.quantity * self.unit_price
+            self.total_price = Decimal(str(self.quantity)) * self.unit_price
+        else:
+            # Recalculate to ensure accuracy
+            self.total_price = Decimal(str(self.quantity)) * self.unit_price
+        
         super().save(*args, **kwargs)
 
 
@@ -160,10 +182,28 @@ class SalesAnalytics(models.Model):
     other_sales = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     
     # Top products
-    top_products = models.JSONField(default=list, blank=True)
+    top_products = models.TextField(default='[]', blank=True, help_text="JSON array of top products")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def get_top_products(self):
+        """Get top products as a list."""
+        import json
+        if not self.top_products:
+            return []
+        try:
+            return json.loads(self.top_products)
+        except (json.JSONDecodeError, TypeError):
+            return []
+    
+    def set_top_products(self, value):
+        """Set top products from a list."""
+        import json
+        if value is None:
+            self.top_products = '[]'
+        else:
+            self.top_products = json.dumps(value)
     
     class Meta:
         verbose_name = "Sales Analytics"
@@ -229,6 +269,6 @@ class SalesAnalytics(models.Model):
             total_revenue=Sum('total_price')
         ).order_by('-total_quantity')[:10]
         
-        self.top_products = list(top_products)
+        self.set_top_products(list(top_products))
         
         self.save()

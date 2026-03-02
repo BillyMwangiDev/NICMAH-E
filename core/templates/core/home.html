@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Welcome to {{ site_name }} - Your Trusted Agrovet Partner{% endblock %}
+{% block title %}Welcome to {{ site_name }} - Your Trusted Agricultural Partner{% endblock %}
 
 {% block content %}
 <!-- Hero Section with Parallax -->
@@ -33,9 +33,9 @@
                     <i class="fas fa-seedling mr-3"></i>
                     Explore Products
                 </a>
-                <a href="{% url 'educational:article_list' %}" 
+                <a href="{% url 'core:about' %}" 
                    class="btn-secondary animate-on-load stagger-item">
-                    <i class="fas fa-book-open mr-3"></i>
+                    <i class="fas fa-info-circle mr-3"></i>
                     Learn More
                 </a>
             </div>
@@ -456,7 +456,7 @@
                 Ready to Transform Your Agricultural Business?
             </h2>
             <p class="text-xl text-green-100 mb-8 leading-relaxed">
-                Join thousands of farmers who trust Nicmah Agrovet for their agricultural needs. 
+                Join thousands of farmers who trust NICMAH for their agricultural needs. 
                 Get started today and experience the difference quality makes.
             </p>
             
@@ -465,7 +465,7 @@
                     <i class="fas fa-shopping-cart mr-3"></i>
                     Shop Now
                 </a>
-                <a href="{% url 'core:contact' %}" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-agro-green transition-colors transform hover:scale-105">
+                <a href="{% url 'core:contact' %}" class="border border-white/70 text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-agro-green transition-colors transform hover:scale-105">
                     <i class="fas fa-phone mr-3"></i>
                     Contact Us
                 </a>

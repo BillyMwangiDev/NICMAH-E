@@ -290,29 +290,29 @@
 <div class="admin-dashboard">
     <!-- Dashboard Header -->
     <div class="dashboard-header">
-        <h1>🌱 Welcome to Nicmah Agrovet</h1>
+        <h1>Welcome to NICMAH</h1>
         <p>Manage your agricultural business operations with ease</p>
     </div>
 
     <!-- Quick Stats -->
     <div class="stats-grid">
         <div class="stat-card users">
-            <div class="icon">👥</div>
+            <div class="icon"></div>
             <div class="number">{{ user_count|default:"0" }}</div>
             <div class="label">Total Users</div>
         </div>
         <div class="stat-card products">
-            <div class="icon">📦</div>
+            <div class="icon"></div>
             <div class="number">{{ product_count|default:"0" }}</div>
             <div class="label">Products</div>
         </div>
         <div class="stat-card sales">
-            <div class="icon">💰</div>
+            <div class="icon"></div>
             <div class="number">{{ sale_count|default:"0" }}</div>
             <div class="label">Sales</div>
         </div>
         <div class="stat-card inventory">
-            <div class="icon">🏪</div>
+            <div class="icon"></div>
             <div class="number">{{ stock_count|default:"0" }}</div>
             <div class="label">Stock Items</div>
         </div>
@@ -320,30 +320,30 @@
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-        <h2>🚀 Quick Actions</h2>
+        <h2>Quick Actions</h2>
         <div class="actions-grid">
             <a href="{% url 'admin:users_customuser_add' %}" class="action-btn">
-                <span class="icon">➕</span>
+                <span class="icon">+</span>
                 Add New User
             </a>
             <a href="{% url 'admin:catalog_product_add' %}" class="action-btn">
-                <span class="icon">📦</span>
+                <span class="icon">BOX</span>
                 Add Product
             </a>
             <a href="{% url 'admin:pos_possale_add' %}" class="action-btn">
-                <span class="icon">💰</span>
+                <span class="icon">$</span>
                 Create Sale
             </a>
             <a href="{% url 'inventory:import_stock_data' %}" class="action-btn">
-                <span class="icon">📊</span>
+                <span class="icon">CH</span>
                 Import Stock
             </a>
             <a href="{% url 'analytics:export_sales_data' %}" class="action-btn">
-                <span class="icon">🛒</span>
+                <span class="icon">EXP</span>
                 Export Sales
             </a>
             <a href="{% url 'admin:index' %}" class="action-btn">
-                <span class="icon">📈</span>
+                <span class="icon">DSH</span>
                 View Dashboard
             </a>
         </div>
@@ -351,31 +351,31 @@
 
     <!-- Recent Activity -->
     <div class="recent-activity">
-        <h2>📅 Recent Activity</h2>
+        <h2>Recent Activity</h2>
         <ul class="activity-list">
             <li class="activity-item">
-                <div class="icon">👤</div>
+                <div class="icon"></div>
                 <div class="content">
                     <div class="title">New user registered</div>
                     <div class="time">2 minutes ago</div>
                 </div>
             </li>
             <li class="activity-item">
-                <div class="icon">💰</div>
+                <div class="icon"></div>
                 <div class="content">
                     <div class="title">Sale completed</div>
                     <div class="time">15 minutes ago</div>
                 </div>
             </li>
             <li class="activity-item">
-                <div class="icon">📦</div>
+                <div class="icon"></div>
                 <div class="content">
                     <div class="title">Product stock updated</div>
                     <div class="time">1 hour ago</div>
                 </div>
             </li>
             <li class="activity-item">
-                <div class="icon">📊</div>
+                <div class="icon"></div>
                 <div class="content">
                     <div class="title">Analytics report generated</div>
                     <div class="time">2 hours ago</div>

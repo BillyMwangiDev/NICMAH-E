@@ -1,5 +1,7 @@
 """
 Admin interface for POS models.
+Note: These admin classes are registered in core/admin.py with the custom admin site.
+This file defines the admin classes but does not register them directly.
 """
 
 from django.contrib import admin
@@ -7,7 +9,6 @@ from django.contrib import admin
 from .models import POSSession, POSSale, POSSaleItem, Receipt, Barcode, TaxRate, Discount, OfflineTransaction
 
 
-@admin.register(TaxRate)
 class TaxRateAdmin(admin.ModelAdmin):
     list_display = ["name", "rate", "is_active", "created_at"]
     list_filter = ["is_active", "created_at"]
@@ -15,7 +16,6 @@ class TaxRateAdmin(admin.ModelAdmin):
     ordering = ["name"]
 
 
-@admin.register(Discount)
 class DiscountAdmin(admin.ModelAdmin):
     list_display = ["name", "discount_type", "percentage_rate", "fixed_amount", "is_active", "start_date", "end_date"]
     list_filter = ["discount_type", "is_active", "start_date", "end_date"]
@@ -26,7 +26,6 @@ class DiscountAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related()
 
 
-@admin.register(Barcode)
 class BarcodeAdmin(admin.ModelAdmin):
     list_display = ["barcode", "product", "barcode_type", "is_active", "created_at"]
     list_filter = ["barcode_type", "is_active", "created_at"]
@@ -34,7 +33,6 @@ class BarcodeAdmin(admin.ModelAdmin):
     ordering = ["barcode"]
 
 
-@admin.register(POSSession)
 class POSSessionAdmin(admin.ModelAdmin):
     list_display = [
         "session_id",
@@ -77,8 +75,12 @@ class POSSessionAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("cashier", "seller")
 
 
-@admin.register(POSSale)
 class POSSaleAdmin(admin.ModelAdmin):
+    """Admin for POSSale model - shows ALL POS sales (pending, completed, cancelled, etc.)
+    
+    Note: For analytics data, see the unified 'Sales' model in Analytics section.
+    This shows raw POS transactions before they're synced to unified Sales.
+    """
     list_display = [
         "sale_number",
         "session",
@@ -111,7 +113,6 @@ class POSSaleAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("session", "cashier", "seller", "tax_rate")
 
 
-@admin.register(POSSaleItem)
 class POSSaleItemAdmin(admin.ModelAdmin):
     list_display = ["sale", "product", "quantity", "unit_price", "total_price", "item_discount", "item_tax"]
     list_filter = ["sale__created_at"]
@@ -122,7 +123,6 @@ class POSSaleItemAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("sale", "product")
 
 
-@admin.register(Receipt)
 class ReceiptAdmin(admin.ModelAdmin):
     list_display = ["receipt_number", "sale", "receipt_type", "generated_at"]
     list_filter = ["receipt_type", "generated_at"]
@@ -133,7 +133,6 @@ class ReceiptAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("sale")
 
 
-@admin.register(OfflineTransaction)
 class OfflineTransactionAdmin(admin.ModelAdmin):
     list_display = [
         "local_transaction_id",

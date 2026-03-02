@@ -1,5 +1,5 @@
 """
-Core models for the Nicmah Agrovet system
+Core models for the NICMAH system
 """
 
 from django.db import models
@@ -10,7 +10,7 @@ class SiteSettings(models.Model):
     """Site-wide settings and configuration."""
 
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
-    site_name = models.CharField(max_length=100, default="Nicmah Agrovet", help_text="Name of the business/site")
+    site_name = models.CharField(max_length=100, default="NICMAH", help_text="Name of the business/site")
     tagline = models.CharField(
         max_length=200,
         blank=True,
@@ -23,7 +23,7 @@ class SiteSettings(models.Model):
         blank=True,
         help_text="Detailed business description and history",
         default=(
-            "Nicmah Agrovet is a farmers focused business that majors on livestock farming "
+            "NICMAH is a farmers focused business that majors on livestock farming "
             "and crop farming for over two decades. We provide comprehensive agricultural "
             "solutions including AI services, quality seeds, and expert farming guidance."
         ),
@@ -64,6 +64,7 @@ class SiteSettings(models.Model):
     # Contact Information
     contact_email = models.EmailField(blank=True, default="nicmahagrovet@gmail.com")
     phone_number = models.CharField(max_length=20, blank=True, default="0726476128/0740368581")
+    whatsapp_number = models.CharField(max_length=20, blank=True, default="254740368581", help_text="WhatsApp number in international format (without +)")
     veterinary_phone = models.CharField(max_length=20, blank=True, default="0721908023", help_text="Veterinary services phone number")
     address = models.TextField(blank=True, default="Naromoru town, Timberland building near KFA")
 
@@ -86,6 +87,46 @@ class SiteSettings(models.Model):
     years_in_business = models.PositiveIntegerField(default=20, help_text="Number of years in business")
     cattle_ai_count = models.PositiveIntegerField(default=1000, help_text="Number of cattle served through AI")
     farmers_served = models.PositiveIntegerField(default=1000, help_text="Number of farmers served")
+    
+    # Receipt Printer Settings
+    printer_enabled = models.BooleanField(default=False, help_text="Enable receipt printing")
+    printer_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('system', 'System/USB Printer'),
+            ('serial', 'Serial/COM Port'),
+            ('network', 'Network Printer'),
+        ],
+        default='system',
+        help_text="Type of receipt printer connection"
+    )
+    printer_name = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Printer name (for system printers) or device path/name"
+    )
+    printer_host = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Network printer IP address or hostname"
+    )
+    printer_port = models.IntegerField(
+        default=9100,
+        help_text="Network printer port (default: 9100 for raw printing)"
+    )
+    printer_serial_port = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Serial port (e.g., COM1 on Windows, /dev/ttyUSB0 on Linux)"
+    )
+    printer_baudrate = models.IntegerField(
+        default=9600,
+        help_text="Serial printer baudrate"
+    )
+    auto_print_receipts = models.BooleanField(
+        default=False,
+        help_text="Automatically print receipts after completing a sale"
+    )
 
     # Meta
     created_at = models.DateTimeField(auto_now_add=True)

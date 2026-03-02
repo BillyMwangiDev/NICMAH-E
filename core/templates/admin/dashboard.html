@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
-{% block title %}Business Dashboard - Nicmah Agrovet{% endblock %}
+{% block title %}Business Dashboard - NICMAH{% endblock %}
 
 {% block extrastyle %}
 <style>
@@ -169,30 +169,30 @@
 <div class="dashboard-container">
     <!-- Dashboard Header -->
     <div class="dashboard-header">
-        <h1>📊 Business Dashboard</h1>
-        <p>Welcome to Nicmah Agrovet Management System</p>
+        <h1>Business Dashboard</h1>
+        <p>Welcome to NICMAH Management System</p>
         <p>Real-time insights into your business performance</p>
     </div>
 
     <!-- Quick Action Buttons -->
     <div class="quick-actions">
         <a href="{% url 'admin:pos-possession-changelist' %}" class="action-btn">
-            🏪 Manage POS Sessions
+            Manage POS Sessions
         </a>
         <a href="{% url 'admin:pos-possale-changelist' %}" class="action-btn">
-            💰 View Sales
+            View Sales
         </a>
         <a href="{% url 'admin:catalog-product-changelist' %}" class="action-btn">
-            📦 Manage Products
+            Manage Products
         </a>
         <a href="{% url 'admin:users-customuser-changelist' %}" class="action-btn">
-            👥 Manage Users
+            Manage Users
         </a>
         <a href="{% url 'admin:inventory-stockmovement-changelist' %}" class="action-btn">
-            📊 Stock Movements
+            Stock Movements
         </a>
         <a href="{% url 'admin:analytics' %}" class="action-btn">
-            📈 Detailed Analytics
+            Detailed Analytics
         </a>
     </div>
 
@@ -228,13 +228,13 @@
     {% if active_alerts or low_stock_products %}
     <div class="alerts-section" style="margin-bottom: 30px;">
         <div class="chart-title" style="text-align: center; margin-bottom: 20px;">
-            🚨 Stock Alerts & Notifications
+            Stock Alerts & Notifications
         </div>
         
         <!-- Critical Alerts -->
         {% if active_alerts %}
         <div class="alert-container" style="margin-bottom: 20px;">
-            <h4 style="color: #ff6b6b; margin-bottom: 15px;">⚠️ Active Stock Alerts</h4>
+            <h4 style="color: #ff6b6b; margin-bottom: 15px;">Active Stock Alerts</h4>
             <div class="alerts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
                 {% for alert in active_alerts %}
                 <div class="alert-card" style="background: rgba(255, 107, 107, 0.15); padding: 15px; border-radius: 10px; border-left: 4px solid #ff6b6b;">
@@ -277,7 +277,7 @@
         <!-- Low Stock Products -->
         {% if low_stock_products %}
         <div class="low-stock-container">
-            <h4 style="color: #ffa726; margin-bottom: 15px;">📦 Low Stock Products</h4>
+            <h4 style="color: #ffa726; margin-bottom: 15px;">Low Stock Products</h4>
             <div class="low-stock-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
                 {% for product in low_stock_products %}
                 <div class="low-stock-card" style="background: rgba(255, 167, 38, 0.15); padding: 15px; border-radius: 10px; border-left: 4px solid #ffa726;">
@@ -312,13 +312,13 @@
         <!-- Quick Actions for Stock Management -->
         <div class="stock-actions" style="margin-top: 20px; text-align: center;">
             <a href="{% url 'admin:inventory-stockalert-changelist' %}" class="action-btn" style="background: rgba(255, 107, 107, 0.2); border-color: rgba(255, 107, 107, 0.3); margin-right: 15px;">
-                🚨 View All Alerts
+                View All Alerts
             </a>
             <a href="{% url 'admin:catalog-product-changelist' %}" class="action-btn" style="background: rgba(255, 167, 38, 0.2); border-color: rgba(255, 167, 38, 0.3); margin-right: 15px;">
-                📦 Manage Products
+                Manage Products
             </a>
             <a href="{% url 'admin:inventory-stockmovement-changelist' %}" class="action-btn" style="background: rgba(255, 167, 38, 0.2); border-color: rgba(255, 167, 38, 0.3);">
-                📊 Stock Movements
+                Stock Movements
             </a>
         </div>
     </div>
@@ -328,20 +328,20 @@
     <div class="charts-section">
         <!-- Sales Chart -->
         <div class="chart-container">
-            <div class="chart-title">📈 Daily Sales Trend (Last 30 Days)</div>
+            <div class="chart-title">Daily Sales Trend (Last 30 Days)</div>
             <canvas id="salesChart" class="chart-canvas"></canvas>
         </div>
 
         <!-- Top Products Chart -->
         <div class="chart-container">
-            <div class="chart-title">🏆 Top Selling Products</div>
+            <div class="chart-title">Top Selling Products</div>
             <canvas id="productsChart" class="chart-canvas"></canvas>
         </div>
     </div>
 
     <!-- Recent Activity -->
     <div class="recent-activity">
-        <div class="chart-title">🕒 Recent Sales Activity</div>
+        <div class="chart-title">Recent Sales Activity</div>
         {% for sale in recent_sales %}
         <div class="activity-item">
             <div class="activity-title">

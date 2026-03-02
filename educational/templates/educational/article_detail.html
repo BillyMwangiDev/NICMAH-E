@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}{{ article.title }} - {{ site_name }}{% endblock %}
 {% block meta_description %}{{ article.excerpt|default:article.content|striptags|truncatechars:160 }}{% endblock %}
 {% block og_title %}{{ article.title }}{% endblock %}
 {% block og_description %}{{ article.excerpt|default:article.content|striptags|truncatechars:160 }}{% endblock %}
+
 {% block extra_css %}
 <script type="application/ld+json">
 {
@@ -22,44 +25,277 @@
 }
 </script>
 {% endblock %}
+
 {% block content %}
-<div class="blog-page">
-  <div class="container py-4 reading-container">
-  <div class="row">
-    <div class="col-lg-8">
-      <a href="/educational/" class="btn btn-outline-success btn-sm mb-3">← Back to blog</a>
-      <h1 class="h3">{{ article.title }}</h1>
-      <div class="text-muted mb-3">
-        {{ article.published_at|date:'M d, Y' }} ·
-        {{ article.content|striptags|length|divisibleby:200 }}
-      </div>
-      {% if article.image %}
-      <img class="img-fluid rounded mb-3" src="{{ article.image.url }}" alt="{{ article.title }}">
-      {% endif %}
-      <div class="card border-0 shadow-sm article-detail-card">
-        <div class="card-body">
-          {# Treat content as trusted HTML produced by staff. If user-generated, sanitize beforehand. #}
-          {{ article.content|safe }}
+<!-- Hero Section -->
+<section class="relative py-16 bg-gradient-to-br from-green-900/20 via-emerald-800/30 to-teal-900/20 overflow-hidden">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2316a34a" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+    
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <a href="{% url 'educational:article_list' %}" 
+           class="inline-flex items-center text-agro-green hover:text-agro-dark mb-6 font-semibold transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Articles
+        </a>
+        
+        <div class="flex items-center gap-4 text-sm text-gray-700 mb-6">
+            {% if article.category %}
+            <span class="bg-white/90 backdrop-blur-sm text-agro-green px-4 py-2 rounded-full font-semibold">
+                {{ article.category }}
+            </span>
+            {% endif %}
+            <span class="flex items-center bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                <i class="fas fa-calendar mr-2 text-agro-green"></i>
+                {{ article.published_at|date:'F d, Y' }}
+            </span>
+            <span class="flex items-center bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                <i class="fas fa-clock mr-2 text-agro-green"></i>
+                {{ article.content|striptags|length|divisibleby:200|default:5 }} min read
+            </span>
         </div>
-      </div>
+        
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-agro-dark mb-6 leading-tight">
+            {{ article.title }}
+        </h1>
+        
+        {% if article.excerpt %}
+        <p class="text-xl text-gray-700 leading-relaxed">
+            {{ article.excerpt }}
+        </p>
+        {% endif %}
     </div>
-    <div class="col-lg-4">
-      <aside class="ps-lg-4 mt-4 mt-lg-0">
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <h5 class="card-title mb-2">About the author</h5>
-            <p class="mb-0 small">{{ article.author.get_full_name|default:article.author.username }}</p>
-          </div>
+</section>
+
+<!-- Article Content Section -->
+<section class="py-12 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                {% if article.image %}
+                <div class="mb-8 rounded-2xl overflow-hidden shadow-2xl">
+                    <img src="{{ article.image.url }}" 
+                         alt="{{ article.title }}" 
+                         class="w-full h-auto object-cover">
+                </div>
+                {% endif %}
+                
+                <article class="prose prose-lg max-w-none article-content">
+                    <div class="bg-white rounded-2xl shadow-lg p-8 lg:p-12">
+                        {# Treat content as trusted HTML produced by staff. If user-generated, sanitize beforehand. #}
+                        <div class="article-body text-gray-700 leading-relaxed">
+                            {{ article.content|safe }}
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Share Section -->
+                <div class="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-agro-dark mb-4">
+                        <i class="fas fa-share-alt text-agro-green mr-2"></i>
+                        Share this Article
+                    </h3>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                           target="_blank"
+                           class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fab fa-facebook mr-2"></i>
+                            Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ article.title|urlencode }}" 
+                           target="_blank"
+                           class="flex items-center bg-sky-500 text-white px-4 py-2 rounded-lg hover:bg-sky-600 transition-colors">
+                            <i class="fab fa-twitter mr-2"></i>
+                            Twitter
+                        </a>
+                        <a href="https://wa.me/?text={{ article.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" 
+                           target="_blank"
+                           class="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                            <i class="fab fa-whatsapp mr-2"></i>
+                            WhatsApp
+                        </a>
+                        <button onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}')"
+                                class="flex items-center bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-link mr-2"></i>
+                            Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1 space-y-6">
+                <!-- Author Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-agro-dark mb-4 flex items-center">
+                        <i class="fas fa-user text-agro-green mr-2"></i>
+                        About the Author
+                    </h3>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-agro-green to-emerald-600 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-agro-dark">
+                                {{ article.author.get_full_name|default:article.author.username }}
+                            </p>
+                            <p class="text-sm text-gray-600">Agricultural Expert</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Article Info Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-agro-dark mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-agro-green mr-2"></i>
+                        Article Info
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-calendar text-agro-green mr-3 w-5"></i>
+                            <div>
+                                <div class="font-semibold">Published</div>
+                                <div class="text-gray-600">{{ article.published_at|date:'F d, Y' }}</div>
+                            </div>
+                        </div>
+                        {% if article.updated_at != article.published_at %}
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-edit text-agro-green mr-3 w-5"></i>
+                            <div>
+                                <div class="font-semibold">Updated</div>
+                                <div class="text-gray-600">{{ article.updated_at|date:'F d, Y' }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-clock text-agro-green mr-3 w-5"></i>
+                            <div>
+                                <div class="font-semibold">Reading Time</div>
+                                <div class="text-gray-600">{{ article.content|striptags|length|divisibleby:200|default:5 }} minutes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CTA Card -->
+                <div class="bg-gradient-to-r from-agro-green to-agro-emerald rounded-2xl shadow-lg p-6 text-white">
+                    <h3 class="text-lg font-bold mb-3">Want More?</h3>
+                    <p class="text-green-100 mb-4 text-sm">
+                        Explore more articles and learn from our expert agricultural guides.
+                    </p>
+                    <a href="{% url 'educational:article_list' %}" 
+                       class="inline-block w-full bg-white text-agro-green px-4 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors text-center">
+                        Browse All Articles
+                    </a>
+                </div>
+            </aside>
         </div>
-        <div class="card border-0 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title mb-2">Published</h5>
-            <p class="small text-muted mb-0">{{ article.published_at|date:'M d, Y H:i' }}</p>
-          </div>
-        </div>
-      </aside>
     </div>
-  </div>
-  </div>
-</div>
+</section>
+
+<!-- Related Articles CTA -->
+<section class="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-6">
+            Continue Learning
+        </h2>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+            Discover more educational content to enhance your agricultural knowledge and improve your farming practices.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="{% url 'educational:article_list' %}" 
+               class="bg-gradient-to-r from-agro-green to-agro-emerald text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all">
+                <i class="fas fa-book-open mr-3"></i>
+                View All Articles
+            </a>
+            <a href="{% url 'catalog:product_list' %}" 
+               class="border border-agro-green/70 text-agro-green px-8 py-4 rounded-xl font-semibold hover:bg-agro-green hover:text-white transition-colors">
+                <i class="fas fa-shopping-cart mr-3"></i>
+                Browse Products
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+    .article-content {
+        font-size: 1.125rem;
+        line-height: 1.75;
+    }
+    
+    .article-body h1,
+    .article-body h2,
+    .article-body h3,
+    .article-body h4 {
+        color: var(--agro-dark);
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .article-body h2 {
+        font-size: 2rem;
+        border-bottom: 2px solid var(--agro-green);
+        padding-bottom: 0.5rem;
+    }
+    
+    .article-body h3 {
+        font-size: 1.5rem;
+    }
+    
+    .article-body p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-body ul,
+    .article-body ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-body li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .article-body img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.75rem;
+        margin: 2rem 0;
+    }
+    
+    .article-body a {
+        color: var(--agro-green);
+        text-decoration: underline;
+    }
+    
+    .article-body a:hover {
+        color: var(--agro-dark);
+    }
+    
+    .article-body blockquote {
+        border-left: 4px solid var(--agro-green);
+        padding-left: 1.5rem;
+        margin: 2rem 0;
+        font-style: italic;
+        color: #6b7280;
+    }
+    
+    .article-body code {
+        background-color: #f3f4f6;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875em;
+    }
+    
+    .article-body pre {
+        background-color: #1f2937;
+        color: #f9fafb;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        overflow-x: auto;
+        margin: 2rem 0;
+    }
+</style>
 {% endblock %}

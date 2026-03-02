@@ -1,5 +1,5 @@
 """
-Core views for Nichmah Agrovet application.
+Core views for NICMAH application.
 """
 
 from django.shortcuts import render

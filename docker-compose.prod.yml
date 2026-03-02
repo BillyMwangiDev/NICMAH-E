@@ -1,22 +1,30 @@
 version: '3.9'
 
+# Production Docker Compose Configuration
 services:
   db:
-    image: postgres:15
+    image: postgres:15-alpine
+    container_name: nicmah_db_prod
     environment:
       POSTGRES_DB: ${DB_NAME:-nichmah_agrovet}
       POSTGRES_USER: ${DB_USER:-nichmah_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-your_secure_password}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nichmah_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
     build:
       context: .
       dockerfile: Dockerfile.prod
+    container_name: nicmah_web_prod
     environment:
       - DEBUG=False
       - DB_HOST=db
@@ -24,29 +32,32 @@ services:
       - DB_ENGINE=django.db.backends.postgresql
       - DB_NAME=${DB_NAME:-nichmah_agrovet}
       - DB_USER=${DB_USER:-nichmah_user}
-      - DB_PASSWORD=${DB_PASSWORD:-your_secure_password}
+      - DB_PASSWORD=${DB_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
     volumes:
       - media_data:/app/media
       - static_data:/app/staticfiles
       - logs_data:/app/logs
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - backend
     restart: unless-stopped
+    command: gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120 --access-logfile - --error-logfile - nichmah_agrovet.wsgi:application
 
   nginx:
     image: nginx:alpine
+    container_name: nicmah_nginx_prod
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-      - static_data:/app/staticfiles
-      - media_data:/app/media
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - static_data:/app/staticfiles:ro
+      - media_data:/app/media:ro
     depends_on:
       - web
     networks:
@@ -56,16 +67,22 @@ services:
 
   redis:
     image: redis:alpine
+    container_name: nicmah_redis_prod
     networks:
       - backend
     restart: unless-stopped
+    volumes:
+      - redis_data:/data
 
 volumes:
   postgres_data:
   media_data:
   static_data:
   logs_data:
+  redis_data:
 
 networks:
   frontend:
+    driver: bridge
   backend:
+    driver: bridge

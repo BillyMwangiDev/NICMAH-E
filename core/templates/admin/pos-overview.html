@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
-{% block title %}POS Overview - Nicmah Agrovet{% endblock %}
+{% block title %}POS Overview - NICMAH{% endblock %}
 
 {% block extrastyle %}
 <style>
@@ -163,14 +163,14 @@
     
     <!-- POS Header -->
     <div class="pos-header">
-        <h1>🏪 POS System Overview</h1>
+        <h1>POS System Overview</h1>
         <p>Real-time monitoring of Point of Sale operations</p>
         <p>Active sessions, today's performance, and pending transactions</p>
     </div>
 
     <!-- Today's Summary -->
     <div class="pos-card today-summary">
-        <div class="card-title">📅 Today's Performance</div>
+        <div class="card-title">Today's Performance</div>
         <div class="summary-number">${{ today_sales.total|default:"0.00" }}</div>
         <div class="summary-label">Total Revenue</div>
         <div style="margin-top: 15px; font-size: 1.1rem;">
@@ -182,7 +182,7 @@
     <div class="pos-grid">
         <!-- Active Sessions -->
         <div class="pos-card">
-            <div class="card-title">🟢 Active POS Sessions</div>
+            <div class="card-title">Active POS Sessions</div>
             {% if active_sessions %}
                 {% for session in active_sessions %}
                 <div class="session-item">
@@ -213,7 +213,7 @@
 
         <!-- Pending Transactions -->
         <div class="pos-card">
-            <div class="card-title">⏳ Pending Transactions</div>
+            <div class="card-title">Pending Transactions</div>
             {% if pending_sales %}
                 {% for sale in pending_sales %}
                 <div class="sale-item">
@@ -241,19 +241,19 @@
 
         <!-- Quick Actions -->
         <div class="pos-card">
-            <div class="card-title">⚡ Quick Actions</div>
+            <div class="card-title">Quick Actions</div>
             <div style="display: grid; gap: 10px;">
                 <a href="{% url 'admin:pos-possession-changelist' %}" class="action-btn">
-                    🏪 Manage All Sessions
+                    Manage All Sessions
                 </a>
                 <a href="{% url 'admin:pos-possale-changelist' %}" class="action-btn">
-                    💰 View All Sales
+                    View All Sales
                 </a>
                 <a href="{% url 'admin:pos-possaleitem-changelist' %}" class="action-btn">
-                    📦 Sale Items
+                    Sale Items
                 </a>
                 <a href="{% url 'admin:pos-receipt-changelist' %}" class="action-btn">
-                    🧾 Receipts
+                    Receipts
                 </a>
             </div>
         </div>

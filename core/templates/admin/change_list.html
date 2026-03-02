@@ -326,17 +326,17 @@
     <!-- Quick Actions Bar -->
     <div class="quick-actions-bar">
         <a href="{% url cl.opts|admin_urlname:'add' %}" class="quick-action-btn">
-            ➕ Add {{ cl.opts.verbose_name }}
+            Add {{ cl.opts.verbose_name }}
         </a>
         <button class="quick-action-btn secondary" onclick="exportData()">
-            📊 Export Data
+            Export Data
         </button>
         <button class="quick-action-btn secondary" onclick="bulkActions()">
-            🔧 Bulk Actions
+            Bulk Actions
         </button>
         {% if cl.has_filters %}
         <button class="quick-action-btn secondary" onclick="toggleFilters()">
-            🔍 Toggle Filters
+            Toggle Filters
         </button>
         {% endif %}
     </div>
@@ -344,7 +344,7 @@
     <!-- Enhanced Object Tools -->
     {% if has_add_permission %}
     <div class="enhanced-object-tools">
-        <h2>🚀 Quick Actions</h2>
+        <h2>Quick Actions</h2>
         {% block object-tools %}
             {% if has_add_permission %}
                 <div class="object-tools">
@@ -363,7 +363,7 @@
     <!-- Enhanced Filters -->
     {% if cl.has_filters %}
     <div class="enhanced-filters" id="filters-section">
-        <h3>🔍 Filters</h3>
+        <h3>Filters</h3>
         {% block filters %}
             {% if cl.has_filters %}
                 <div id="changelist-filter">
@@ -378,7 +378,7 @@
     <!-- Enhanced Search -->
     {% if cl.search_fields %}
     <div class="enhanced-search">
-        <h3>🔎 Search</h3>
+        <h3>Search</h3>
         {% block search %}{% search_form cl %}{% endblock %}
     </div>
     {% endif %}

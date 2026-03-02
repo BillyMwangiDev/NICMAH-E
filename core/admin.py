@@ -1,5 +1,5 @@
 """
-Custom admin site for Nicmah Agrovet with role-based access control.
+Custom admin site for NICMAH with role-based access control.
 """
 
 from django.contrib import admin
@@ -67,11 +67,11 @@ except ImportError:
     OrderAdmin = None
 
 try:
-    from analytics.models import SalesReport, ProductPerformance, CustomerInsight, DashboardWidget
-    from analytics.admin import SalesReportAdmin, ProductPerformanceAdmin, CustomerInsightAdmin, DashboardWidgetAdmin
+    from analytics.models import Sales, SalesItem, SalesAnalytics, SalesReport, ProductPerformance, CustomerInsight, DashboardWidget
+    from analytics.admin import SalesAdmin, SalesItemAdmin, SalesAnalyticsAdmin, SalesReportAdmin, ProductPerformanceAdmin, CustomerInsightAdmin, DashboardWidgetAdmin
 except ImportError:
-    SalesReport = ProductPerformance = CustomerInsight = DashboardWidget = None
-    SalesReportAdmin = ProductPerformanceAdmin = CustomerInsightAdmin = DashboardWidgetAdmin = None
+    Sales = SalesItem = SalesAnalytics = SalesReport = ProductPerformance = CustomerInsight = DashboardWidget = None
+    SalesAdmin = SalesItemAdmin = SalesAnalyticsAdmin = SalesReportAdmin = ProductPerformanceAdmin = CustomerInsightAdmin = DashboardWidgetAdmin = None
 
 
 try:
@@ -95,9 +95,9 @@ def is_seller_user(user):
 class NicmahAgrovetAdminSite(AdminSite):
     """Custom admin site with enhanced features and role-based access."""
 
-    site_header = "Nicmah Agrovet Administration"
-    site_title = "Nicmah Agrovet Admin"
-    index_title = "Welcome to Nicmah Agrovet Administration"
+    site_header = "NICMAH Administration"
+    site_title = "NICMAH Admin"
+    index_title = "Welcome to NICMAH Administration"
 
     def has_permission(self, request):
         """Check if user has permission to access admin."""
@@ -117,6 +117,31 @@ class NicmahAgrovetAdminSite(AdminSite):
             path("inventory-status/", self.admin_view(self.inventory_status_view), name="inventory-status"),
         ]
         return custom_urls + urls
+
+    def index(self, request, extra_context=None):
+        """Override admin index to add custom count statistics."""
+        extra_context = extra_context or {}
+        
+        # Get actual counts from database
+        user_count = CustomUser.objects.count() if CustomUser else 0
+        product_count = Product.objects.count() if Product else 0
+        
+        # Use unified Sales model for sales count (matches analytics views)
+        sale_count = Sales.objects.count() if Sales else 0
+        
+        # Stock count - use StockMovement model
+        stock_count = StockMovement.objects.count() if StockMovement else 0
+        
+        extra_context.update({
+            'user_count': user_count,
+            'product_count': product_count,
+            'sale_count': sale_count,
+            'stock_count': stock_count,
+        })
+        
+        return super().index(request, extra_context)
+        
+        return super().index(request, extra_context)
 
     def dashboard_view(self, request):
         """Enhanced admin dashboard with key metrics."""
@@ -246,21 +271,10 @@ class NicmahAgrovetAdminSite(AdminSite):
                 .order_by("day")
             )
 
-        # Prepare sales data for charts - use sample data if no real data
-        if daily_sales:
-            sales_data = [
-                {"date": item["day"], "total": float(item["total"]), "count": item["count"]} for item in daily_sales
-            ]
-        else:
-            # Sample data for testing
-            sales_data = [
-                {
-                    "date": (end_date - timedelta(days=i)).strftime("%Y-%m-%d"),
-                    "total": 500 + (i * 100) + (i * 50),
-                    "count": 5 + i,
-                }
-                for i in range(30, 0, -1)
-            ]
+        # Prepare sales data for charts - use real data from database
+        sales_data = [
+            {"date": item["day"], "total": float(item["total"]), "count": item["count"]} for item in daily_sales
+        ]
 
         # Top products by quantity sold
         top_products = []
@@ -272,79 +286,17 @@ class NicmahAgrovetAdminSite(AdminSite):
                 .order_by("-total_quantity")[:8]
             )
 
-        # Use sample products if no real data
-        if not top_products:
-            top_products = [
-                {
-                    "product__name": "Sample Product 1",
-                    "product__category__name": "Fertilizers",
-                    "total_quantity": 150,
-                    "total_revenue": 1500.00,
-                },
-                {
-                    "product__name": "Sample Product 2",
-                    "product__category__name": "Seeds",
-                    "total_quantity": 120,
-                    "total_revenue": 1200.00,
-                },
-                {
-                    "product__name": "Sample Product 3",
-                    "product__category__name": "Pesticides",
-                    "total_quantity": 95,
-                    "total_revenue": 950.00,
-                },
-                {
-                    "product__name": "Sample Product 4",
-                    "product__category__name": "Tools",
-                    "total_quantity": 80,
-                    "total_revenue": 800.00,
-                },
-                {
-                    "product__name": "Sample Product 5",
-                    "product__category__name": "Fertilizers",
-                    "total_quantity": 75,
-                    "total_revenue": 750.00,
-                },
-                {
-                    "product__name": "Sample Product 6",
-                    "product__category__name": "Seeds",
-                    "total_quantity": 65,
-                    "total_revenue": 650.00,
-                },
-                {
-                    "product__name": "Sample Product 7",
-                    "product__category__name": "Pesticides",
-                    "total_quantity": 55,
-                    "total_revenue": 550.00,
-                },
-                {
-                    "product__name": "Sample Product 8",
-                    "product__category__name": "Tools",
-                    "total_quantity": 45,
-                    "total_revenue": 450.00,
-                },
-            ]
+        # Use real data from database only - no sample data
 
-        # Category performance
+        # Category performance - use real data from database only
         category_performance = []
-        if top_products and any("product__category__name" in item for item in top_products):
+        if "pos.POSSaleItem" in [app.model_name for app in apps.get_app_configs()]:
             category_performance = (
                 POSSaleItem.objects.filter(sale__created_at__range=[start_date, end_date], sale__status="completed")
                 .values("product__category__name")
                 .annotate(total_revenue=Sum("total_price"), total_quantity=Sum("quantity"))
                 .order_by("-total_revenue")
             )
-
-        # Use sample category data if no real data
-        if not category_performance:
-            category_performance = [
-                {"product__category__name": "Fertilizers", "total_revenue": 2250.00, "total_quantity": 225},
-                {"product__category__name": "Seeds", "total_revenue": 1850.00, "total_quantity": 185},
-                {"product__category__name": "Pesticides", "total_revenue": 1500.00, "total_quantity": 150},
-                {"product__category__name": "Tools", "total_revenue": 1250.00, "total_quantity": 125},
-                {"product__category__name": "Irrigation", "total_revenue": 950.00, "total_quantity": 95},
-                {"product__category__name": "Organic", "total_revenue": 750.00, "total_quantity": 75},
-            ]
 
         # Payment method analysis
         payment_methods = []
@@ -494,26 +446,8 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return is_admin_user(request.user)
 
-    list_display = ["site_name", "contact_email", "phone_number", "currency", "years_in_business"]
+    list_display = ["site_name", "contact_email", "phone_number", "currency", "years_in_business", "printer_enabled"]
     list_editable = ["currency"]
-    fieldsets = (
-        ("Basic Information", {"fields": ("site_name", "site_description", "logo")}),
-        (
-            "Business Information",
-            {"fields": ("business_description", "mission_statement", "vision_statement"), "classes": ("wide",)},
-        ),
-        ("Services Offered", {"fields": ("livestock_services", "crop_services"), "classes": ("wide", "collapse")}),
-        ("Contact Information", {"fields": ("contact_email", "phone_number", "address")}),
-        (
-            "Social Media",
-            {"fields": ("facebook_url", "tiktok_url", "instagram_url", "twitter_url"), "classes": ("collapse",)},
-        ),
-        ("Business Settings", {"fields": ("currency", "tax_rate", "business_hours")}),
-        (
-            "Experience & Achievements",
-            {"fields": ("years_in_business", "cattle_ai_count", "farmers_served"), "classes": ("collapse",)},
-        ),
-    )
 
 
 class CustomUserAdminOverride(admin.ModelAdmin):
@@ -606,39 +540,6 @@ class POSSaleAdminOverride(admin.ModelAdmin):
         elif is_seller_user(request.user):
             return qs.filter(seller=request.user)
         return qs.none()
-
-
-class ProductAdmin(admin.ModelAdmin):
-    """Admin for products with role-based access."""
-
-    def has_module_permission(self, request):
-        return is_admin_user(request.user) or is_seller_user(request.user)
-
-    def has_view_permission(self, request, obj=None):
-        return True
-
-    def has_add_permission(self, request):
-        return is_admin_user(request.user)
-
-    def has_change_permission(self, request, obj=None):
-        return is_admin_user(request.user)
-
-    def has_delete_permission(self, request, obj=None):
-        return is_admin_user(request.user)
-
-    list_display = ["name", "sku", "category", "price", "stock_quantity", "is_active"]
-    list_filter = ["category", "is_active", "created_at"]
-    search_fields = ["name", "sku", "description"]
-    ordering = ["name"]
-
-    fieldsets = (
-        ("Basic Information", {"fields": ("name", "sku", "description", "category")}),
-        ("Pricing & Stock", {"fields": ("price", "stock_quantity", "min_stock_level")}),
-        ("Status", {"fields": ("is_active",)}),
-        ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
-    )
-
-    readonly_fields = ["created_at", "updated_at"]
 
 
 class StockMovementAdmin(admin.ModelAdmin):
@@ -760,7 +661,17 @@ if PurchaseOrder and PurchaseOrderAdmin:
 if Article and ArticleAdmin:
     admin_site.register(Article, ArticleAdmin)
 
-# Register analytics models
+# Register analytics models (unified sales - this is what analytics views use)
+if Sales and SalesAdmin:
+    admin_site.register(Sales, SalesAdmin)
+
+if SalesItem and SalesItemAdmin:
+    admin_site.register(SalesItem, SalesItemAdmin)
+
+if SalesAnalytics and SalesAnalyticsAdmin:
+    admin_site.register(SalesAnalytics, SalesAnalyticsAdmin)
+
+# Legacy analytics models (if they exist)
 if SalesReport and SalesReportAdmin:
     admin_site.register(SalesReport, SalesReportAdmin)
 

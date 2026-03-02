@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
-{% block title %}Inventory Status - Nicmah Agrovet{% endblock %}
+{% block title %}Inventory Status - NICMAH{% endblock %}
 
 {% block extrastyle %}
 <style>
@@ -182,7 +182,7 @@
     
     <!-- Inventory Header -->
     <div class="inventory-header">
-        <h1>📦 Inventory Status</h1>
+        <h1>Inventory Status</h1>
         <p>Real-time monitoring of stock levels and movements</p>
         <p>Low stock alerts, recent activities, and expiry management</p>
     </div>
@@ -191,7 +191,7 @@
     <div class="inventory-grid">
         <!-- Low Stock Alerts -->
         <div class="inventory-card">
-            <div class="card-title">🚨 Low Stock Alerts</div>
+            <div class="card-title">Low Stock Alerts</div>
             {% if low_stock_products %}
                 {% for product in low_stock_products %}
                 <div class="alert-item">
@@ -225,7 +225,7 @@
 
         <!-- Recent Stock Movements -->
         <div class="inventory-card">
-            <div class="card-title">📊 Recent Stock Movements</div>
+            <div class="card-title">Recent Stock Movements</div>
             {% if recent_movements %}
                 {% for movement in recent_movements %}
                 <div class="movement-item">
@@ -254,7 +254,7 @@
 
         <!-- Expiring Products -->
         <div class="inventory-card">
-            <div class="card-title">⏰ Expiring Products</div>
+            <div class="card-title">Expiring Products</div>
             {% if expiring_products %}
                 {% for product in expiring_products %}
                 <div class="expiry-item">
@@ -284,22 +284,22 @@
 
         <!-- Quick Actions -->
         <div class="inventory-card">
-            <div class="card-title">⚡ Quick Actions</div>
+            <div class="card-title">Quick Actions</div>
             <div class="quick-actions">
                 <a href="{% url 'admin:catalog-product-changelist' %}" class="action-btn">
-                    📦 Manage Products
+                    Manage Products
                 </a>
                 <a href="{% url 'admin:inventory-stockmovement-changelist' %}" class="action-btn">
-                    📊 View All Movements
+                    View All Movements
                 </a>
                 <a href="{% url 'admin:inventory-stockalert-changelist' %}" class="action-btn">
-                    🚨 Stock Alerts
+                    Stock Alerts
                 </a>
                 <a href="{% url 'admin:inventory-purchaseorder-changelist' %}" class="action-btn">
-                    📋 Purchase Orders
+                    Purchase Orders
                 </a>
                 <a href="{% url 'admin:inventory-supplier-changelist' %}" class="action-btn">
-                    🏢 Manage Suppliers
+                    Manage Suppliers
                 </a>
             </div>
         </div>

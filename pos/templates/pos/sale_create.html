@@ -5,88 +5,97 @@
 {% block title %}Create New Sale - POS{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 pos-dashboard">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pos-dashboard">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="h3 mb-0 text-gray-800">
-                <i class="fas fa-cash-register me-2 text-primary"></i>
-                New POS Sale
-            </h2>
-            <p class="text-muted mb-0">Scan products and complete transactions</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'pos:sales_list' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-list me-2"></i>View Sales
-            </a>
-            <a href="{% url 'pos:dashboard' %}" class="btn btn-outline-primary">
-                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-            </a>
+    <div class="mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-display font-bold text-agro-dark mb-2">
+                    <i class="fas fa-cash-register text-agro-green mr-3"></i>
+                    New POS Sale
+                </h1>
+                <p class="text-gray-600">Scan products and complete transactions</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="{% url 'pos:sales_list' %}" class="btn-secondary inline-flex items-center">
+                    <i class="fas fa-list mr-2"></i>View Sales
+                </a>
+                <a href="{% url 'pos:dashboard' %}" class="btn-primary inline-flex items-center">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Product Selection and Cart -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-header bg-gradient-primary text-white border-0">
-                    <h5 class="mb-0">
-                        <i class="fas fa-shopping-cart me-2"></i>
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-agro-green to-emerald-600 px-6 py-4">
+                    <h2 class="text-xl font-semibold text-white">
+                        <i class="fas fa-shopping-cart mr-2"></i>
                         Product Selection
-                    </h5>
+                    </h2>
                 </div>
-                <div class="card-body p-4">
+                <div class="p-6">
                     <!-- Enhanced Barcode Scanner -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-gray-700">
-                            <i class="fas fa-barcode me-2 text-primary"></i>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-barcode text-agro-green mr-2"></i>
                             Scan Barcode or Search Products
                         </label>
-                        <div class="input-group input-group-lg">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input type="text" 
-                                   class="form-control border-start-0 ps-0" 
-                                   id="barcodeInput" 
-                                   placeholder="Scan barcode, enter product name, or SKU..."
-                                   autocomplete="off">
-                            <button class="btn btn-primary px-4" onclick="scanBarcode()">
-                                <i class="fas fa-search me-2"></i>Search
+                        <div class="flex gap-2">
+                            <div class="flex-1 relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                </div>
+                                <input type="text" 
+                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-lg transition-colors" 
+                                       id="barcodeInput" 
+                                       placeholder="Start typing product name, SKU, or scan barcode..."
+                                       autocomplete="off"
+                                       style="transition: border-color 0.3s ease;">
+                                <!-- Autocomplete Dropdown -->
+                                <div id="autocompleteDropdown" class="hidden absolute z-50 w-full mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-xl max-h-96 overflow-y-auto">
+                                    <div id="autocompleteResults" class="py-2"></div>
+                                </div>
+                            </div>
+                            <button class="btn-primary px-6 py-3 rounded-lg" onclick="scanBarcode()">
+                                <i class="fas fa-search mr-2"></i>Search
                             </button>
                         </div>
-                        <div class="form-text">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Press Enter to search or scan barcode automatically
-                        </div>
+                        <p class="mt-2 text-sm text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span id="scannerStatus">Press Enter to search or scan barcode automatically</span>
+                        </p>
                     </div>
 
                     <!-- Enhanced Product Search Results -->
-                    <div id="productResults" style="display: none;" class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0 text-gray-700">
-                                <i class="fas fa-list me-2 text-success"></i>
+                    <div id="productResults" style="display: none;" class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                <i class="fas fa-list text-agro-green mr-2"></i>
                                 Search Results
-                            </h6>
-                            <span class="badge bg-primary" id="resultCount"></span>
+                            </h3>
+                            <span class="px-3 py-1 bg-agro-green text-white rounded-full text-sm font-semibold" id="resultCount"></span>
                         </div>
-                        <div id="productList" class="row g-3"></div>
+                        <div id="productList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
 
                     <!-- Enhanced Current Cart -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0 text-gray-700">
-                                <i class="fas fa-shopping-bag me-2 text-info"></i>
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                <i class="fas fa-shopping-bag text-blue-600 mr-2"></i>
                                 Current Cart
-                            </h6>
-                            <span class="badge bg-info" id="cartItemCount">0 items</span>
+                            </h3>
+                            <span class="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-semibold" id="cartItemCount">0 items</span>
                         </div>
-                        <div id="cartItems" class="border rounded-3 p-3 bg-light">
-                            <div class="text-center py-4">
-                                <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
-                                <p class="text-muted mb-0">No items in cart</p>
-                                <small class="text-muted">Start scanning or searching for products</small>
+                        <div id="cartItems" class="border-2 border-dashed border-gray-300 rounded-xl p-6 bg-gray-50 min-h-[200px]">
+                            <div class="text-center py-8">
+                                <i class="fas fa-shopping-cart text-5xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-600 font-medium mb-1">No items in cart</p>
+                                <p class="text-sm text-gray-500">Start scanning or searching for products</p>
                             </div>
                         </div>
                     </div>
@@ -95,51 +104,22 @@
         </div>
 
         <!-- Sale Details and Checkout -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 2rem;">
-                <div class="card-header bg-gradient-success text-white border-0">
-                    <h5 class="mb-0">
-                        <i class="fas fa-calculator me-2"></i>
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-lg sticky top-4">
+                <div class="bg-gradient-to-r from-agro-green to-emerald-600 px-6 py-4">
+                    <h2 class="text-xl font-semibold text-white">
+                        <i class="fas fa-calculator mr-2"></i>
                         Sale Summary
-                    </h5>
+                    </h2>
                 </div>
-                <div class="card-body p-4">
-                    <!-- Customer Information -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-gray-700 mb-3">
-                            <i class="fas fa-user me-2 text-primary"></i>
-                            Customer Information
-                        </h6>
-                        <div class="mb-3">
-                            <label class="form-label small text-muted">Customer Name</label>
-                            <input type="text" 
-                                   class="form-control form-control-lg" 
-                                   id="customerName" 
-                                   placeholder="Walk-in Customer">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small text-muted">Phone Number</label>
-                            <input type="tel" 
-                                   class="form-control" 
-                                   id="customerPhone" 
-                                   placeholder="+1234567890">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small text-muted">Email Address</label>
-                            <input type="email" 
-                                   class="form-control" 
-                                   id="customerEmail" 
-                                   placeholder="customer@example.com">
-                        </div>
-                    </div>
-
+                <div class="p-6">
                     <!-- Tax Rate Selection -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-gray-700 mb-3">
-                            <i class="fas fa-percentage me-2 text-warning"></i>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-percentage text-yellow-500 mr-2"></i>
                             Tax Rate
-                        </h6>
-                        <select class="form-select form-select-lg" id="taxRate">
+                        </label>
+                        <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-base" id="taxRate">
                             <option value="">No Tax Applied</option>
                             {% for tax_rate in tax_rates %}
                             <option value="{{ tax_rate.id }}" data-rate="{{ tax_rate.rate }}">
@@ -150,112 +130,108 @@
                     </div>
 
                     <!-- Available Discounts -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-gray-700 mb-3">
-                            <i class="fas fa-tag me-2 text-info"></i>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-tag text-blue-600 mr-2"></i>
                             Available Discounts
-                        </h6>
-                        <div id="availableDiscounts">
+                        </label>
+                        <div id="availableDiscounts" class="space-y-3 max-h-48 overflow-y-auto">
                             {% for discount in active_discounts %}
-                            <div class="form-check mb-3 p-3 border rounded-3 bg-light">
-                                <input class="form-check-input" 
+                            <div class="flex items-start p-3 border-2 border-gray-200 rounded-lg hover:border-agro-green transition-colors bg-gray-50">
+                                <input class="mt-1 mr-3 w-5 h-5 text-agro-green focus:ring-agro-green border-gray-300 rounded" 
                                        type="checkbox" 
                                        value="{{ discount.id }}" 
                                        id="discount{{ discount.id }}">
-                                <label class="form-check-label fw-bold" for="discount{{ discount.id }}">
-                                    {{ discount.name }}
+                                <label class="flex-1 cursor-pointer" for="discount{{ discount.id }}">
+                                    <div class="font-semibold text-gray-800">{{ discount.name }}</div>
+                                    <div class="text-sm text-gray-600 mt-1">
+                                        {{ discount.get_discount_type_display }}
+                                        {% if discount.percentage_rate %}({{ discount.percentage_rate }}%){% endif %}
+                                    </div>
                                 </label>
-                                <div class="text-muted small mt-1">
-                                    {{ discount.get_discount_type_display }}
-                                    {% if discount.percentage_rate %}({{ discount.percentage_rate }}%){% endif %}
-                                </div>
                             </div>
                             {% empty %}
-                            <div class="text-center py-3">
-                                <i class="fas fa-tag fa-2x text-muted mb-2"></i>
-                                <p class="text-muted small mb-0">No active discounts available</p>
+                            <div class="text-center py-6">
+                                <i class="fas fa-tag text-4xl text-gray-300 mb-2"></i>
+                                <p class="text-sm text-gray-500">No active discounts available</p>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
 
                     <!-- Payment Method -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-gray-700 mb-3">
-                            <i class="fas fa-credit-card me-2 text-success"></i>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-credit-card text-agro-green mr-2"></i>
                             Payment Method
-                        </h6>
-                        <select class="form-select form-select-lg" id="paymentMethod">
-                            <option value="cash">
-                                <i class="fas fa-money-bill-wave me-2"></i>Cash
-                            </option>
-                            <option value="card">
-                                <i class="fas fa-credit-card me-2"></i>Card
-                            </option>
-                            <option value="mobile_money">
-                                <i class="fas fa-mobile-alt me-2"></i>Mobile Money
-                            </option>
-                            <option value="bank_transfer">
-                                <i class="fas fa-university me-2"></i>Bank Transfer
-                            </option>
+                        </label>
+                        <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-base" id="paymentMethod">
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="mobile_money">Mobile Money</option>
+                            <option value="bank_transfer">Bank Transfer</option>
                         </select>
                     </div>
 
                     <!-- Amount Paid and Change -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-gray-700 mb-3">
-                            <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-money-bill-wave text-agro-green mr-2"></i>
                             Payment Details
-                        </h6>
+                        </label>
                         <div class="mb-3">
-                            <label class="form-label small text-muted">Amount Paid</label>
+                            <label class="block text-xs text-gray-600 mb-1">Amount Paid</label>
                             <input type="number" 
-                                   class="form-control form-control-lg" 
+                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-agro-green focus:border-agro-green text-lg font-semibold" 
                                    id="amountPaid" 
                                    placeholder="0.00"
                                    step="0.01"
                                    min="0">
                         </div>
-                        <div id="changeAmount" class="alert alert-success d-none" role="alert">
-                            <i class="fas fa-coins me-2"></i>
-                            <strong>Change Due:</strong> $<span id="changeValue">0.00</span>
+                        <div id="changeAmount" class="hidden p-3 bg-green-50 border-2 border-green-200 rounded-lg" role="alert">
+                            <div class="flex items-center text-green-800 font-semibold">
+                                <i class="fas fa-coins mr-2"></i>
+                                <span>Change Due: KSh <span id="changeValue">0.00</span></span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Sale Totals -->
-                    <div class="border-top pt-4 mb-4">
-                        <h6 class="fw-bold text-gray-700 mb-3">
-                            <i class="fas fa-calculator me-2 text-primary"></i>
+                    <div class="border-t-2 border-gray-200 pt-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-calculator text-agro-green mr-2"></i>
                             Sale Totals
-                        </h6>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Subtotal:</span>
-                            <span class="fw-bold" id="subtotal">$0.00</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Tax:</span>
-                            <span class="fw-bold text-warning" id="taxAmount">$0.00</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Discounts:</span>
-                            <span class="fw-bold text-info" id="discountAmount">$0.00</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3 pt-3 border-top">
-                            <span class="h5 mb-0 text-gray-800">Total:</span>
-                            <span class="h4 mb-0 text-success fw-bold" id="totalAmount">$0.00</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Subtotal:</span>
+                                <span class="font-semibold text-gray-900" id="subtotal">KSh 0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Tax:</span>
+                                <span class="font-semibold text-yellow-600" id="taxAmount">KSh 0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Discounts:</span>
+                                <span class="font-semibold text-blue-600" id="discountAmount">KSh 0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-4 border-t-2 border-gray-200">
+                                <span class="text-xl font-bold text-gray-900">Total:</span>
+                                <span class="text-2xl font-bold text-agro-green" id="totalAmount">KSh 0.00</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="d-grid gap-3">
-                        <button class="btn btn-success btn-lg py-3" onclick="completeSale()" id="completeBtn" disabled>
-                            <i class="fas fa-check me-2"></i>Complete Sale
+                    <div class="space-y-3">
+                        <button class="w-full btn-primary py-4 text-lg font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" onclick="completeSale()" id="completeBtn" disabled>
+                            <i class="fas fa-check mr-2"></i>Complete Sale
                         </button>
-                        <button class="btn btn-outline-secondary py-2" onclick="clearSale()">
-                            <i class="fas fa-times me-2"></i>Clear Sale
+                        <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold" onclick="clearSale()">
+                            <i class="fas fa-times mr-2"></i>Clear Sale
                         </button>
-                        <button class="btn btn-outline-info py-2" onclick="holdSale()">
-                            <i class="fas fa-pause me-2"></i>Hold Sale
+                        <button class="w-full bg-blue-100 text-blue-800 py-3 rounded-lg hover:bg-blue-200 transition-colors font-semibold" onclick="holdSale()">
+                            <i class="fas fa-pause mr-2"></i>Hold Sale
                         </button>
                     </div>
                 </div>
@@ -266,6 +242,44 @@
 {% endblock %}
 
 {% block extra_css %}
+<style>
+    /* Autocomplete Styles */
+    .autocomplete-item {
+        transition: background-color 0.2s ease;
+    }
+    
+    .autocomplete-item.active {
+        background-color: #f0fdf4;
+        border-left: 3px solid #16a34a;
+    }
+    
+    .autocomplete-item:hover {
+        background-color: #f0fdf4;
+    }
+    
+    #autocompleteDropdown {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border: 2px solid #e5e7eb;
+    }
+    
+    #autocompleteDropdown::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    #autocompleteDropdown::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    #autocompleteDropdown::-webkit-scrollbar-thumb {
+        background: #16a34a;
+        border-radius: 4px;
+    }
+    
+    #autocompleteDropdown::-webkit-scrollbar-thumb:hover {
+        background: #14532d;
+    }
+</style>
 <style>
 .bg-gradient-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -372,11 +386,136 @@
 let currentCart = [];
 let selectedTaxRate = null;
 let selectedDiscounts = [];
+let currentAutocompleteQuery = '';
+let autocompleteTimeout = null;
+let selectedAutocompleteIndex = -1;
+
+// Barcode scanner detection variables
+let firstInputTime = null;
+let lastInputTime = null;
+let inputLength = 0;
+let isScannerInput = false;
+const SCANNER_DETECTION_THRESHOLD = 200; // milliseconds - if all input happens within this time, it's likely a scanner
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('barcodeInput').focus();
+    const barcodeInput = document.getElementById('barcodeInput');
+    barcodeInput.focus();
     updateTotals();
+    
+    // Enhanced autocomplete with debouncing and scanner detection
+    barcodeInput.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        const currentTime = Date.now();
+        
+        // Track input timing for scanner detection
+        if (query.length === 1) {
+            // First character - start tracking
+            firstInputTime = currentTime;
+            lastInputTime = currentTime;
+            inputLength = 1;
+            isScannerInput = false;
+        } else if (query.length > inputLength) {
+            // New character added
+            const timeSinceFirst = currentTime - firstInputTime;
+            lastInputTime = currentTime;
+            inputLength = query.length;
+            
+            // If input is happening very fast (within threshold), it's likely a scanner
+            // Scanners typically input all characters within 50-200ms
+            if (timeSinceFirst < SCANNER_DETECTION_THRESHOLD && query.length >= 3) {
+                isScannerInput = true;
+                // Hide autocomplete when scanner is detected to avoid interference
+                hideAutocomplete();
+            }
+        }
+        
+        // Clear previous timeout
+        if (autocompleteTimeout) {
+            clearTimeout(autocompleteTimeout);
+        }
+        
+        // Hide autocomplete if input is cleared
+        if (query.length === 0) {
+            hideAutocomplete();
+            firstInputTime = null;
+            lastInputTime = null;
+            inputLength = 0;
+            isScannerInput = false;
+            return;
+        }
+        
+        // Only show autocomplete if not scanner input (manual typing)
+        if (!isScannerInput) {
+            // Debounce autocomplete search (300ms delay)
+            autocompleteTimeout = setTimeout(() => {
+                searchAutocomplete(query);
+            }, 300);
+        }
+    });
+    
+    // Keyboard navigation for autocomplete and barcode scanner
+    barcodeInput.addEventListener('keydown', function(e) {
+        const dropdown = document.getElementById('autocompleteDropdown');
+        const items = dropdown && dropdown.style.display !== 'none' ? dropdown.querySelectorAll('.autocomplete-item') : [];
+        const barcodeValue = barcodeInput.value.trim();
+        
+        // Handle Enter key
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            
+            // If scanner input detected or Enter pressed quickly after input, process as barcode scan
+            const timeSinceLastInput = Date.now() - (lastInputTime || 0);
+            if (isScannerInput || (barcodeValue.length >= 3 && timeSinceLastInput < 300)) {
+                // Process as barcode scan - look up product immediately
+                processBarcodeScan(barcodeValue);
+                return;
+            }
+            
+            // If autocomplete items are visible and one is selected
+            if (items.length > 0 && selectedAutocompleteIndex >= 0) {
+                const item = items[selectedAutocompleteIndex];
+                const productId = parseInt(item.dataset.productId);
+                const productName = item.dataset.productName;
+                const productPrice = parseFloat(item.dataset.productPrice);
+                const productStock = parseInt(item.dataset.productStock);
+                selectAutocompleteProduct(productId, productName, productPrice, productStock);
+                return;
+            }
+            
+            // Fallback: regular search
+            if (barcodeValue.length > 0) {
+                scanBarcode();
+            }
+            return;
+        }
+        
+        // Only handle arrow keys if autocomplete is visible
+        if (items.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, items.length - 1);
+                updateAutocompleteSelection(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+                updateAutocompleteSelection(items);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                hideAutocomplete();
+                barcodeInput.focus();
+            }
+        }
+    });
+    
+    // Hide autocomplete when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('autocompleteDropdown');
+        const input = document.getElementById('barcodeInput');
+        if (dropdown && !dropdown.contains(e.target) && e.target !== input) {
+            hideAutocomplete();
+        }
+    });
     
     // Event listeners
     document.getElementById('taxRate').addEventListener('change', updateTotals);
@@ -387,6 +526,115 @@ document.addEventListener('DOMContentLoaded', function() {
         checkbox.addEventListener('change', updateTotals);
     });
 });
+
+// Update autocomplete selection highlight
+function updateAutocompleteSelection(items) {
+    items.forEach((item, index) => {
+        if (index === selectedAutocompleteIndex) {
+            item.classList.add('active', 'bg-green-50');
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+            item.classList.remove('active', 'bg-green-50');
+        }
+    });
+}
+
+// Process barcode scan from external scanner
+function processBarcodeScan(barcode) {
+    if (!barcode || barcode.length < 1) {
+        return;
+    }
+    
+    // Hide autocomplete
+    hideAutocomplete();
+    
+    // Show loading indicator
+    const barcodeInput = document.getElementById('barcodeInput');
+    const originalPlaceholder = barcodeInput.placeholder;
+    barcodeInput.placeholder = 'Scanning...';
+    barcodeInput.disabled = true;
+    
+    // Look up product by barcode or SKU
+    fetch(`{% url 'pos:product_search' %}?q=${encodeURIComponent(barcode)}&limit=1`)
+        .then(response => response.json())
+        .then(data => {
+            barcodeInput.disabled = false;
+            barcodeInput.placeholder = originalPlaceholder;
+            
+            if (data.products && data.products.length > 0) {
+                const product = data.products[0];
+                
+                // Check stock
+                if (product.stock_quantity <= 0) {
+                    alert(`${product.name} is out of stock.`);
+                    barcodeInput.value = '';
+                    barcodeInput.focus();
+                    return;
+                }
+                
+                // Add product to cart immediately
+                addToCart(product.id, product.name, product.price);
+                
+                // Play success sound (optional - browser may require user interaction first)
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                } catch (e) {
+                    // Sound not available or blocked - that's okay
+                }
+                
+                // Update status message
+                const statusEl = document.getElementById('scannerStatus');
+                if (statusEl) {
+                    const originalText = statusEl.innerHTML;
+                    statusEl.innerHTML = `<i class="fas fa-check-circle text-green-500 mr-1"></i>Scanned: ${product.name}`;
+                    setTimeout(() => {
+                        statusEl.innerHTML = originalText;
+                    }, 2000);
+                }
+                
+                // Clear input and prepare for next scan
+                barcodeInput.value = '';
+                barcodeInput.focus();
+                
+                // Reset scanner detection
+                firstInputTime = null;
+                lastInputTime = null;
+                inputLength = 0;
+                isScannerInput = false;
+                
+                // Visual feedback - green border flash
+                barcodeInput.style.borderColor = '#10b981';
+                barcodeInput.style.borderWidth = '3px';
+                setTimeout(() => {
+                    barcodeInput.style.borderColor = '';
+                    barcodeInput.style.borderWidth = '';
+                }, 500);
+            } else {
+                // Product not found
+                alert(`Product not found for barcode/SKU: ${barcode}`);
+                barcodeInput.value = '';
+                barcodeInput.focus();
+            }
+        })
+        .catch(error => {
+            console.error('Error processing barcode scan:', error);
+            barcodeInput.disabled = false;
+            barcodeInput.placeholder = originalPlaceholder;
+            alert('Error processing barcode scan. Please try again.');
+            barcodeInput.value = '';
+            barcodeInput.focus();
+        });
+}
 
 function scanBarcode() {
     const barcodeInput = document.getElementById('barcodeInput');
@@ -400,7 +648,146 @@ function scanBarcode() {
     searchProducts(barcode);
 }
 
+// Autocomplete search function with debouncing
+function searchAutocomplete(query) {
+    if (query.length < 1) {
+        hideAutocomplete();
+        return;
+    }
+    
+    currentAutocompleteQuery = query;
+    selectedAutocompleteIndex = -1; // Reset selection
+    
+    // Show loading state
+    const dropdown = document.getElementById('autocompleteDropdown');
+    const results = document.getElementById('autocompleteResults');
+    if (dropdown && results) {
+        results.innerHTML = `
+            <div class="px-4 py-3 text-center text-gray-500">
+                <i class="fas fa-spinner fa-spin text-agro-green mb-2"></i>
+                <p class="text-sm">Searching products...</p>
+            </div>
+        `;
+        dropdown.classList.remove('hidden');
+    }
+    
+    fetch(`{% url 'pos:product_search' %}?q=${encodeURIComponent(query)}&limit=10&include_out_of_stock=true`)
+        .then(response => response.json())
+        .then(data => {
+            // Only update if query hasn't changed
+            if (query === currentAutocompleteQuery) {
+                displayAutocomplete(data.products, query);
+            }
+        })
+        .catch(error => {
+            console.error('Error in autocomplete:', error);
+            if (query === currentAutocompleteQuery) {
+                hideAutocomplete();
+            }
+        });
+}
+
+// Display autocomplete results
+function displayAutocomplete(products, query) {
+    const dropdown = document.getElementById('autocompleteDropdown');
+    const results = document.getElementById('autocompleteResults');
+    
+    if (products.length === 0) {
+        results.innerHTML = `
+            <div class="px-4 py-3 text-center text-gray-500">
+                <i class="fas fa-search text-gray-400 mb-2"></i>
+                <p class="text-sm">No products found for "${query}"</p>
+            </div>
+        `;
+        dropdown.classList.remove('hidden');
+        return;
+    }
+    
+    results.innerHTML = products.map((product, index) => {
+        const stockClass = product.stock_status === 'in_stock' ? 'bg-green-100 text-green-800' :
+                          product.stock_status === 'low_stock' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800';
+        const stockIcon = product.stock_status === 'in_stock' ? 'fa-check-circle' :
+                         product.stock_status === 'low_stock' ? 'fa-exclamation-triangle' :
+                         'fa-times-circle';
+        
+        return `
+            <div class="autocomplete-item px-4 py-3 hover:bg-green-50 cursor-pointer border-b border-gray-100 ${index === 0 ? 'active' : ''}" 
+                 data-product-id="${product.id}"
+                 data-product-name="${product.name}"
+                 data-product-price="${product.price}"
+                 data-product-stock="${product.stock_quantity}"
+                 onclick="selectAutocompleteProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price}, ${product.stock_quantity})">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1 min-w-0">
+                        <div class="flex-shrink-0 mr-3">
+                            ${product.image_url ? 
+                                `<img src="${product.image_url}" alt="${product.name}" class="w-10 h-10 rounded object-cover">` :
+                                `<div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-box text-gray-400"></i>
+                                </div>`
+                            }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-semibold text-gray-900 truncate">${product.name}</div>
+                            <div class="text-sm text-gray-500">
+                                <span class="font-mono">${product.sku || 'No SKU'}</span>
+                                <span class="mx-2">•</span>
+                                <span class="font-semibold text-agro-green">KSh ${parseFloat(product.price).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 ml-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${stockClass}">
+                            <i class="fas ${stockIcon} mr-1"></i>
+                            ${product.stock_label}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    dropdown.classList.remove('hidden');
+}
+
+// Select product from autocomplete
+function selectAutocompleteProduct(productId, productName, productPrice, productStock) {
+    if (productStock <= 0) {
+        alert(`${productName} is out of stock.`);
+        hideAutocomplete();
+        return;
+    }
+    
+    // Add to cart (addToCart expects: productId, productName, price)
+    addToCart(productId, productName, productPrice);
+    
+    // Clear input and hide autocomplete
+    document.getElementById('barcodeInput').value = '';
+    hideAutocomplete();
+    document.getElementById('barcodeInput').focus();
+}
+
+// Hide autocomplete dropdown
+function hideAutocomplete() {
+    const dropdown = document.getElementById('autocompleteDropdown');
+    if (dropdown) {
+        dropdown.classList.add('hidden');
+    }
+    currentAutocompleteQuery = '';
+    selectedAutocompleteIndex = -1;
+    
+    // Clear any pending autocomplete requests
+    if (autocompleteTimeout) {
+        clearTimeout(autocompleteTimeout);
+        autocompleteTimeout = null;
+    }
+}
+
 function searchProducts(query) {
+    // Hide autocomplete when doing full search
+    hideAutocomplete();
+    
     fetch(`{% url 'pos:product_search' %}?q=${encodeURIComponent(query)}`)
         .then(response => response.json())
         .then(data => {
@@ -419,37 +806,33 @@ function displayProducts(products) {
     
     if (products.length === 0) {
         productList.innerHTML = `
-            <div class="col-12">
-                <div class="text-center py-4">
-                    <i class="fas fa-search fa-2x text-muted mb-3"></i>
-                    <h6 class="text-muted">No products found</h6>
-                    <p class="text-muted small">Try a different search term or SKU</p>
+            <div class="col-span-2">
+                <div class="text-center py-12">
+                    <i class="fas fa-search text-5xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No products found</h3>
+                    <p class="text-sm text-gray-500">Try a different search term or SKU</p>
                 </div>
             </div>
         `;
     } else {
         productList.innerHTML = products.map(product => `
-            <div class="col-md-6 col-lg-12">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-3">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1 me-3">
-                                <h6 class="mb-1 fw-bold text-gray-800">${product.name}</h6>
-                                <div class="small text-muted mb-2">
-                                    <span class="badge bg-light text-dark me-2">SKU: ${product.sku}</span>
-                                    <span class="badge bg-${product.stock_quantity > 0 ? 'success' : 'danger'}">Stock: ${product.stock_quantity}</span>
-                                </div>
-                                <small class="text-muted">
-                                    <i class="fas fa-tag me-1"></i>${product.category}
-                                </small>
-                            </div>
-                            <div class="text-end">
-                                <div class="h5 text-primary mb-2 fw-bold">$${parseFloat(product.price).toFixed(2)}</div>
-                                <button class="btn btn-success btn-sm" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">
-                                    <i class="fas fa-plus me-1"></i>Add
-                                </button>
-                            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-agro-green hover:shadow-lg transition-all">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 mr-4">
+                        <h4 class="font-semibold text-gray-900 mb-2">${product.name}</h4>
+                        <div class="flex gap-2 mb-2">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">SKU: ${product.sku}</span>
+                            <span class="px-2 py-1 ${product.stock_quantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} rounded text-xs font-medium">Stock: ${product.stock_quantity}</span>
                         </div>
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-tag mr-1"></i>${product.category}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xl font-bold text-agro-green mb-3">KSh ${parseFloat(product.price).toFixed(2)}</div>
+                        <button class="px-4 py-2 bg-agro-green text-white rounded-lg hover:bg-agro-dark transition-colors font-semibold text-sm" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price})">
+                            <i class="fas fa-plus mr-1"></i>Add to Cart
+                        </button>
                     </div>
                 </div>
             </div>
@@ -486,10 +869,10 @@ function updateCartDisplay() {
     
     if (currentCart.length === 0) {
         cartItems.innerHTML = `
-            <div class="text-center py-4">
-                <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
-                <p class="text-muted mb-0">No items in cart</p>
-                <small class="text-muted">Start scanning or searching for products</small>
+            <div class="text-center py-8">
+                <i class="fas fa-shopping-cart text-5xl text-gray-300 mb-3"></i>
+                <p class="text-gray-600 font-medium mb-1">No items in cart</p>
+                <p class="text-sm text-gray-500">Start scanning or searching for products</p>
             </div>
         `;
         cartItemCount.textContent = '0 items';
@@ -498,35 +881,33 @@ function updateCartDisplay() {
     }
     
     cartItems.innerHTML = currentCart.map((item, index) => `
-        <div class="card mb-3 border-0 shadow-sm">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1 me-3">
-                        <h6 class="mb-1 fw-bold text-gray-800">${item.name}</h6>
-                        <div class="d-flex align-items-center gap-3 mb-2">
-                            <span class="text-muted">$${item.price.toFixed(2)}</span>
-                            <span class="text-muted">×</span>
-                            <div class="input-group input-group-sm" style="width: 80px;">
-                                <button class="btn btn-outline-secondary btn-sm" onclick="updateQuantity(${index}, -1)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" class="form-control text-center" value="${item.quantity}" 
-                                       min="1" onchange="setQuantity(${index}, this.value)">
-                                <button class="btn btn-outline-secondary btn-sm" onclick="updateQuantity(${index}, 1)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
+        <div class="bg-white border-2 border-gray-200 rounded-xl p-4 mb-3 hover:border-agro-green transition-colors">
+            <div class="flex justify-between items-start">
+                <div class="flex-1 mr-4">
+                    <h4 class="font-semibold text-gray-900 mb-2">${item.name}</h4>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-gray-600 font-medium">KSh ${item.price.toFixed(2)}</span>
+                        <span class="text-gray-400">×</span>
+                        <div class="flex items-center border-2 border-gray-300 rounded-lg">
+                            <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg transition-colors" onclick="updateQuantity(${index}, -1)">
+                                <i class="fas fa-minus text-sm"></i>
+                            </button>
+                            <input type="number" class="w-16 px-2 py-1 text-center border-x-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-agro-green" value="${item.quantity}" 
+                                   min="1" onchange="setQuantity(${index}, this.value)">
+                            <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg transition-colors" onclick="updateQuantity(${index}, 1)">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
                         </div>
-                        <small class="text-muted">
-                            <i class="fas fa-tag me-1"></i>$${(item.price * item.quantity).toFixed(2)}
-                        </small>
                     </div>
-                    <div class="text-end">
-                        <div class="h6 text-success mb-2 fw-bold">$${(item.price * item.quantity).toFixed(2)}</div>
-                        <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+                    <p class="text-sm text-gray-500">
+                        <i class="fas fa-tag mr-1"></i>Subtotal: KSh ${(item.price * item.quantity).toFixed(2)}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <div class="text-xl font-bold text-agro-green mb-2">KSh ${(item.price * item.quantity).toFixed(2)}</div>
+                    <button class="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-semibold" onclick="removeFromCart(${index})">
+                        <i class="fas fa-trash mr-1"></i>Remove
+                    </button>
                 </div>
             </div>
         </div>
@@ -561,10 +942,10 @@ function updateTotals() {
     const total = subtotal + taxAmount - discountAmount;
     
     // Update display
-    document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('taxAmount').textContent = `$${taxAmount.toFixed(2)}`;
-    document.getElementById('discountAmount').textContent = `$${discountAmount.toFixed(2)}`;
-    document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('subtotal').textContent = `KSh ${subtotal.toFixed(2)}`;
+    document.getElementById('taxAmount').textContent = `KSh ${taxAmount.toFixed(2)}`;
+    document.getElementById('discountAmount').textContent = `KSh ${discountAmount.toFixed(2)}`;
+    document.getElementById('totalAmount').textContent = `KSh ${total.toFixed(2)}`;
     
     // Calculate change if amount paid is entered
     calculateChange();
@@ -584,20 +965,23 @@ function calculateDiscounts(subtotal, discountIds) {
 
 function calculateChange() {
     const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
-    const total = parseFloat(document.getElementById('totalAmount').textContent.replace('$', '')) || 0;
+    const total = parseFloat(document.getElementById('totalAmount').textContent.replace('KSh', '').replace(/,/g, '').trim()) || 0;
     const change = amountPaid - total;
+    const changeElement = document.getElementById('changeAmount');
     
     if (amountPaid > 0) {
         document.getElementById('changeValue').textContent = change.toFixed(2);
-        document.getElementById('changeAmount').style.display = 'block';
+        changeElement.classList.remove('hidden');
         
         if (change < 0) {
-            document.getElementById('changeAmount').className = 'text-danger fw-bold';
+            changeElement.className = 'p-3 bg-red-50 border-2 border-red-200 rounded-lg';
+            changeElement.querySelector('div').className = 'flex items-center text-red-800 font-semibold';
         } else {
-            document.getElementById('changeAmount').className = 'text-success fw-bold';
+            changeElement.className = 'p-3 bg-green-50 border-2 border-green-200 rounded-lg';
+            changeElement.querySelector('div').className = 'flex items-center text-green-800 font-semibold';
         }
     } else {
-        document.getElementById('changeAmount').style.display = 'none';
+        changeElement.classList.add('hidden');
     }
 }
 
@@ -608,7 +992,7 @@ function completeSale() {
     }
     
     const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
-    const total = parseFloat(document.getElementById('totalAmount').textContent.replace('$', '')) || 0;
+    const total = parseFloat(document.getElementById('totalAmount').textContent.replace('KSh', '').replace(/,/g, '').trim()) || 0;
     
     if (amountPaid < total) {
         alert('Amount paid must be at least equal to total amount');
@@ -617,9 +1001,6 @@ function completeSale() {
     
     // Prepare sale data
     const saleData = {
-        customer_name: document.getElementById('customerName').value,
-        customer_phone: document.getElementById('customerPhone').value,
-        customer_email: document.getElementById('customerEmail').value,
         payment_method: document.getElementById('paymentMethod').value,
         tax_rate_id: document.getElementById('taxRate').value || null,
         amount_paid: amountPaid,
@@ -632,16 +1013,38 @@ function completeSale() {
             .map(checkbox => checkbox.value)
     };
     
+    // Get CSRF token
+    const csrfToken = window.NICMAH.getCSRFToken();
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page and try again.');
+        console.error('CSRF token missing');
+        return;
+    }
+    
     // Send sale data to server
     fetch('{% url "pos:sale_create" %}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
+            'X-CSRFToken': csrfToken
         },
         body: JSON.stringify(saleData)
     })
-    .then(response => response.json())
+    .then(response => {
+        // Always try to parse JSON first to get error details
+        return response.json().then(data => {
+            if (!response.ok) {
+                throw new Error(data.error || data.message || `Server error: ${response.status}`);
+            }
+            return data;
+        }).catch(parseError => {
+            // If JSON parsing fails, return a generic error
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status} ${response.statusText}`);
+            }
+            throw parseError;
+        });
+    })
     .then(data => {
         if (data.success) {
             alert(`Sale completed successfully! Sale Number: ${data.sale_number}`);
@@ -649,12 +1052,14 @@ function completeSale() {
             // Redirect to sale detail page
             window.location.href = `/pos/sale/${data.sale_id}/`;
         } else {
-            alert(`Error: ${data.error}`);
+            const errorMsg = data.error || data.message || 'Unknown error occurred';
+            console.error('Sale creation error:', errorMsg);
+            alert(`Error: ${errorMsg}`);
         }
     })
     .catch(error => {
         console.error('Error completing sale:', error);
-        alert('Error completing sale. Please try again.');
+        alert(`Error completing sale: ${error.message || 'Please try again.'}`);
     });
 }
 
@@ -664,13 +1069,10 @@ function clearSale() {
     updateTotals();
     
     // Clear form fields
-    document.getElementById('customerName').value = '';
-    document.getElementById('customerPhone').value = '';
-    document.getElementById('customerEmail').value = '';
     document.getElementById('taxRate').selectedIndex = 0;
     document.getElementById('paymentMethod').selectedIndex = 0;
     document.getElementById('amountPaid').value = '';
-    document.getElementById('changeAmount').classList.add('d-none');
+    document.getElementById('changeAmount').classList.add('hidden');
     
     // Uncheck all discounts
     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
@@ -715,21 +1117,7 @@ function clearScanner() {
     document.getElementById('productResults').style.display = 'none';
 }
 
-// Helper function to get CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+// CSRF token functions are now in core/static/js/main.js via window.NICMAH.getCSRFToken()
 
 // Enter key support for barcode scanner
 document.getElementById('barcodeInput').addEventListener('keypress', function(e) {

@@ -1,24 +1,75 @@
 {% comment %}Reusable card grid for article list and infinite scroll{% endcomment %}
-<div class="row g-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
   {% for a in articles %}
-  <div class="col-md-6">
-    <article class="card h-100 shadow-sm border-0 article-card">
-      {% if a.image %}
-      <img class="card-img-top" src="{{ a.image.url }}" alt="{{ a.title }}">
-      {% endif %}
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{ a.title }}</h5>
-        <p class="card-text text-muted small mb-2">
-          {{ a.published_at|date:'M d, Y' }} · {{ a.reading_minutes|default:3 }} min read
-          {% if a.category %} · <span class="badge bg-light text-success border">{{ a.category }}</span>{% endif %}
-        </p>
-        <p class="card-text">{{ a.excerpt|default:a.content|striptags|truncatechars:130 }}</p>
-        <div class="mt-auto">
-          <a href="{% url 'educational:article_detail' a.slug %}" class="btn btn-success btn-sm">Read more</a>
-        </div>
+  <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:scale-105 animate-on-scroll article-card">
+    {% if a.image %}
+    <div class="relative h-48 overflow-hidden">
+      <img src="{{ a.image.url }}" 
+           alt="{{ a.title }}" 
+           class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+      {% if a.category %}
+      <div class="absolute top-4 right-4">
+        <span class="bg-agro-green text-white px-3 py-1 rounded-full text-xs font-semibold">
+          {{ a.category }}
+        </span>
       </div>
-    </article>
-  </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+      <i class="fas fa-book-open text-5xl text-agro-green"></i>
+      {% if a.category %}
+      <div class="absolute top-4 right-4">
+        <span class="bg-agro-green text-white px-3 py-1 rounded-full text-xs font-semibold">
+          {{ a.category }}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="p-6 flex flex-col h-full">
+      <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
+        <span class="flex items-center">
+          <i class="fas fa-calendar mr-2 text-agro-green"></i>
+          {{ a.published_at|date:'M d, Y' }}
+        </span>
+        <span class="flex items-center">
+          <i class="fas fa-clock mr-2 text-agro-green"></i>
+          {{ a.reading_minutes|default:3 }} min
+        </span>
+      </div>
+      
+      <h3 class="text-xl font-bold text-agro-dark mb-3 line-clamp-2">
+        {{ a.title }}
+      </h3>
+      
+      <p class="text-gray-600 mb-4 flex-grow line-clamp-3">
+        {{ a.excerpt|default:a.content|striptags|truncatechars:150 }}
+      </p>
+      
+      <a href="{% url 'educational:article_detail' a.slug %}" 
+         class="inline-flex items-center justify-center bg-gradient-to-r from-agro-green to-agro-emerald text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all mt-auto">
+        <span>Read More</span>
+        <i class="fas fa-arrow-right ml-2"></i>
+      </a>
+    </div>
+  </article>
   {% endfor %}
 </div>
 
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
