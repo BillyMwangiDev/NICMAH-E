@@ -1,0 +1,111 @@
+<!-- Test HTML template for CodeRabbit review -->
+<!-- This template contains intentional issues to test CodeRabbit suggestions -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+    <!-- Missing meta tags -->
+    <!-- Missing viewport meta tag -->
+    <!-- Missing charset declaration -->
+</head>
+<body>
+    <!-- Security issue - XSS vulnerability -->
+    <div id="user-input">{{ user_input|safe }}</div>
+    
+    <!-- Security issue - no CSRF token -->
+    <form method="post" action="/submit">
+        <input type="text" name="data">
+        <button type="submit">Submit</button>
+    </form>
+    
+    <!-- Accessibility issue - missing alt text -->
+    <img src="/static/images/logo.png">
+    
+    <!-- Performance issue - no lazy loading -->
+    <img src="/static/images/large-image.jpg">
+    
+    <!-- Security issue - inline JavaScript -->
+    <script>
+        var userData = "{{ user_data }}";  // XSS risk
+        document.write(userData);
+    </script>
+    
+    <!-- Bad practice - inline styles -->
+    <div style="color: red; font-size: 16px;">Inline styles are bad</div>
+    
+    <!-- Accessibility issue - no semantic HTML -->
+    <div class="button" onclick="submitForm()">Click me</div>
+    
+    <!-- Performance issue - no minification -->
+    <script src="/static/js/large-file.js"></script>
+    
+    <!-- Security issue - no Content Security Policy -->
+    <!-- Missing CSP headers -->
+    
+    <!-- Bad practice - hardcoded URLs -->
+    <a href="http://localhost:8000/admin/">Admin</a>
+    
+    <!-- Accessibility issue - no proper heading structure -->
+    <h3>Subheading</h3>
+    <h1>Main heading</h1>
+    
+    <!-- Performance issue - no image optimization -->
+    <img src="/static/images/unoptimized.png" width="1000" height="1000">
+    
+    <!-- Security issue - no input validation -->
+    <input type="text" name="search" value="{{ search_query }}">
+    
+    <!-- Bad practice - no proper error handling -->
+    <div id="error">{{ error_message }}</div>
+    
+    <!-- Performance issue - no caching headers -->
+    <!-- Missing cache control -->
+    
+    <!-- Accessibility issue - no ARIA labels -->
+    <button>Submit</button>
+    
+    <!-- Security issue - no HTTPS enforcement -->
+    <script src="http://example.com/script.js"></script>
+    
+    <!-- Bad practice - no responsive design -->
+    <div style="width: 800px;">Fixed width</div>
+    
+    <!-- Performance issue - no CDN usage -->
+    <script src="/static/js/jquery.js"></script>
+    
+    <!-- Security issue - no input sanitization -->
+    <div>{{ user_content }}</div>
+    
+    <!-- Bad practice - no proper form structure -->
+    <input type="text" name="name">
+    <input type="email" name="email">
+    <button type="submit">Send</button>
+    
+    <!-- Accessibility issue - no focus management -->
+    <div tabindex="-1">No focus</div>
+    
+    <!-- Performance issue - no resource hints -->
+    <!-- Missing preload/prefetch -->
+    
+    <!-- Security issue - no secure cookies -->
+    <!-- Missing secure and httpOnly flags -->
+    
+    <!-- Bad practice - no proper error pages -->
+    <div>Error: {{ error }}</div>
+    
+    <!-- Accessibility issue - no keyboard navigation -->
+    <div onclick="handleClick()">Click me</div>
+    
+    <!-- Performance issue - no critical CSS -->
+    <link rel="stylesheet" href="/static/css/all.css">
+    
+    <!-- Security issue - no input length limits -->
+    <textarea name="comment"></textarea>
+    
+    <!-- Bad practice - no proper HTML structure -->
+    <body>
+        <div>Nested body tag</div>
+    </body>
+</body>
+</html>
