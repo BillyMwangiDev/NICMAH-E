@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__claude-in-chrome__tabs_create_mcp",
+  "tool_input_preview": "{}",
+  "error": "This session's tab group no longer exists (tabs were closed). Call tabs_context_mcp with createIfEmpty: true to create a new one.",
+  "timestamp": "2026-08-28T13:39:47.083Z",
+  "retry_count": 1
+}

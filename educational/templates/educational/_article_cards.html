@@ -4,7 +4,7 @@
   <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all hover:scale-105 animate-on-scroll article-card">
     {% if a.image %}
     <div class="relative h-48 overflow-hidden">
-      <img src="{{ a.image.url }}" 
+      <img src="{{ a.image.url }}" loading="lazy" decoding="async"
            alt="{{ a.title }}" 
            class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
       {% if a.category %}

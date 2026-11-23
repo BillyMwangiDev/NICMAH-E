@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__playwright__browser_take_screenshot",
+  "tool_input_preview": "{\"scale\":\"css\",\"filename\":\"docs/live-api/storefront-catalog-vaccines-2026-09-22.png\"}",
+  "error": "### Error\nTimeoutError: browserBackend.callTool: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m",
+  "timestamp": "2026-09-22T09:10:48.385Z",
+  "retry_count": 1
+}

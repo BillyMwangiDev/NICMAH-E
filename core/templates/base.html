@@ -39,8 +39,13 @@
     <meta name="ai-expertise" content="{% block ai_expertise %}agricultural supplies and services{% endblock %}">
     {% endblock %}
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Third-party origins: open the connections early so fonts and icons do not wait on DNS/TLS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+    <!-- Tailwind CSS, compiled at build time (npm run build:css). No runtime compiler. -->
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     
     <!-- Font Awesome Icons (Latest) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -51,27 +56,6 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     
-    <!-- Tailwind Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'agro-green': '#16a34a',
-                        'agro-dark': '#14532d',
-                        'agro-light': '#bbf7d0',
-                        'agro-brown': '#92400e',
-                        'agro-gold': '#f59e0b',
-                        'agro-sky': '#0ea5e9'
-                    },
-                    fontFamily: {
-                        'sans': ['Inter', 'sans-serif'],
-                        'display': ['Poppins', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
     
     {% block extra_css %}{% endblock %}
 </head>

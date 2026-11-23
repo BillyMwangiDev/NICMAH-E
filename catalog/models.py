@@ -6,7 +6,12 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MinLengthValidator
+from django.core.cache import cache
 import json
+
+from core.images import shrink_image_field
+
+CATEGORY_DROPDOWN_CACHE_KEYS = ("catalog_categories:public", "catalog_categories:admin")
 
 
 class Category(models.Model):
@@ -62,6 +67,12 @@ class Category(models.Model):
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
         super().save(*args, **kwargs)
+        cache.delete_many(CATEGORY_DROPDOWN_CACHE_KEYS)
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        cache.delete_many(CATEGORY_DROPDOWN_CACHE_KEYS)
+        return result
 
     def get_absolute_url(self):
         return reverse("catalog:category_detail", kwargs={"slug": self.slug})
@@ -152,6 +163,7 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        shrink_image_field(self.main_image)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -230,6 +242,10 @@ class ProductImage(models.Model):
         ordering = ["order", "created_at"]
         verbose_name = "product image"
         verbose_name_plural = "product images"
+
+    def save(self, *args, **kwargs):
+        shrink_image_field(self.image)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.product.name} - Image {self.order}"

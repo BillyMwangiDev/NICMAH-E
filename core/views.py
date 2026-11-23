@@ -6,7 +6,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from django.db.utils import OperationalError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Sum, Count, Q
@@ -35,22 +34,35 @@ def home(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def health_check(request):
-    """Health check endpoint for production monitoring."""
+    """Health check endpoint for production monitoring.
+
+    Runs a real query and a cache round-trip so a broken database or an
+    unwritable cache directory shows up here before customers see it.
+    """
+    from django.core.cache import cache
+
+    checks = {}
     try:
-        # Test database connection
-        connection.ensure_connection()
-        db_status = "healthy"
-    except OperationalError:
-        db_status = "unhealthy"
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        checks["database"] = "healthy"
+    except Exception:
+        checks["database"] = "unhealthy"
 
+    try:
+        cache.set("health_check", "ok", 10)
+        checks["cache"] = "healthy" if cache.get("health_check") == "ok" else "unhealthy"
+    except Exception:
+        checks["cache"] = "unhealthy"
+
+    healthy = all(status == "healthy" for status in checks.values())
     health_data = {
-        "status": "healthy" if db_status == "healthy" else "unhealthy",
-        "database": db_status,
-        "timestamp": "2025-09-04T12:00:00Z"
+        "status": "healthy" if healthy else "unhealthy",
+        **checks,
+        "timestamp": timezone.now().isoformat(),
     }
-
-    status_code = 200 if health_data["status"] == "healthy" else 503
-    return JsonResponse(health_data, status=status_code)
+    return JsonResponse(health_data, status=200 if healthy else 503)
 
 
 def get_featured_products(start_date, end_date, limit=8):

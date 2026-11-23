@@ -1,8 +1,29 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Q, F
+from django.core.cache import cache
+from django.db.models import Q, F, Prefetch
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponseForbidden
-from .models import Product, Category
+from .models import Product, Category, ProductImage
+
+CATEGORY_DROPDOWN_CACHE_SECONDS = 300
+
+
+def active_images_prefetch():
+    """Prefetch active gallery images in display order (first one is the card image)."""
+    return Prefetch("images", queryset=ProductImage.objects.filter(is_active=True).order_by("order", "id"))
+
+
+def dropdown_categories(is_admin):
+    """Active categories for filter dropdowns, cached; Category.save() clears it."""
+    key = "catalog_categories:admin" if is_admin else "catalog_categories:public"
+    categories = cache.get(key)
+    if categories is None:
+        qs = Category.objects.filter(is_active=True)
+        if not is_admin:
+            qs = qs.filter(is_admin_only=False)
+        categories = list(qs.order_by("name"))
+        cache.set(key, categories, CATEGORY_DROPDOWN_CACHE_SECONDS)
+    return categories
 
 def is_admin_user(request):
     """Check if the current user is an authenticated admin/staff user."""
@@ -22,7 +43,11 @@ def product_list(request):
     sort_by = request.GET.get("sort", "name")
     
     # Base queryset
-    products = Product.objects.filter(is_active=True, is_available=True)
+    products = (
+        Product.objects.filter(is_active=True, is_available=True)
+        .select_related("category")
+        .prefetch_related(active_images_prefetch())
+    )
     
     # Exclude admin-only category products for non-admin users
     if not is_admin_user(request):
@@ -96,10 +121,7 @@ def product_list(request):
     page_obj = paginator.get_page(page_number)
     
     # Get categories for filter dropdown (exclude admin-only for non-admin users)
-    categories = Category.objects.filter(is_active=True)
-    if not is_admin_user(request):
-        categories = categories.filter(is_admin_only=False)
-    categories = categories.order_by("name")
+    categories = dropdown_categories(is_admin_user(request))
     
     # Get search suggestions based on query
     search_suggestions = []
@@ -124,7 +146,7 @@ def product_list(request):
         "stock_filter": stock_filter,
         "sort_by": sort_by,
         "search_suggestions": search_suggestions,
-        "total_products": products.count(),
+        "total_products": paginator.count,
         "filters_applied": any([query, category_filter, price_min, price_max, stock_filter]),
     }
     return render(request, "catalog/product_list.html", context)
@@ -137,7 +159,11 @@ def product_detail(request, slug):
     if product.category.is_admin_only and not is_admin_user(request):
         return HttpResponseForbidden("Access denied. This product is only available to admin users.")
     
-    related_products = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)
+    related_products = (
+        Product.objects.filter(category=product.category, is_active=True)
+        .exclude(id=product.id)
+        .select_related("category")
+    )
     # Exclude admin-only category products for non-admin users
     if not is_admin_user(request):
         related_products = related_products.filter(category__is_admin_only=False)
@@ -156,10 +182,12 @@ def category_detail(request, slug):
     if category.is_admin_only and not is_admin_user(request):
         return HttpResponseForbidden("Access denied. This category is only available to admin users.")
     
-    products = category.products.filter(is_active=True)
+    products = category.products.filter(is_active=True).select_related("category").order_by("name")
+    paginator = Paginator(products, 24)
+    page_obj = paginator.get_page(request.GET.get("page"))
     context = {
         "category": category,
-        "products": products,
+        "products": page_obj,
     }
     return render(request, "catalog/category_detail.html", context)
 
@@ -178,7 +206,7 @@ def search_suggestions(request):
         Q(name__icontains=query) | 
         Q(sku__icontains=query) |
         Q(category__name__icontains=query)
-    ).filter(is_active=True, is_available=True)
+    ).filter(is_active=True, is_available=True).select_related("category")
     
     # Exclude admin-only category products for non-admin users
     if not is_admin_user(request):
@@ -214,18 +242,18 @@ def quick_search(request):
         Q(description__icontains=query) |
         Q(sku__icontains=query) |
         Q(category__name__icontains=query)
-    ).filter(is_active=True, is_available=True)
+    ).filter(is_active=True, is_available=True).select_related("category")
     
     # Exclude admin-only category products for non-admin users
     if not is_admin_user(request):
         products = products.filter(category__is_admin_only=False)
     
-    products = products.order_by("-is_featured", "name")[:20]
+    products = list(products.order_by("-is_featured", "name")[:20])
     
     context = {
         "products": products,
         "query": query,
-        "total_results": products.count(),
+        "total_results": len(products),
     }
     return render(request, "catalog/quick_search.html", context)
 
@@ -266,7 +294,7 @@ def api_product_search(request):
         Q(name__icontains=query) | 
         Q(sku__icontains=query) |
         Q(category__name__icontains=query)
-    ).filter(is_active=True, is_available=True)
+    ).filter(is_active=True, is_available=True).select_related("category")
     
     # Exclude admin-only category products for non-admin users
     if not is_admin_user(request):

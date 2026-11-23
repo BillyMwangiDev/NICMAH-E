@@ -1,0 +1,207 @@
+- generic [active] [ref=f14e1]:
+  - iframe [ref=f14e2]
+  - generic [ref=f14e3]:
+    - navigation [ref=f14e4]:
+      - generic [ref=f14e5]:
+        - link [ref=f14e6] [cursor=pointer]:
+          - /url: ../index.html
+          - img "cPanel" [ref=f14e7]
+        - text: File Manager
+      - generic [ref=f14e8]:
+        - generic [ref=f14e9]:
+          - generic [ref=f14e10]:
+            - generic [ref=f14e11]: Search
+            - combobox "Search" [ref=f14e12]:
+              - option "All Your Files" [selected]
+              - option "Only public_html"
+              - option "Current Directory"
+          - generic [ref=f14e13]:
+            - generic [ref=f14e14]: for
+            - textbox "for" [ref=f14e15]
+          - button "Go" [ref=f14e17] [cursor=pointer]
+        - link " Settings" [ref=f14e19] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e20]: 
+          - text: Settings
+    - list [ref=f14e22]:
+      - listitem [ref=f14e23]:
+        - link "+ File" [ref=f14e24] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e25]: +
+          - text: File
+      - listitem [ref=f14e26]:
+        - link "+ Folder" [ref=f14e27] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e28]: +
+          - text: Folder
+      - listitem [ref=f14e29]:
+        - link " Copy" [ref=f14e30] [cursor=pointer]:
+          - /url: copymove.html.tt
+          - generic [ref=f14e31]: 
+          - text: Copy
+      - listitem [ref=f14e32]:
+        - link " Move" [ref=f14e33] [cursor=pointer]:
+          - /url: copymove.html.tt
+          - generic [ref=f14e34]: 
+          - text: Move
+      - listitem [ref=f14e35]:
+        - link " Upload" [ref=f14e36] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e37]: 
+          - text: Upload
+      - listitem [ref=f14e38]:
+        - link " Download" [ref=f14e39] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e40]: 
+          - text: Download
+      - listitem [ref=f14e41]:
+        - link " Delete" [ref=f14e42] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e43]: 
+          - text: Delete
+      - listitem [ref=f14e44]:
+        - link " Restore" [ref=f14e45] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e46]: 
+          - text: Restore
+      - listitem [ref=f14e47]:
+        - link " Rename" [ref=f14e48] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e49]: 
+          - text: Rename
+      - listitem [ref=f14e50]:
+        - link " Edit" [ref=f14e51] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e52]: 
+          - text: Edit
+      - listitem [ref=f14e53]:
+        - link " HTML Editor" [ref=f14e54] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e55]: 
+          - text: HTML Editor
+      - listitem [ref=f14e56]:
+        - link " Permissions" [ref=f14e57] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e58]: 
+          - text: Permissions
+      - listitem [ref=f14e59]:
+        - link " View" [ref=f14e60] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e61]: 
+          - text: View
+      - listitem [ref=f14e62]:
+        - link " Extract" [ref=f14e63] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e64]: 
+          - text: Extract
+      - listitem [ref=f14e65]:
+        - link " Compress" [ref=f14e66] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e67]: 
+          - text: Compress
+  - generic [ref=f14e68]:
+    - generic [ref=f14e70]:
+      - generic [ref=f14e71]: 
+      - textbox [ref=f14e73]: api.nicmah.com
+      - button "Go" [ref=f14e75] [cursor=pointer]
+    - generic [ref=f14e76]:
+      - generic [ref=f14e79]:
+        - button "Collapse All" [ref=f14e81] [cursor=pointer]
+        - table [ref=f14e87]:
+          - rowgroup [ref=f14e88]:
+            - row [ref=f14e89]:
+              - cell [ref=f14e90] [cursor=pointer]:
+                - text: 
+                - link [ref=f14e91]:
+                  - /url: "#"
+                - text: 
+              - cell " (/home3/nicmahco)" [ref=f14e92]:
+                - generic [ref=f14e93] [cursor=pointer]:
+                  - generic [ref=f14e94]: 
+                  - text: (/home3/nicmahco)
+      - paragraph [ref=f14e97]
+  - generic [ref=f14e98]:
+    - list [ref=f14e100]:
+      - listitem [ref=f14e101]:
+        - link " Home" [ref=f14e102] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e103]: 
+          - text: Home
+      - listitem [ref=f14e104]:
+        - link " Up One Level" [ref=f14e105] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e106]: 
+          - text: Up One Level
+      - listitem [ref=f14e107]:
+        - link " Back" [ref=f14e108] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e109]: 
+          - text: Back
+      - listitem [ref=f14e110]:
+        - link " Forward" [ref=f14e111] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e112]: 
+          - text: Forward
+      - listitem [ref=f14e113]:
+        - link " Reload" [ref=f14e114] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e115]: 
+          - text: Reload
+      - listitem [ref=f14e116]:
+        - link " Select All" [ref=f14e117] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e118]: 
+          - text: Select All
+      - listitem [ref=f14e119]:
+        - link " Unselect All" [ref=f14e120] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e121]: 
+          - text: Unselect All
+      - listitem [ref=f14e122]:
+        - link " View Trash" [ref=f14e123] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e124]: 
+          - text: View Trash
+      - listitem [ref=f14e125]:
+        - link " Empty Trash" [ref=f14e126] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f14e127]: 
+          - text: Empty Trash
+    - generic [ref=f14e128]:
+      - table [ref=f14e130]:
+        - rowgroup [ref=f14e138]:
+          - row "Name Size Last Modified Type Permissions" [ref=f14e139]:
+            - columnheader [ref=f14e140]
+            - columnheader [ref=f14e142] [cursor=pointer]:
+              - link "Name" [ref=f14e145]:
+                - /url: yui-dt8-href-file
+            - columnheader [ref=f14e146] [cursor=pointer]:
+              - link "Size" [ref=f14e149]:
+                - /url: yui-dt8-href-size
+            - columnheader [ref=f14e150] [cursor=pointer]:
+              - link "Last Modified" [ref=f14e153]:
+                - /url: yui-dt8-href-mtime
+            - columnheader [ref=f14e154] [cursor=pointer]:
+              - link "Type" [ref=f14e157]:
+                - /url: yui-dt8-href-mimetype
+            - columnheader [ref=f14e158] [cursor=pointer]:
+              - link "Permissions" [ref=f14e161]:
+                - /url: yui-dt8-href-nicemode
+      - table [ref=f14e163]:
+        - rowgroup:
+          - row "Name Size Last Modified Type Permissions":
+            - columnheader [ref=f14e164]
+            - columnheader "Name" [ref=f14e165]
+            - columnheader "Size" [ref=f14e166]
+            - columnheader "Last Modified" [ref=f14e167]
+            - columnheader "Type" [ref=f14e168]
+            - columnheader "Permissions" [ref=f14e169]
+        - rowgroup [ref=f14e170]:
+          - row [ref=f14e171]:
+            - cell [ref=f14e172]:
+              - generic [ref=f14e173]:
+                - img "loading" [ref=f14e174]
+                - text: Fetching directory contents …
+        - rowgroup
+  - text:      
+  - iframe

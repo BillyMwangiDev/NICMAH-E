@@ -1,4 +1,7 @@
-from django.db import models
+import uuid
+
+from django.db import models, transaction
+from django.db.models import F
 from django.conf import settings
 from django.utils import timezone
 from catalog.models import Product
@@ -93,6 +96,10 @@ class Order(models.Model):
         verbose_name = "Order"
         verbose_name_plural = "Orders"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["status", "created_at"]),
+        ]
 
     def __str__(self):
         return f"Order {self.order_number} - {self.customer_name}"
@@ -113,45 +120,55 @@ class Order(models.Model):
             # New order with completed status
             status_changing_to_completed = True
         
-        if not self.order_number:
-            # Generate order number
-            last_order = Order.objects.order_by('-id').first()
-            if last_order:
-                last_number = int(last_order.order_number[3:])  # Remove 'ORD' prefix
-                self.order_number = f"ORD{last_number + 1:06d}"
-            else:
-                self.order_number = "ORD000001"
-        
-        super().save(*args, **kwargs)
-        
-        # Create stock movements when order status changes to completed status
-        if status_changing_to_completed:
-            from inventory.models import StockMovement
-            for order_item in self.items.all():
-                # Check if stock movement already exists
-                existing_movement = StockMovement.objects.filter(
-                    reference_number=self.order_number,
-                    reference_type='Order',
-                    product=order_item.product
-                ).exists()
-                
-                if not existing_movement and order_item.product.stock_quantity >= order_item.quantity:
-                    previous_stock = order_item.product.stock_quantity
-                    order_item.product.stock_quantity -= order_item.quantity
-                    order_item.product.save()
-                    
-                    # Create stock movement record
-                    StockMovement.objects.create(
-                        product=order_item.product,
-                        movement_type=StockMovement.MovementType.SALE,
-                        quantity=-order_item.quantity,  # Negative for sale
-                        previous_stock=previous_stock,
-                        new_stock=order_item.product.stock_quantity,
-                        reference_number=self.order_number,
-                        reference_type='Order',
-                        user=self.customer,
-                        notes=f"E-commerce order {self.order_number} - {order_item.quantity} units sold"
-                    )
+        assign_number = not self.order_number
+        if assign_number:
+            # Unique placeholder until the pk is known; the real number derives from
+            # the pk so concurrent checkouts can never collide. Max length is 20.
+            self.order_number = f"tmp-{uuid.uuid4().hex[:16]}"
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+
+            if assign_number:
+                self.order_number = f"ORD{self.pk:06d}"
+                Order.objects.filter(pk=self.pk).update(order_number=self.order_number)
+
+            # Create stock movements when order status changes to completed status
+            if status_changing_to_completed:
+                self._deduct_stock()
+
+    def _deduct_stock(self):
+        """Deduct each item's quantity once, under a row lock on the product."""
+        from inventory.models import StockMovement
+
+        for order_item in self.items.all():
+            product = Product.objects.select_for_update().get(pk=order_item.product_id)
+
+            existing_movement = StockMovement.objects.filter(
+                reference_number=self.order_number,
+                reference_type='Order',
+                product=product,
+            ).exists()
+            if existing_movement or product.stock_quantity < order_item.quantity:
+                continue
+
+            previous_stock = product.stock_quantity
+            new_stock = previous_stock - order_item.quantity
+            Product.objects.filter(pk=product.pk).update(
+                stock_quantity=F("stock_quantity") - order_item.quantity
+            )
+
+            StockMovement.objects.create(
+                product=product,
+                movement_type=StockMovement.MovementType.SALE,
+                quantity=-order_item.quantity,  # Negative for sale
+                previous_stock=previous_stock,
+                new_stock=new_stock,
+                reference_number=self.order_number,
+                reference_type='Order',
+                user=self.customer,
+                notes=f"E-commerce order {self.order_number} - {order_item.quantity} units sold"
+            )
 
 
 class OrderItem(models.Model):

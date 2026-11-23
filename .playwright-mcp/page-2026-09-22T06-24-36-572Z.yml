@@ -1,0 +1,129 @@
+- generic [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - toolbar [ref=f2e4]:
+      - button [ref=f2e5] [cursor=pointer]
+      - button [ref=f2e8] [cursor=pointer]
+      - separator [ref=f2e11]
+      - separator [ref=f2e12]
+      - button "Show popup" [ref=f2e15] [cursor=pointer]:
+        - generic [ref=f2e18]:
+          - generic [ref=f2e19]: "Domain:"
+          - generic [ref=f2e20]: nicmah.com
+      - separator [ref=f2e23]
+      - combobox [ref=f2e25] [cursor=pointer]:
+        - generic [ref=f2e28]:
+          - generic [ref=f2e29]: "Language:"
+          - generic [ref=f2e30]: en
+      - separator [ref=f2e33]
+      - button [ref=f2e34] [cursor=pointer]
+    - iframe [active] [ref=f2e37]:
+      - generic [active] [ref=f3e1]:
+        - generic [ref=f3e3]:
+          - heading "Python" [level=2] [ref=f3e4]
+          - list [ref=f3e7]:
+            - listitem [ref=f3e8] [cursor=pointer]:
+              - generic [ref=f3e9]: Web applications
+            - listitem [ref=f3e10] [cursor=pointer]:
+              - generic [ref=f3e12]: api.nicmah.com/
+            - listitem [ref=f3e13] [cursor=pointer]:
+              - group [ref=f3e16]:
+                - button "delete" [ref=f3e17]: Destroy
+              - group [ref=f3e20]:
+                - button "Cancel" [ref=f3e21]
+              - group [ref=f3e24]:
+                - button "Save" [disabled]
+          - list [ref=f3e26]:
+            - listitem [ref=f3e27] [cursor=pointer]:
+              - generic [ref=f3e28]: Web applications
+            - listitem [ref=f3e29] [cursor=pointer]:
+              - generic [ref=f3e31]: api.nicmah.com/
+            - listitem [ref=f3e32] [cursor=pointer]:
+              - group [ref=f3e35]:
+                - button "delete" [ref=f3e36]: Destroy
+              - group [ref=f3e39]:
+                - button "Cancel" [ref=f3e40]
+              - group [ref=f3e43]:
+                - button "Save" [disabled]
+          - generic [ref=f3e46]:
+            - generic [ref=f3e52]:
+              - paragraph
+              - paragraph [ref=f3e53]: Enter to the virtual environment.
+              - paragraph [ref=f3e54]:
+                - text: "To enter to virtual environment, run the command:"
+                - code [ref=f3e55] [cursor=pointer]: source /home/nicmahco/virtualenv/domains/nicmah.com/public_html/api/3.11/bin/activate && cd /home/nicmahco/domains/nicmah.com/public_html/api
+            - generic [ref=f3e56]:
+              - generic [ref=f3e59]:
+                - generic [ref=f3e60]: Python
+                - generic [ref=f3e62]:
+                  - group [ref=f3e65]:
+                    - button "stop" [ref=f3e66] [cursor=pointer]: Stop app
+                  - group [ref=f3e69]:
+                    - button "reset" [ref=f3e70] [cursor=pointer]: Restart
+              - separator [ref=f3e71]
+              - generic [ref=f3e72]:
+                - generic [ref=f3e75]:
+                  - generic [ref=f3e76]: Python version
+                  - button "3.11.16" [ref=f3e81] [cursor=pointer]
+                - generic [ref=f3e85]:
+                  - generic [ref=f3e86]:
+                    - generic [ref=f3e87]: Application root
+                    - generic [ref=f3e88]: It is a physical address to your application on a server that corresponds with its URI. Upload your application files here.
+                  - textbox "Application root" [ref=f3e91]:
+                    - /placeholder: ""
+                    - text: domains/nicmah.com/public_html/api
+                - generic [ref=f3e93]:
+                  - generic [ref=f3e94]:
+                    - generic [ref=f3e95]: Application URL
+                    - generic [ref=f3e96]: It is an HTTP/HTTPS link to your application
+                  - generic [ref=f3e97]:
+                    - generic [ref=f3e98]:
+                      - button "api.nicmah.com" [ref=f3e101] [cursor=pointer]
+                      - textbox [ref=f3e104]
+                    - group [ref=f3e107]:
+                      - button "open" [ref=f3e108] [cursor=pointer]: Open
+                - generic [ref=f3e111]:
+                  - generic [ref=f3e112]: Application startup file
+                  - textbox "Application startup file" [ref=f3e116]:
+                    - /placeholder: ""
+                    - text: passenger_wsgi.py
+                - generic [ref=f3e119]:
+                  - generic [ref=f3e120]:
+                    - generic [ref=f3e121]: Application Entry point
+                    - generic [ref=f3e122]: Setup wsgi callable object for your application
+                  - textbox "Application Entry point" [ref=f3e125]:
+                    - /placeholder: ""
+                    - text: application
+              - separator [ref=f3e126]
+              - generic [ref=f3e127]:
+                - generic [ref=f3e130]:
+                  - generic [ref=f3e131]: Configuration files
+                  - group [ref=f3e136]:
+                    - button "start" [disabled]: Run Pip Install
+                - generic [ref=f3e140]:
+                  - textbox "Add another file and press enter" [ref=f3e142]
+                  - group [ref=f3e145]:
+                    - button "add" [disabled]: Add
+                - generic [ref=f3e147]:
+                  - generic [ref=f3e148]:
+                    - generic [ref=f3e149]: Execute python script
+                    - generic [ref=f3e150]:
+                      - text: You can also enter a command to execute (e.g
+                      - code [ref=f3e151] [cursor=pointer]: /path/to/manage.py
+                      - text: migrate). Note, only python scripts allowed.
+                  - generic [ref=f3e152]:
+                    - textbox "Enter the path to the script file" [ref=f3e172]: run_vaccines_migration.py
+                    - group [ref=f3e175]:
+                      - button "start" [ref=f3e176] [cursor=pointer]: Run Script
+                - generic [ref=f3e177]: "returncode: 0 stdout: stderr:"
+              - separator [ref=f3e158]
+              - generic [ref=f3e159]:
+                - generic [ref=f3e161]:
+                  - heading "Environment variables" [level=2] [ref=f3e163]
+                  - group [ref=f3e167]:
+                    - button "add" [ref=f3e168] [cursor=pointer]: Add variable
+                - generic [ref=f3e169]: NO RESULT FOUND
+        - generic [ref=f3e181]:
+          - button [ref=f3e182] [cursor=pointer]
+          - generic [ref=f3e184]: Run script
+          - generic [ref=f3e185] [cursor=pointer]: Script completed successfully.
+  - generic [ref=f2e38]: <div>Plugins</div>

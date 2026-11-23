@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__pencil__get_app_state",
+  "tool_input_preview": "{}",
+  "error": "Failed to access file \"undefined\". A file needs to be open in the editor to perform this action.",
+  "timestamp": "2026-08-28T11:52:24.197Z",
+  "retry_count": 1
+}

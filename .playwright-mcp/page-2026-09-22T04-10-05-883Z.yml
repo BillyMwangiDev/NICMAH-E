@@ -1,0 +1,50 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e7]:
+    - toolbar [ref=f4e8]:
+      - button [ref=f4e9] [cursor=pointer]
+      - button [ref=f4e12] [cursor=pointer]
+      - separator [ref=f4e15]
+      - separator [ref=f4e16]
+      - button "Show popup" [ref=f4e19] [cursor=pointer]:
+        - generic [ref=f4e22]:
+          - generic [ref=f4e23]: "Domain:"
+          - generic [ref=f4e24]: nicmah.com
+      - separator [ref=f4e27]
+      - combobox [ref=f4e29] [cursor=pointer]:
+        - generic [ref=f4e32]:
+          - generic [ref=f4e33]: "Language:"
+          - generic [ref=f4e34]: en
+      - separator [ref=f4e37]
+      - button [ref=f4e38] [cursor=pointer]
+    - iframe [ref=f4e41]:
+      - generic [ref=f5e25]:
+        - heading "Python" [level=2] [ref=f5e26]
+        - list [ref=f5e29]:
+          - listitem [ref=f5e30] [cursor=pointer]:
+            - generic [ref=f5e31]: Web applications
+          - listitem [ref=f5e32] [cursor=pointer]:
+            - group [ref=f5e35]:
+              - button "add" [ref=f5e36]: Create application
+        - table [ref=f5e42]:
+          - rowgroup [ref=f5e43]:
+            - row [ref=f5e44]:
+              - columnheader "App URI" [ref=f5e45]
+              - columnheader "App Root Directory" [ref=f5e48]
+              - columnheader "Status" [ref=f5e51]
+              - columnheader "Actions" [ref=f5e54]
+          - rowgroup [ref=f5e56]:
+            - row [ref=f5e57]:
+              - cell "api.nicmah.com/" [ref=f5e58]
+              - cell "/home/nicmahco/domains/nicmah.com/public_html/api" [ref=f5e61]
+              - cell "started (v3.11.16)" [ref=f5e64]
+              - cell [ref=f5e68]:
+                - generic [ref=f5e69]:
+                  - group [ref=f5e72]:
+                    - button "stop" [ref=f5e73] [cursor=pointer]
+                  - group [ref=f5e76]:
+                    - button "restart" [ref=f5e77] [cursor=pointer]
+                  - group [ref=f5e80]:
+                    - button "edit" [ref=f5e81] [cursor=pointer]
+                  - group [ref=f5e84]:
+                    - button "delete" [ref=f5e85] [cursor=pointer]
+  - generic [ref=f4e6]: <div>Plugins</div>

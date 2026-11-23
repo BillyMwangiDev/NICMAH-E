@@ -1,0 +1,24 @@
+- generic [active] [ref=f18e1]:
+  - paragraph [ref=f18e2]:
+    - img "logo" [ref=f18e3]
+  - generic [ref=f18e6]:
+    - heading "HTTP error 404" [level=2] [ref=f18e7]
+    - paragraph [ref=f18e8]: The requested page was not found.
+    - heading "Possible reasons why you are seeing this page:" [level=2] [ref=f18e9]
+    - list [ref=f18e10]:
+      - listitem [ref=f18e11]: A bookmarked URL may have changed since you last visited.
+      - listitem [ref=f18e12]: The URL was entered incorrectly.
+      - listitem [ref=f18e13]:
+        - text: The URL was entered with inaccurate capitalization (URLs are
+        - link "case sensitive" [ref=f18e14] [cursor=pointer]:
+          - /url: http://wikipedia.org/wiki/Case_sensitivity
+        - text: ).
+    - paragraph [ref=f18e15]:
+      - text: Please re-check the URL you are trying to reach. (
+      - link "Go Back" [ref=f18e16] [cursor=pointer]:
+        - /url: javascript:history.back()
+      - text: )
+  - generic [ref=f18e17]:
+    - text: Copyright© 2026 cPanel, L.L.C.
+    - link "Privacy Policy" [ref=f18e18] [cursor=pointer]:
+      - /url: https://go.cpanel.net/privacy

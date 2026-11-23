@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__claude-in-chrome__get_page_text",
+  "tool_input_preview": "{\"tabId\":436275819}",
+  "error": "No text content found. Page may contain only images, videos, or canvas-based content.",
+  "timestamp": "2026-08-31T07:23:34.178Z",
+  "retry_count": 1
+}

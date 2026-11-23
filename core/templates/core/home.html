@@ -266,7 +266,7 @@
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center relative">
                             {% if product.main_image %}
-                                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                             {% else %}
                                 <i class="fas fa-seedling text-4xl text-agro-green"></i>
                             {% endif %}

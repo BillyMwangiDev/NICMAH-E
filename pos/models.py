@@ -2,8 +2,8 @@
 POS (Point of Sale) models for NICMAH application.
 """
 
-from django.db import models
-from django.db.models import Sum
+from django.db import models, transaction
+from django.db.models import F, Sum
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from decimal import Decimal
@@ -477,6 +477,10 @@ class POSSale(models.Model):
         verbose_name = "POS Sale"
         verbose_name_plural = "POS Sales"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["status", "created_at"]),
+        ]
 
     def __str__(self):
         seller_name = f" - {self.seller.get_full_name()}" if self.seller else ""
@@ -487,65 +491,18 @@ class POSSale(models.Model):
         is_new = self.pk is None
 
         if is_new:
-            # Generate auto-incrementing sale number if not set
-            if not self.sale_number:
-                from django.db.models import Max
-                
-                # Get the maximum sale number from existing sales (exclude this one if it exists)
-                max_sale = POSSale.objects.exclude(pk=self.pk).aggregate(Max('sale_number'))
-                max_number = max_sale.get('sale_number__max')
-                
-                if max_number:
-                    # Extract number from existing sale numbers (format: SALE-00001)
-                    try:
-                        # If it's already in format SALE-XXXXX, extract the number
-                        if max_number.startswith('SALE-'):
-                            number = int(max_number.split('-')[1])
-                            new_number = number + 1
-                        else:
-                            # If it's a UUID or other format, start fresh from current count
-                            # Count existing sales with SALE- format
-                            existing_sales_count = POSSale.objects.filter(sale_number__startswith='SALE-').count()
-                            new_number = existing_sales_count + 1
-                    except (ValueError, IndexError):
-                        # If parsing fails, count existing SALE- sales
-                        existing_sales_count = POSSale.objects.filter(sale_number__startswith='SALE-').count()
-                        new_number = existing_sales_count + 1
-                else:
-                    # First sale
-                    new_number = 1
-                
-                # Format as SALE-00001, SALE-00002, etc.
-                self.sale_number = f"SALE-{new_number:05d}"
-            
-            # Generate receipt number if not set
-            if not self.receipt_number:
-                from django.db.models import Max
-                
-                # Get the maximum receipt number from existing receipts/sales
-                max_receipt_sale = POSSale.objects.exclude(pk=self.pk).exclude(receipt_number__isnull=True).exclude(receipt_number='').aggregate(Max('receipt_number'))
-                max_receipt_receipt = Receipt.objects.aggregate(Max('receipt_number'))
-                
-                max_number = max_receipt_sale.get('receipt_number__max') or max_receipt_receipt.get('receipt_number__max')
-                
-                if max_number:
-                    try:
-                        if max_number.startswith('RCP-'):
-                            number = int(max_number.split('-')[1])
-                            new_receipt_number = number + 1
-                        else:
-                            existing_receipts_count = (POSSale.objects.filter(receipt_number__startswith='RCP-').count() + 
-                                                       Receipt.objects.filter(receipt_number__startswith='RCP-').count())
-                            new_receipt_number = existing_receipts_count + 1
-                    except (ValueError, IndexError):
-                        existing_receipts_count = (POSSale.objects.filter(receipt_number__startswith='RCP-').count() + 
-                                                   Receipt.objects.filter(receipt_number__startswith='RCP-').count())
-                        new_receipt_number = existing_receipts_count + 1
-                else:
-                    new_receipt_number = 1
-                
-                self.receipt_number = f"RCP-{new_receipt_number:05d}"
-            
+            # Sale and receipt numbers derive from the primary key after the first
+            # INSERT, so concurrent sales can never share a number and no table scan
+            # is needed. A unique placeholder satisfies the unique constraint until
+            # the pk is known.
+            placeholder = uuid.uuid4().hex
+            assign_sale_number = not self.sale_number
+            assign_receipt_number = not self.receipt_number
+            if assign_sale_number:
+                self.sale_number = f"tmp-{placeholder}"
+            if assign_receipt_number:
+                self.receipt_number = f"tmp-{placeholder}"
+
             # Assign seller from session before first save
             if not self.seller and self.session and self.session.seller:
                 self.seller = self.session.seller
@@ -560,6 +517,16 @@ class POSSale(models.Model):
             if self.total_amount is None:
                 self.total_amount = Decimal("0.00")
             super().save(*args, **kwargs)
+
+            numbers = {}
+            if assign_sale_number:
+                numbers["sale_number"] = f"SALE-{self.pk:05d}"
+            if assign_receipt_number:
+                numbers["receipt_number"] = f"RCP-{self.pk:05d}"
+            if numbers:
+                POSSale.objects.filter(pk=self.pk).update(**numbers)
+                for field, value in numbers.items():
+                    setattr(self, field, value)
             return
 
         # Calculate totals (safe because pk now exists and M2M can be accessed)
@@ -710,33 +677,43 @@ class POSSaleItem(models.Model):
 
     def save(self, *args, **kwargs):
         """Override save to calculate total price and update stock."""
-        from inventory.models import StockMovement
-        
-        is_new = not self.pk
-        previous_stock = self.product.stock_quantity if not is_new else self.product.stock_quantity
-        
-        if is_new:  # New item
-            # Update product stock
-            if self.product.stock_quantity >= self.quantity:
-                previous_stock = self.product.stock_quantity
-                self.product.stock_quantity -= self.quantity
-                self.product.save()
-                
-                # Create stock movement record for sale
-                StockMovement.objects.create(
-                    product=self.product,
-                    movement_type=StockMovement.MovementType.SALE,
-                    quantity=-self.quantity,  # Negative for sale
-                    previous_stock=previous_stock,
-                    new_stock=self.product.stock_quantity,
-                    reference_number=self.sale.sale_number,
-                    reference_type='POSSale',
-                    user=self.sale.cashier,
-                    notes=f"Sale {self.sale.sale_number} - {self.quantity} units sold"
-                )
-            else:
-                raise ValueError(f"Insufficient stock for {self.product.name}")
+        with transaction.atomic():
+            if not self.pk:
+                self._deduct_stock()
+            self._calculate_total_price()
+            super().save(*args, **kwargs)
 
+    def _deduct_stock(self):
+        """Deduct this item's quantity from stock under a row lock.
+
+        The product row is locked with SELECT ... FOR UPDATE and decremented with an
+        F() expression, so two cashiers selling the last unit cannot both succeed.
+        """
+        from inventory.models import StockMovement
+
+        locked = Product.objects.select_for_update().get(pk=self.product_id)
+        if locked.stock_quantity < self.quantity:
+            raise ValueError(f"Insufficient stock for {locked.name}")
+
+        previous_stock = locked.stock_quantity
+        new_stock = previous_stock - self.quantity
+        Product.objects.filter(pk=locked.pk).update(stock_quantity=F("stock_quantity") - self.quantity)
+        # Keep the in-memory instance consistent with the database.
+        self.product.stock_quantity = new_stock
+
+        StockMovement.objects.create(
+            product=self.product,
+            movement_type=StockMovement.MovementType.SALE,
+            quantity=-self.quantity,  # Negative for sale
+            previous_stock=previous_stock,
+            new_stock=new_stock,
+            reference_number=self.sale.sale_number,
+            reference_type='POSSale',
+            user=self.sale.cashier,
+            notes=f"Sale {self.sale.sale_number} - {self.quantity} units sold"
+        )
+
+    def _calculate_total_price(self):
         # Ensure all values are Decimal before calculation
         quantity = Decimal(str(self.quantity))
         unit_price = Decimal(str(self.unit_price))
@@ -746,8 +723,6 @@ class POSSaleItem(models.Model):
         # Note: Tax is calculated at sale level, not item level, to avoid double taxation
         # item_tax field is kept for backward compatibility but should not be used
         self.total_price = (quantity * unit_price) - item_discount
-
-        super().save(*args, **kwargs)
 
     def apply_item_discount(self, discount):
         """Apply a discount to this specific item."""

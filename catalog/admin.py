@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from django.utils.html import format_html
 from django.urls import reverse
 from .models import Category, Product, ProductImage
@@ -12,15 +13,22 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     list_editable = ("is_active", "is_admin_only")
 
+    def get_queryset(self, request):
+        # One COUNT via annotation instead of one query per row.
+        return super().get_queryset(request).annotate(_product_count=Count("products"))
+
     def product_count(self, obj):
         """Display product count with link to filtered products."""
-        count = obj.products.count()
+        count = getattr(obj, "_product_count", None)
+        if count is None:
+            count = obj.products.count()
         if count > 0:
             url = f"{reverse('admin:catalog_product_changelist')}?category__id__exact={obj.id}"
             return format_html('<a href="{}">{}</a>', url, count)
         return count
 
     product_count.short_description = "Products"
+    product_count.admin_order_field = "_product_count"
 
     # actions method removed to fix admin issues
 

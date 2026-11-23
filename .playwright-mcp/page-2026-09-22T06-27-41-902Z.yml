@@ -1,0 +1,330 @@
+- generic [ref=f11e1]:
+  - generic [ref=f11e7]:
+    - link [ref=f11e9] [cursor=pointer]:
+      - /url: /evo/
+    - toolbar [ref=f11e13]:
+      - generic [ref=f11e14]:
+        - button "New Folder" [ref=f11e1053] [cursor=pointer]
+        - button "New File" [ref=f11e1054] [cursor=pointer]
+        - button "Upload" [ref=f11e1055] [cursor=pointer]
+        - separator [ref=f11e24]
+        - button "Search" [ref=f11e1056] [cursor=pointer]
+      - generic [ref=f11e28]:
+        - button "Directory sizes" [ref=f11e1057] [cursor=pointer]
+        - separator [ref=f11e32]
+        - button "Back to Dashboard" [ref=f11e1058] [cursor=pointer]
+    - complementary [ref=f11e36]:
+      - tree [ref=f11e37]:
+        - generic [ref=f11e38]:
+          - treeitem "My Files" [expanded] [level=1] [ref=f11e1059] [cursor=pointer]
+          - treeitem ".cache" [level=2] [ref=f11e1060] [cursor=pointer]
+          - treeitem ".cagefs" [level=2] [ref=f11e1061] [cursor=pointer]
+          - treeitem ".caldav" [level=2] [ref=f11e1062] [cursor=pointer]
+          - treeitem ".cl.selector" [level=2] [ref=f11e1063] [cursor=pointer]
+          - treeitem ".clwpos" [level=2] [ref=f11e1064] [cursor=pointer]
+          - treeitem ".htpasswds" [level=2] [ref=f11e1065] [cursor=pointer]
+          - treeitem ".koality" [level=2] [ref=f11e1066] [cursor=pointer]
+          - treeitem ".local" [level=2] [ref=f11e1067] [cursor=pointer]
+          - treeitem ".mail_unused_folder_from_cpanel" [level=2] [ref=f11e1068] [cursor=pointer]
+          - treeitem ".php" [level=2] [ref=f11e1069] [cursor=pointer]
+          - treeitem ".pip" [level=2] [ref=f11e1070] [cursor=pointer]
+          - treeitem ".razor" [level=2] [ref=f11e1071] [cursor=pointer]
+          - treeitem ".sitepad" [level=2] [ref=f11e1072] [cursor=pointer]
+          - treeitem ".softaculous" [level=2] [ref=f11e1073] [cursor=pointer]
+          - treeitem ".ssh" [level=2] [ref=f11e1074] [cursor=pointer]
+          - treeitem "Maildir" [level=2] [ref=f11e1075] [cursor=pointer]
+          - treeitem "backups" [level=2] [ref=f11e1076] [cursor=pointer]
+          - treeitem "domains" [expanded] [level=2] [ref=f11e1077] [cursor=pointer]
+          - treeitem "nicmah.com" [expanded] [level=3] [ref=f11e1078] [cursor=pointer]
+          - treeitem "public_html" [expanded] [level=4] [ref=f11e1079] [cursor=pointer]
+          - treeitem "api" [expanded] [level=5] [ref=f11e1080] [cursor=pointer]
+          - treeitem ".well-known" [level=6] [ref=f11e1081] [cursor=pointer]
+          - treeitem "__pycache__" [level=6] [ref=f11e1082] [cursor=pointer]
+          - treeitem "backend" [level=6] [ref=f11e1083] [cursor=pointer]
+          - treeitem "inventory" [level=6] [ref=f11e1084] [cursor=pointer]
+          - treeitem "public" [level=6] [ref=f11e1085] [cursor=pointer]
+          - treeitem "services" [level=6] [ref=f11e1086] [cursor=pointer]
+          - treeitem "tmp" [level=6] [ref=f11e1087] [cursor=pointer]
+          - treeitem "etc" [level=2] [ref=f11e1088] [cursor=pointer]
+    - main [ref=f11e276]:
+      - generic [ref=f11e1089]:
+        - generic [ref=f11e1091]:
+          - navigation "Breadcrumbs" [ref=f11e1092]:
+            - list [ref=f11e1093]:
+              - listitem [ref=f11e1094]:
+                - link "My Files" [ref=f11e1095] [cursor=pointer]:
+                  - /url: /evo/filemanager/files?path=/
+              - listitem [ref=f11e1098]:
+                - 'generic "Hidden under ellipsis: /domains" [ref=f11e1101]': …
+              - listitem [ref=f11e1102]:
+                - generic [ref=f11e1105] [cursor=pointer]: nicmah.com
+              - listitem [ref=f11e1107]:
+                - generic [ref=f11e1110] [cursor=pointer]: public_html
+              - listitem [ref=f11e1112]:
+                - generic [ref=f11e1115]: api
+          - generic [ref=f11e1117]:
+            - generic [ref=f11e1118]:
+              - generic [ref=f11e1119]: "Selected:"
+              - generic [ref=f11e1120]: 0 / 22
+            - toolbar [ref=f11e1121]:
+              - generic [ref=f11e1122]:
+                - button "Edit" [disabled]
+              - generic [ref=f11e1123]:
+                - button "Copy" [disabled]
+              - generic [ref=f11e1124]:
+                - button "Duplicate" [disabled]
+              - generic [ref=f11e1125]:
+                - button "Move" [disabled]
+              - generic [ref=f11e1126]:
+                - button "Download" [disabled]
+              - generic [ref=f11e1127]:
+                - button "Archive" [disabled]
+              - generic [ref=f11e1128]:
+                - button "Rename" [disabled]
+              - generic [ref=f11e1129]:
+                - button "Set Permissions" [disabled]
+              - generic [ref=f11e1130]:
+                - button "Remove" [disabled]
+              - generic [ref=f11e1131]:
+                - link "Edit":
+                  - /url: /evo/filemanager/files
+                - button "Copy" [disabled]
+                - button "Duplicate" [disabled]
+                - button "Move" [disabled]
+                - button "Download" [disabled]
+                - button [disabled]
+        - table [ref=f11e1135]:
+          - rowgroup [ref=f11e1136]:
+            - row [ref=f11e1137]:
+              - columnheader [ref=f11e1138]:
+                - checkbox "Select all" [ref=f11e1141] [cursor=pointer]
+              - columnheader [ref=f11e1143]
+              - columnheader "Name" [ref=f11e1144]
+              - columnheader "Size" [ref=f11e1147]
+              - columnheader "Permissions" [ref=f11e1150]
+              - columnheader "Last modified" [ref=f11e1151]
+              - columnheader "UID/GID" [ref=f11e1154]
+          - rowgroup [ref=f11e1155]:
+            - row [ref=f11e1156] [cursor=pointer]:
+              - cell [ref=f11e1157]:
+                - checkbox "__pycache__" [ref=f11e1160]
+              - cell [ref=f11e1162]
+              - cell "__pycache__" [ref=f11e1166]
+              - cell [ref=f11e1167]
+              - cell "drwxr-xr-x" [ref=f11e1168]
+              - cell "8/23/2026, 1:31 PM" [ref=f11e1169]
+              - cell "nicmahco/nicmahco" [ref=f11e1170]
+            - row [ref=f11e1171] [cursor=pointer]:
+              - cell [ref=f11e1172]:
+                - checkbox ".well-known" [ref=f11e1175]
+              - cell [ref=f11e1177]
+              - cell ".well-known" [ref=f11e1181]
+              - cell [ref=f11e1182]
+              - cell "drwxr-xr-x" [ref=f11e1183]
+              - cell "6/26/2026, 2:49 PM" [ref=f11e1184]
+              - cell "nicmahco/nicmahco" [ref=f11e1185]
+            - row [ref=f11e1186] [cursor=pointer]:
+              - cell [ref=f11e1187]:
+                - checkbox "backend" [ref=f11e1190]
+              - cell [ref=f11e1192]
+              - cell "backend" [ref=f11e1196]
+              - cell [ref=f11e1197]
+              - cell "drwxr-xr-x" [ref=f11e1198]
+              - cell "9/22/2026, 8:38 AM" [ref=f11e1199]
+              - cell "nicmahco/nicmahco" [ref=f11e1200]
+            - row [ref=f11e1201] [cursor=pointer]:
+              - cell [ref=f11e1202]:
+                - checkbox "inventory" [ref=f11e1205]
+              - cell [ref=f11e1207]
+              - cell "inventory" [ref=f11e1211]
+              - cell [ref=f11e1212]
+              - cell "drwxr-xr-x" [ref=f11e1213]
+              - cell "5/19/2026, 9:10 AM" [ref=f11e1214]
+              - cell "nicmahco/nicmahco" [ref=f11e1215]
+            - row [ref=f11e1216] [cursor=pointer]:
+              - cell [ref=f11e1217]:
+                - checkbox "public" [ref=f11e1220]
+              - cell [ref=f11e1222]
+              - cell "public" [ref=f11e1226]
+              - cell [ref=f11e1227]
+              - cell "drwxr-xr-x" [ref=f11e1228]
+              - cell "4/26/2026, 6:03 PM" [ref=f11e1229]
+              - cell "nicmahco/nicmahco" [ref=f11e1230]
+            - row [ref=f11e1231] [cursor=pointer]:
+              - cell [ref=f11e1232]:
+                - checkbox "services" [ref=f11e1235]
+              - cell [ref=f11e1237]
+              - cell "services" [ref=f11e1241]
+              - cell [ref=f11e1242]
+              - cell "drwxr-xr-x" [ref=f11e1243]
+              - cell "5/19/2026, 7:20 AM" [ref=f11e1244]
+              - cell "nicmahco/nicmahco" [ref=f11e1245]
+            - row [ref=f11e1246] [cursor=pointer]:
+              - cell [ref=f11e1247]:
+                - checkbox "tmp" [ref=f11e1250]
+              - cell [ref=f11e1252]
+              - cell "tmp" [ref=f11e1256]
+              - cell [ref=f11e1257]
+              - cell "drwxr-xr-x" [ref=f11e1258]
+              - cell "4/26/2026, 6:03 PM" [ref=f11e1259]
+              - cell "nicmahco/nicmahco" [ref=f11e1260]
+            - row [ref=f11e1261] [cursor=pointer]:
+              - cell [ref=f11e1262]:
+                - checkbox ".htaccess" [ref=f11e1265]
+              - cell [ref=f11e1267]
+              - cell ".htaccess" [ref=f11e1275]
+              - cell "299 B" [ref=f11e1276]
+              - cell "-rw-r--r--" [ref=f11e1277]
+              - cell "8/28/2026, 4:32 PM" [ref=f11e1278]
+              - cell "nicmahco/nicmahco" [ref=f11e1279]
+            - row [ref=f11e1280] [cursor=pointer]:
+              - cell [ref=f11e1281]:
+                - checkbox ".htaccess.pre-htfix.1787481041" [ref=f11e1284]
+              - cell [ref=f11e1286]
+              - cell ".htaccess.pre-htfix.1787481041" [ref=f11e1294]
+              - cell "260 B" [ref=f11e1295]
+              - cell "-rw-r--r--" [ref=f11e1296]
+              - cell "4/26/2026, 6:05 PM" [ref=f11e1297]
+              - cell "root/root" [ref=f11e1298]
+            - row [ref=f11e1299] [cursor=pointer]:
+              - cell [ref=f11e1300]:
+                - checkbox ".products_loaded" [ref=f11e1303]
+              - cell [ref=f11e1305]
+              - cell ".products_loaded" [ref=f11e1313]
+              - cell "0 B" [ref=f11e1314]
+              - cell "-rw-r--r--" [ref=f11e1315]
+              - cell "4/26/2026, 6:18 PM" [ref=f11e1316]
+              - cell "nicmahco/nicmahco" [ref=f11e1317]
+            - row [ref=f11e1318] [cursor=pointer]:
+              - cell [ref=f11e1319]:
+                - checkbox ".pyn-requirements.txt" [ref=f11e1322]
+              - cell [ref=f11e1324]
+              - cell ".pyn-requirements.txt" [ref=f11e1331]
+              - cell "539 B" [ref=f11e1332]
+              - cell "-rw-r--r--" [ref=f11e1333]
+              - cell "8/23/2026, 1:31 PM" [ref=f11e1334]
+              - cell "root/root" [ref=f11e1335]
+            - row [ref=f11e1336] [cursor=pointer]:
+              - cell [ref=f11e1337]:
+                - checkbox ".setup_done" [ref=f11e1340]
+              - cell [ref=f11e1342]
+              - cell ".setup_done" [ref=f11e1350]
+              - cell "0 B" [ref=f11e1351]
+              - cell "-rw-r--r--" [ref=f11e1352]
+              - cell "4/26/2026, 6:18 PM" [ref=f11e1353]
+              - cell "nicmahco/nicmahco" [ref=f11e1354]
+            - row [ref=f11e1355] [cursor=pointer]:
+              - cell [ref=f11e1356]:
+                - checkbox ".superuser_done" [ref=f11e1359]
+              - cell [ref=f11e1361]
+              - cell ".superuser_done" [ref=f11e1369]
+              - cell "0 B" [ref=f11e1370]
+              - cell "-rw-r--r--" [ref=f11e1371]
+              - cell "4/26/2026, 6:18 PM" [ref=f11e1372]
+              - cell "nicmahco/nicmahco" [ref=f11e1373]
+            - row [ref=f11e1374] [cursor=pointer]:
+              - cell [ref=f11e1375]:
+                - checkbox "agrovet-backend.zip" [ref=f11e1378]
+              - cell [ref=f11e1380]
+              - cell "agrovet-backend.zip" [ref=f11e1388]
+              - cell "156.82 KB" [ref=f11e1389]
+              - cell "-rw-r--r--" [ref=f11e1390]
+              - cell "9/22/2026, 8:17 AM" [ref=f11e1391]
+              - cell "nicmahco/nicmahco" [ref=f11e1392]
+            - row [ref=f11e1393] [cursor=pointer]:
+              - cell [ref=f11e1394]:
+                - checkbox "backup-backend-20260922.zip" [ref=f11e1397]
+              - cell [ref=f11e1399]
+              - cell "backup-backend-20260922.zip" [ref=f11e1407]
+              - cell "1.47 MB" [ref=f11e1408]
+              - cell "-rw-r--r--" [ref=f11e1409]
+              - cell "9/22/2026, 8:04 AM" [ref=f11e1410]
+              - cell "nicmahco/nicmahco" [ref=f11e1411]
+            - row [ref=f11e1412] [cursor=pointer]:
+              - cell [ref=f11e1413]:
+                - checkbox "create_superuser.py" [ref=f11e1416]
+              - cell [ref=f11e1418]
+              - cell "create_superuser.py" [ref=f11e1426]
+              - cell "800 B" [ref=f11e1427]
+              - cell "-rw-r--r--" [ref=f11e1428]
+              - cell "9/22/2026, 10:22 AM" [ref=f11e1429]
+              - cell "nicmahco/nicmahco" [ref=f11e1430]
+            - row [ref=f11e1431] [cursor=pointer]:
+              - cell [ref=f11e1432]:
+                - checkbox "load_products.py" [ref=f11e1435]
+              - cell [ref=f11e1437]
+              - cell "load_products.py" [ref=f11e1445]
+              - cell "503 B" [ref=f11e1446]
+              - cell "-rw-r--r--" [ref=f11e1447]
+              - cell "9/22/2026, 10:22 AM" [ref=f11e1448]
+              - cell "nicmahco/nicmahco" [ref=f11e1449]
+            - row [ref=f11e1450] [cursor=pointer]:
+              - cell [ref=f11e1451]:
+                - checkbox "passenger_wsgi.py" [ref=f11e1454]
+              - cell [ref=f11e1456]
+              - cell "passenger_wsgi.py" [ref=f11e1464]
+              - cell "4.53 KB" [ref=f11e1465]
+              - cell "-rw-r--r--" [ref=f11e1466]
+              - cell "9/22/2026, 10:22 AM" [ref=f11e1467]
+              - cell "nicmahco/nicmahco" [ref=f11e1468]
+            - row [ref=f11e1469] [cursor=pointer]:
+              - cell [ref=f11e1470]:
+                - checkbox "run_vaccines_migration.py" [ref=f11e1473]
+              - cell [ref=f11e1475]
+              - cell "run_vaccines_migration.py" [ref=f11e1483]
+              - cell "1.53 KB" [ref=f11e1484]
+              - cell "-rw-r--r--" [ref=f11e1485]
+              - cell "9/22/2026, 10:27 AM" [ref=f11e1486]
+              - cell "nicmahco/nicmahco" [ref=f11e1487]
+            - row [ref=f11e1488] [cursor=pointer]:
+              - cell [ref=f11e1489]:
+                - checkbox "startup.log" [ref=f11e1492]
+              - cell [ref=f11e1494]
+              - cell "startup.log" [ref=f11e1502]
+              - cell "133.23 KB" [ref=f11e1503]
+              - cell "-rw-r--r--" [ref=f11e1504]
+              - cell "9/22/2026, 7:08 AM" [ref=f11e1505]
+              - cell "nicmahco/nicmahco" [ref=f11e1506]
+            - row [ref=f11e1507] [cursor=pointer]:
+              - cell [ref=f11e1508]:
+                - checkbox "stderr.log" [ref=f11e1511]
+              - cell [ref=f11e1513]
+              - cell "stderr.log" [ref=f11e1521]
+              - cell "24.98 MB" [ref=f11e1522]
+              - cell "-rw-r--r--" [ref=f11e1523]
+              - cell "9/22/2026, 7:08 AM" [ref=f11e1524]
+              - cell "nicmahco/nicmahco" [ref=f11e1525]
+            - row [ref=f11e1526] [cursor=pointer]:
+              - cell [ref=f11e1527]:
+                - checkbox "views.py" [ref=f11e1530]
+              - cell [ref=f11e1532]
+              - cell "views.py" [ref=f11e1540]
+              - cell "25.17 KB" [ref=f11e1541]
+              - cell "-rw-r--r--" [ref=f11e1542]
+              - cell "5/19/2026, 7:18 AM" [ref=f11e1543]
+              - cell "nicmahco/nicmahco" [ref=f11e1544]
+  - dialog [ref=f11e1554]:
+    - dialog [ref=f11e1556]:
+      - generic [ref=f11e1558]:
+        - generic [ref=f11e1560]:
+          - heading "Upload Files" [level=3] [ref=f11e1561]
+          - button "Close" [ref=f11e1562] [cursor=pointer]
+        - generic [ref=f11e1567]:
+          - generic [ref=f11e1569] [cursor=pointer]:
+            - generic [ref=f11e1572]: Drop files here or click to select files
+            - button "Drop files here or click to select files" [ref=f11e1573]
+          - generic [ref=f11e1574]:
+            - toolbar [ref=f11e1575]
+            - generic [ref=f11e1580]:
+              - progressbar "0%" [ref=f11e1581]
+              - generic [ref=f11e1583]:
+                - generic [ref=f11e1591]:
+                  - generic [ref=f11e1592]: run_vaccines_migration.py
+                  - generic [ref=f11e1593]: 2 KB
+                - button [ref=f11e1595] [cursor=pointer]
+      - generic [ref=f11e1599]:
+        - generic [ref=f11e1600]:
+          - checkbox "Overwrite" [checked] [active] [ref=f11e1602] [cursor=pointer]
+          - paragraph [aria-hidden] [ref=f11e1605]: Overwrite existing files
+        - button "Start Upload" [ref=f11e1607] [cursor=pointer]
+  - generic [ref=f11e6]: <div>Archive extracted successfully</div>

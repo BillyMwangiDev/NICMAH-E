@@ -1,0 +1,48 @@
+- generic [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - toolbar [ref=f2e4]:
+      - button [ref=f2e5] [cursor=pointer]
+      - button [ref=f2e8] [cursor=pointer]
+      - separator [ref=f2e11]
+      - separator [ref=f2e12]
+      - button "Show popup" [ref=f2e15] [cursor=pointer]:
+        - generic [ref=f2e18]:
+          - generic [ref=f2e19]: "Domain:"
+          - generic [ref=f2e20]: nicmah.com
+      - separator [ref=f2e23]
+      - combobox [ref=f2e25] [cursor=pointer]:
+        - generic [ref=f2e28]:
+          - generic [ref=f2e29]: "Language:"
+          - generic [ref=f2e30]: en
+      - separator [ref=f2e33]
+      - button [ref=f2e34] [cursor=pointer]
+    - iframe [active] [ref=f2e37]:
+      - generic [ref=f3e3]:
+        - heading "Python" [level=2] [ref=f3e4]
+        - list [ref=f3e7]:
+          - listitem [ref=f3e208] [cursor=pointer]:
+            - generic [ref=f3e209]: Web applications
+          - listitem [ref=f3e210] [cursor=pointer]:
+            - group [ref=f3e213]:
+              - button "add" [ref=f3e214]: Create application
+        - table [ref=f3e219]:
+          - rowgroup [ref=f3e220]:
+            - row [ref=f3e221]:
+              - columnheader "App URI" [ref=f3e222]
+              - columnheader "App Root Directory" [ref=f3e225]
+              - columnheader "Status" [ref=f3e228]
+              - columnheader "Actions" [ref=f3e231]
+          - rowgroup [ref=f3e233]:
+            - row [ref=f3e281]:
+              - cell "api.nicmah.com/" [ref=f3e235]
+              - cell "/home/nicmahco/domains/nicmah.com/public_html/api" [ref=f3e238]
+              - cell "stopped (v3.11.16)" [ref=f3e282]
+              - cell [ref=f3e245]:
+                - generic [ref=f3e246]:
+                  - group [ref=f3e285]:
+                    - button "start" [ref=f3e286] [cursor=pointer]
+                  - group [ref=f3e289]:
+                    - button "edit" [ref=f3e290] [cursor=pointer]
+                  - group [ref=f3e293]:
+                    - button "delete" [ref=f3e294] [cursor=pointer]
+  - generic [ref=f2e38]: <div>Plugins</div>

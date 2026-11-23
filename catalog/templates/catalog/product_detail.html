@@ -42,7 +42,7 @@
                 <div class="grid grid-cols-4 gap-2">
                     {% for image in product.images.all|slice:":4" %}
                     <div class="bg-white rounded-lg overflow-hidden">
-                        <img src="{{ image.image.url }}" 
+                        <img src="{{ image.image.url }}" loading="lazy" decoding="async"
                              alt="{{ product.name }}"
                              class="w-full h-24 object-cover">
                     </div>
@@ -152,7 +152,7 @@
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div class="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
                     {% if rp.main_image %}
-                        <img src="{{ rp.main_image.url }}" 
+                        <img src="{{ rp.main_image.url }}" loading="lazy" decoding="async"
                              alt="{{ rp.name }}"
                              class="w-full h-full object-cover">
                     {% else %}

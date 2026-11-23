@@ -1,0 +1,69 @@
+- generic [ref=f12e1]:
+  - generic [ref=f12e7]:
+    - link [ref=f12e9] [cursor=pointer]:
+      - /url: /evo/
+    - toolbar [ref=f12e13]:
+      - generic [ref=f12e14]:
+        - button "New Folder" [ref=f12e15] [cursor=pointer]
+        - button "New File" [ref=f12e18] [cursor=pointer]
+        - button "Upload" [ref=f12e21] [cursor=pointer]
+        - separator [ref=f12e24]
+        - button "Search" [ref=f12e25] [cursor=pointer]
+      - generic [ref=f12e28]:
+        - button "Directory sizes" [ref=f12e29] [cursor=pointer]
+        - separator [ref=f12e32]
+        - button "Back to Dashboard" [ref=f12e33] [cursor=pointer]
+    - complementary [ref=f12e36]:
+      - tree [ref=f12e37]:
+        - generic [ref=f12e38]:
+          - treeitem "My Files" [expanded] [level=1] [ref=f12e39] [cursor=pointer]
+          - treeitem ".cache" [level=2] [ref=f12e44] [cursor=pointer]
+          - treeitem ".cagefs" [level=2] [ref=f12e52] [cursor=pointer]
+          - treeitem ".caldav" [level=2] [ref=f12e60] [cursor=pointer]
+          - treeitem ".cl.selector" [level=2] [ref=f12e68] [cursor=pointer]
+          - treeitem ".clwpos" [level=2] [ref=f12e76] [cursor=pointer]
+          - treeitem ".htpasswds" [level=2] [ref=f12e84] [cursor=pointer]
+          - treeitem ".koality" [level=2] [ref=f12e92] [cursor=pointer]
+          - treeitem ".local" [level=2] [ref=f12e100] [cursor=pointer]
+          - treeitem ".mail_unused_folder_from_cpanel" [level=2] [ref=f12e108] [cursor=pointer]
+          - treeitem ".php" [level=2] [ref=f12e116] [cursor=pointer]
+          - treeitem ".pip" [level=2] [ref=f12e124] [cursor=pointer]
+          - treeitem ".razor" [level=2] [ref=f12e132] [cursor=pointer]
+          - treeitem ".sitepad" [level=2] [ref=f12e140] [cursor=pointer]
+          - treeitem ".softaculous" [level=2] [ref=f12e148] [cursor=pointer]
+          - treeitem ".ssh" [level=2] [ref=f12e156] [cursor=pointer]
+          - treeitem "Maildir" [level=2] [ref=f12e164] [cursor=pointer]
+          - treeitem "backups" [level=2] [ref=f12e172] [cursor=pointer]
+          - treeitem "domains" [expanded] [level=2] [ref=f12e180] [cursor=pointer]
+          - treeitem "nicmah.com" [expanded] [level=3] [ref=f12e188] [cursor=pointer]
+          - treeitem "public_html" [expanded] [level=4] [ref=f12e196] [cursor=pointer]
+          - treeitem "api" [expanded] [level=5] [ref=f12e204] [cursor=pointer]
+          - treeitem ".well-known" [level=6] [ref=f12e212] [cursor=pointer]
+          - treeitem "__pycache__" [level=6] [ref=f12e220] [cursor=pointer]
+          - treeitem "backend" [level=6] [ref=f12e228] [cursor=pointer]
+          - treeitem "inventory" [level=6] [ref=f12e236] [cursor=pointer]
+          - treeitem "public" [level=6] [ref=f12e244] [cursor=pointer]
+          - treeitem "services" [level=6] [ref=f12e252] [cursor=pointer]
+          - treeitem "tmp" [level=6] [ref=f12e260] [cursor=pointer]
+          - treeitem "etc" [level=2] [ref=f12e268] [cursor=pointer]
+    - main [ref=f12e276]
+  - dialog [ref=f12e1170]:
+    - dialog [ref=f12e1172]:
+      - generic [ref=f12e1174]:
+        - generic [ref=f12e1176]:
+          - heading "Remove item" [level=3] [ref=f12e1177]
+          - button "Close" [ref=f12e1178] [cursor=pointer]
+        - generic [ref=f12e1188] [cursor=pointer]:
+          - generic [ref=f12e1197]:
+            - generic [ref=f12e1198]: .setup_done
+            - generic [ref=f12e1199]: 0 B
+          - checkbox [checked] [ref=f12e1202]
+      - generic [ref=f12e1205]:
+        - generic [ref=f12e1206]:
+          - checkbox "Move To Trash" [checked] [ref=f12e1208] [cursor=pointer]
+          - paragraph [aria-hidden] [ref=f12e1211]: If unchecked, files will be permanently deleted
+        - button "Remove" [active] [ref=f12e1212] [cursor=pointer]
+  - generic [ref=f12e1217]:
+    - generic [ref=f12e1220]: Selected items were removed successfully
+    - button [ref=f12e1223] [cursor=pointer]
+  - generic [ref=f12e6]: <div>Selected items were removed successfully</div>

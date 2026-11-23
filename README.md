@@ -432,6 +432,14 @@ docker-compose -f docker-compose.prod.yml down
 - **`requirements.txt`** - Production dependencies only
 - **`requirements-dev.txt`** - Includes production dependencies + development tools (testing, linting, etc.)
 
+### Environment and static assets
+
+- Copy `.env.example` to `.env`. With `DEBUG=False` the app refuses to start unless `SECRET_KEY` is set.
+- Static files are served by WhiteNoise with hashed, compressed names: run `python manage.py collectstatic --noinput` on every deploy.
+- Tailwind is compiled at build time. After changing templates run `npm install` (once) and `npm run build:css`, then commit `core/static/css/tailwind.css`. The server does not need Node.
+- The production cache defaults to the file cache in `<project>/cache`; override with `CACHE_BACKEND` / `CACHE_LOCATION`.
+- `/health/` checks the database and the cache and returns 503 if either fails.
+
 ### Manual Deployment
 
 1. **Prepare the server**

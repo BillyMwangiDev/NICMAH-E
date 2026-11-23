@@ -1,0 +1,111 @@
+- generic [ref=e1]:
+  - generic [ref=e7]:
+    - toolbar [ref=e8]:
+      - button [ref=e9] [cursor=pointer]
+      - button [ref=e12] [cursor=pointer]
+      - separator [ref=e15]
+      - separator [ref=e16]
+      - button "Show popup" [ref=e19] [cursor=pointer]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: "Domain:"
+          - generic [ref=e24]: nicmah.com
+      - separator [ref=e27]
+      - combobox [ref=e29] [cursor=pointer]:
+        - generic [ref=e32]:
+          - generic [ref=e33]: "Language:"
+          - generic [ref=e34]: en
+      - separator [ref=e37]
+      - button [ref=e38] [cursor=pointer]
+    - iframe [active] [ref=e41]:
+      - generic [ref=f1e3]:
+        - heading "Python" [level=2] [ref=f1e4]
+        - list [ref=f1e7]:
+          - listitem [ref=f1e65] [cursor=pointer]:
+            - generic [ref=f1e66]: Web applications
+          - listitem [ref=f1e67] [cursor=pointer]:
+            - generic [ref=f1e69]: api.nicmah.com/
+          - listitem [ref=f1e70] [cursor=pointer]:
+            - group [ref=f1e73]:
+              - button "delete" [ref=f1e74]: Destroy
+            - group [ref=f1e77]:
+              - button "Cancel" [ref=f1e78]
+            - group [ref=f1e81]:
+              - button "Save" [disabled]
+        - generic [ref=f1e83]:
+          - generic [ref=f1e89]:
+            - paragraph
+            - paragraph [ref=f1e90]: Enter to the virtual environment.
+            - paragraph [ref=f1e91]:
+              - text: "To enter to virtual environment, run the command:"
+              - code [ref=f1e92] [cursor=pointer]: source /home/nicmahco/virtualenv/domains/nicmah.com/public_html/api/3.11/bin/activate && cd /home/nicmahco/domains/nicmah.com/public_html/api
+          - generic [ref=f1e93]:
+            - generic [ref=f1e96]:
+              - generic [ref=f1e97]: Python
+              - generic [ref=f1e99]:
+                - group [ref=f1e102]:
+                  - button "stop" [ref=f1e103] [cursor=pointer]: Stop app
+                - group [ref=f1e106]:
+                  - button "reset" [ref=f1e107] [cursor=pointer]: Restart
+            - separator [ref=f1e108]
+            - generic [ref=f1e109]:
+              - generic [ref=f1e112]:
+                - generic [ref=f1e113]: Python version
+                - button "3.11.16" [ref=f1e118] [cursor=pointer]
+              - generic [ref=f1e122]:
+                - generic [ref=f1e123]:
+                  - generic [ref=f1e124]: Application root
+                  - generic [ref=f1e125]: It is a physical address to your application on a server that corresponds with its URI. Upload your application files here.
+                - textbox "Application root" [ref=f1e128]:
+                  - /placeholder: ""
+                  - text: domains/nicmah.com/public_html/api
+              - generic [ref=f1e130]:
+                - generic [ref=f1e131]:
+                  - generic [ref=f1e132]: Application URL
+                  - generic [ref=f1e133]: It is an HTTP/HTTPS link to your application
+                - generic [ref=f1e134]:
+                  - generic [ref=f1e135]:
+                    - button "api.nicmah.com" [ref=f1e138] [cursor=pointer]
+                    - textbox [ref=f1e141]
+                  - group [ref=f1e144]:
+                    - button "open" [ref=f1e145] [cursor=pointer]: Open
+              - generic [ref=f1e148]:
+                - generic [ref=f1e149]: Application startup file
+                - textbox "Application startup file" [ref=f1e153]:
+                  - /placeholder: ""
+                  - text: passenger_wsgi.py
+              - generic [ref=f1e156]:
+                - generic [ref=f1e157]:
+                  - generic [ref=f1e158]: Application Entry point
+                  - generic [ref=f1e159]: Setup wsgi callable object for your application
+                - textbox "Application Entry point" [ref=f1e162]:
+                  - /placeholder: ""
+                  - text: application
+            - separator [ref=f1e163]
+            - generic [ref=f1e164]:
+              - generic [ref=f1e167]:
+                - generic [ref=f1e168]: Configuration files
+                - group [ref=f1e173]:
+                  - button "start" [disabled]: Run Pip Install
+              - generic [ref=f1e177]:
+                - textbox "Add another file and press enter" [ref=f1e179]
+                - group [ref=f1e182]:
+                  - button "add" [disabled]: Add
+              - generic [ref=f1e184]:
+                - generic [ref=f1e185]:
+                  - generic [ref=f1e186]: Execute python script
+                  - generic [ref=f1e187]:
+                    - text: You can also enter a command to execute (e.g
+                    - code [ref=f1e188] [cursor=pointer]: /path/to/manage.py
+                    - text: migrate). Note, only python scripts allowed.
+                - generic [ref=f1e189]:
+                  - textbox "Enter the path to the script file" [ref=f1e191]
+                  - group [ref=f1e194]:
+                    - button "start" [disabled]: Run Script
+            - separator [ref=f1e195]
+            - generic [ref=f1e196]:
+              - generic [ref=f1e198]:
+                - heading "Environment variables" [level=2] [ref=f1e200]
+                - group [ref=f1e204]:
+                  - button "add" [ref=f1e205] [cursor=pointer]: Add variable
+              - generic [ref=f1e206]: NO RESULT FOUND
+  - generic [ref=e6]: <div>Plugins</div>

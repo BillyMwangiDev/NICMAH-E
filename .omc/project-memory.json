@@ -1,0 +1,308 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1791188364383,
+  "projectRoot": "/Users/billy/WORK/NICMAH-E",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "requirements.txt"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {
+      "build:css": "tailwindcss -c tailwind.config.js -i core/static/css/tailwind.src.css -o core/static/css/tailwind.css --minify",
+      "watch:css": "tailwindcss -c tailwind.config.js -i core/static/css/tailwind.src.css -o core/static/css/tailwind.css --watch"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "analytics": {
+      "path": "analytics",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1791188364355,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "apps.py",
+        "models.py",
+        "signals.py"
+      ]
+    },
+    "catalog": {
+      "path": "catalog",
+      "purpose": null,
+      "fileCount": 9,
+      "lastAccessed": 1791188364359,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "admin_views.py",
+        "apps.py",
+        "models.py"
+      ]
+    },
+    "core": {
+      "path": "core",
+      "purpose": null,
+      "fileCount": 17,
+      "lastAccessed": 1791188364359,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "admin_mixins.py",
+        "context_processors.py",
+        "images.py"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 3,
+      "lastAccessed": 1791188364360,
+      "keyFiles": [
+        "CODEREVIEW.md",
+        "PERFORMANCE_AND_ROBUSTNESS_BRAINSTORM.md",
+        "README.md"
+      ]
+    },
+    "educational": {
+      "path": "educational",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1791188364360,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "apps.py",
+        "models.py",
+        "sitemaps.py"
+      ]
+    },
+    "inventory": {
+      "path": "inventory",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1791188364360,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "apps.py",
+        "document_generation.py",
+        "models.py"
+      ]
+    },
+    "logs": {
+      "path": "logs",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1791188364361,
+      "keyFiles": [
+        "django.log",
+        "security.log"
+      ]
+    },
+    "media": {
+      "path": "media",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1791188364361,
+      "keyFiles": []
+    },
+    "nginx": {
+      "path": "nginx",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791188364361,
+      "keyFiles": [
+        "nginx.conf"
+      ]
+    },
+    "nichmah_agrovet": {
+      "path": "nichmah_agrovet",
+      "purpose": null,
+      "fileCount": 11,
+      "lastAccessed": 1791188364361,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "apps.py",
+        "asgi.py",
+        "security_middleware.py"
+      ]
+    },
+    "orders": {
+      "path": "orders",
+      "purpose": null,
+      "fileCount": 7,
+      "lastAccessed": 1791188364362,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "apps.py",
+        "models.py",
+        "tests.py"
+      ]
+    },
+    "pos": {
+      "path": "pos",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1791188364362,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "apps.py",
+        "models.py",
+        "printer.py"
+      ]
+    },
+    "users": {
+      "path": "users",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1791188364362,
+      "keyFiles": [
+        "__init__.py",
+        "admin.py",
+        "api_urls.py",
+        "api_views.py",
+        "apps.py"
+      ]
+    },
+    "analytics/migrations": {
+      "path": "analytics/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 6,
+      "lastAccessed": 1791188364363,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_initial.py",
+        "0003_sales_salesanalytics_salesitem_and_more.py"
+      ]
+    },
+    "catalog/migrations": {
+      "path": "catalog/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 7,
+      "lastAccessed": 1791188364363,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_product_package_size.py",
+        "0003_category_is_admin_only.py"
+      ]
+    },
+    "core/migrations": {
+      "path": "core/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 5,
+      "lastAccessed": 1791188364364,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_sitesettings_veterinary_phone.py",
+        "0003_add_whatsapp_number.py"
+      ]
+    },
+    "educational/migrations": {
+      "path": "educational/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 3,
+      "lastAccessed": 1791188364365,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_initial.py",
+        "__init__.py"
+      ]
+    },
+    "inventory/migrations": {
+      "path": "inventory/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 5,
+      "lastAccessed": 1791188364366,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_initial.py",
+        "0003_documenttemplate_document_documentitem.py"
+      ]
+    },
+    "orders/migrations": {
+      "path": "orders/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 5,
+      "lastAccessed": 1791188364367,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_initial.py",
+        "0003_alter_cart_options_alter_cartitem_options_and_more.py"
+      ]
+    },
+    "pos/migrations": {
+      "path": "pos/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 8,
+      "lastAccessed": 1791188364368,
+      "keyFiles": [
+        "0001_initial.py",
+        "0002_initial.py",
+        "0003_alter_possession_session_id.py"
+      ]
+    },
+    "users/migrations": {
+      "path": "users/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 2,
+      "lastAccessed": 1791188364368,
+      "keyFiles": [
+        "0001_initial.py",
+        "__init__.py"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": ".playwright-mcp/nicmah-home.png",
+      "accessCount": 2,
+      "lastAccessed": 1791188525741,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

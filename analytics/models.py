@@ -79,6 +79,10 @@ class Sales(models.Model):
         verbose_name = "Sale"
         verbose_name_plural = "Sales"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["status", "created_at"]),
+        ]
         
     def __str__(self):
         return f"Sale {self.sale_number} - {self.customer_name}"

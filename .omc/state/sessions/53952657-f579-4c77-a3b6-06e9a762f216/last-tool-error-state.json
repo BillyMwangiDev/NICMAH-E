@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"grep -ril \\\"nicmah\\\\|nichmah\\\\|agrovet\\\" /Users/billy/.claude/projects/-Users-billy-WORK-NICMAH-E/memory/ 2>/dev/null; echo \\\"---\\\"; cat /Users/billy/.claude/projects/-Users-billy-WORK-NIC...",
+  "error": "Exit code 1\n---",
+  "timestamp": "2026-08-31T15:21:37.696Z",
+  "retry_count": 2
+}

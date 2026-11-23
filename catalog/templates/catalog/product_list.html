@@ -137,13 +137,16 @@
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
                     <!-- Product Image -->
                     <div class="relative h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center overflow-hidden">
-                        {% if product.images.first %}
-                            <img src="{{ product.images.first.image.url }}" 
+                        {% with first_image=product.images.all|first %}
+                        {% if first_image %}
+                            <img src="{{ first_image.image.url }}" 
                                  alt="{{ product.name }}"
+                                 loading="lazy" decoding="async"
                                  class="w-full h-full object-cover transition-transform duration-500">
                         {% else %}
                             <i class="fas fa-leaf text-4xl text-agro-green"></i>
                         {% endif %}
+                        {% endwith %}
                         
                         <!-- Stock Status Badge -->
                         <div class="absolute top-3 right-3">

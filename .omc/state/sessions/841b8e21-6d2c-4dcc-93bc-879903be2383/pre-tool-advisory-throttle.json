@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "entries": {
+    "79a93d4a2f8f50b95f852280616242fee1855dc99a3c75211917f55e72e95fae": {
+      "last_emitted_at_ms": 1787923186082,
+      "message": "Use parallel execution for independent tasks. Use run_in_background for long operations (npm install, builds, tests)."
+    },
+    "466399dafa2d20f60587180bad0a07358eb7f2bce724df0ff682f038ad33f5ad": {
+      "last_emitted_at_ms": 1787922923089,
+      "message": "Read multiple files in parallel when possible for faster analysis."
+    },
+    "8062652a35ddd0484eff5e8355a45123e6b2abf118e97489ad5c30d0c8adb1e7": {
+      "last_emitted_at_ms": 1787922858881,
+      "message": "Spawning agent: Explore (inherit) | Task: Find real product categories and business data"
+    }
+  },
+  "updated_at": "2026-08-28T13:19:46.082Z"
+}

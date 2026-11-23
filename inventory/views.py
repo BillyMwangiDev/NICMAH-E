@@ -337,8 +337,9 @@ def stock_movements(request):
 
     context = {
         "stock_movements": page_obj,
-        "total_movements": movements.count(),
-        "products": Product.objects.all(),
+        "total_movements": paginator.count,
+        # Only what the filter <select> needs; the count badge uses products|length.
+        "products": Product.objects.only("id", "name").order_by("name"),
     }
 
     return render(request, "inventory/stock_movements.html", context)

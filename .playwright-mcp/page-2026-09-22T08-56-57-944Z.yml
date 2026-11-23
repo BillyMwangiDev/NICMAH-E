@@ -1,0 +1,649 @@
+- generic [ref=f19e1]:
+  - link "Skip to main content" [ref=f19e2] [cursor=pointer]:
+    - /url: "#content"
+  - generic [ref=f19e3]:
+    - link "Skip to main content" [ref=f19e4] [cursor=pointer]:
+      - /url: "#content"
+    - complementary [ref=f19e5]:
+      - navigation [ref=f19e10]:
+        - generic [ref=f19e12]:
+          - link [ref=f19e17] [cursor=pointer]:
+            - /url: index.html
+            - img "cPanel logo" [ref=f19e18]
+          - list [ref=f19e19]:
+            - listitem [ref=f19e20]:
+              - link "Tools" [ref=f19e21] [cursor=pointer]:
+                - /url: index.html
+            - listitem [ref=f19e26]:
+              - link "Social Media Management" [ref=f19e27] [cursor=pointer]:
+                - /url: socialbee/index.html
+            - listitem [ref=f19e37]:
+              - link "WordPress Management" [ref=f19e38] [cursor=pointer]:
+                - /url: wp-toolkit/index.live.php
+            - listitem [ref=f19e46]:
+              - link "Manage Team" [ref=f19e47] [cursor=pointer]:
+                - /url: team-manager/index.html
+            - listitem [ref=f19e54]:
+              - link "Site Quality Monitoring" [ref=f19e55] [cursor=pointer]:
+                - /url: koality/signup/index.html
+            - listitem [ref=f19e61]:
+              - link "WordPress Manager by Softaculous" [ref=f19e62] [cursor=pointer]:
+                - /url: softaculous/index.live.php?act=wordpress
+    - generic [ref=f19e69]:
+      - banner [ref=f19e70]:
+        - generic [ref=f19e75]:
+          - text: 
+          - generic [ref=f19e76]:
+            - button "Try the new Meridian theme" [ref=f19e79] [cursor=pointer]
+            - text: 
+            - generic [ref=f19e85]:
+              - text: 
+              - combobox [ref=f19e87]:
+                - searchbox "Search Tools (/)" [ref=f19e88]
+                - text:  
+            - generic [ref=f19e90]:
+              - link "Notifications" [ref=f19e93] [cursor=pointer]:
+                - /url: notifications/index.html.tt
+                - generic [ref=f19e94]: 
+              - button "User Menu" [ref=f19e101] [cursor=pointer]:
+                - generic [ref=f19e102]: 
+      - generic [ref=f19e108]:
+        - heading "Tools" [level=1] [ref=f19e109]
+        - generic [ref=f19e111]:
+          - generic [ref=f19e114]:
+            - group [ref=f19e117]:
+              - generic [ref=f19e118]:
+                - heading "Email" [level=3] [ref=f19e120]
+                - button "Expand or collapse “email” application group." [ref=f19e121] [cursor=pointer]: 
+              - generic [ref=f19e123]:
+                - link "Email Accounts Email Accounts" [ref=f19e124] [cursor=pointer]:
+                  - /url: email_accounts/index.html
+                  - generic "Email Accounts" [ref=f19e125]
+                  - generic [ref=f19e126]: Email Accounts
+                - link "Forwarders Forwarders" [ref=f19e127] [cursor=pointer]:
+                  - /url: mail/fwds.html
+                  - generic "Forwarders" [ref=f19e128]
+                  - generic [ref=f19e129]: Forwarders
+                - link "Email Routing Email Routing" [ref=f19e130] [cursor=pointer]:
+                  - /url: mail/email_routing.html
+                  - generic "Email Routing" [ref=f19e131]
+                  - generic [ref=f19e132]: Email Routing
+                - link "Autoresponders Autoresponders" [ref=f19e133] [cursor=pointer]:
+                  - /url: mail/autores.html
+                  - generic "Autoresponders" [ref=f19e134]
+                  - generic [ref=f19e135]: Autoresponders
+                - link "Default Address Default Address" [ref=f19e136] [cursor=pointer]:
+                  - /url: mail/def.html
+                  - generic "Default Address" [ref=f19e137]
+                  - generic [ref=f19e138]: Default Address
+                - link "Mailing Lists Mailing Lists" [ref=f19e139] [cursor=pointer]:
+                  - /url: mail/lists.html
+                  - generic "Mailing Lists" [ref=f19e140]
+                  - generic [ref=f19e141]: Mailing Lists
+                - link "Track Delivery Track Delivery" [ref=f19e142] [cursor=pointer]:
+                  - /url: mail/route.html
+                  - generic "Track Delivery" [ref=f19e143]
+                  - generic [ref=f19e144]: Track Delivery
+                - link "Global Email Filters Global Email Filters" [ref=f19e145] [cursor=pointer]:
+                  - /url: mail/filters/userfilters.html
+                  - generic "Global Email Filters" [ref=f19e146]
+                  - generic [ref=f19e147]: Global Email Filters
+                - link "Email Filters Email Filters" [ref=f19e148] [cursor=pointer]:
+                  - /url: mail/filters/managefilters.html
+                  - generic "Email Filters" [ref=f19e149]
+                  - generic [ref=f19e150]: Email Filters
+                - link "Email Deliverability Email Deliverability" [ref=f19e151] [cursor=pointer]:
+                  - /url: email_deliverability/
+                  - generic "Email Deliverability" [ref=f19e152]
+                  - generic [ref=f19e153]: Email Deliverability
+                - link "Address Importer Address Importer" [ref=f19e154] [cursor=pointer]:
+                  - /url: mail/csvimport.html
+                  - generic "Address Importer" [ref=f19e155]
+                  - generic [ref=f19e156]: Address Importer
+                - link "Spam Filters Spam Filters" [ref=f19e157] [cursor=pointer]:
+                  - /url: mail/spam/index.html
+                  - generic "Spam Filters" [ref=f19e158]
+                  - generic [ref=f19e159]: Spam Filters
+                - link "Email Marketing Email Marketing" [ref=f19e160] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/emailmarketing
+                  - generic "Email Marketing" [ref=f19e161]
+                  - generic [ref=f19e162]: Email Marketing
+                - link "Encryption Encryption" [ref=f19e163] [cursor=pointer]:
+                  - /url: gpg/index.html
+                  - generic "Encryption" [ref=f19e164]
+                  - generic [ref=f19e165]: Encryption
+                - link "BoxTrapper BoxTrapper" [ref=f19e166] [cursor=pointer]:
+                  - /url: mail/boxtrapper.html
+                  - generic "BoxTrapper" [ref=f19e167]
+                  - generic [ref=f19e168]: BoxTrapper
+                - link "Calendars and Contacts Configuration Calendars and Contacts Configuration" [ref=f19e169] [cursor=pointer]:
+                  - /url: mail/calendars_and_contacts/index.html
+                  - generic "Calendars and Contacts Configuration" [ref=f19e170]
+                  - generic [ref=f19e171]: Calendars and Contacts Configuration
+                - link "Calendars and Contacts Sharing Calendars and Contacts Sharing" [ref=f19e172] [cursor=pointer]:
+                  - /url: manage-calendar-access/index.html
+                  - generic "Calendars and Contacts Sharing" [ref=f19e173]
+                  - generic [ref=f19e174]: Calendars and Contacts Sharing
+                - link "Calendars and Contacts Management Calendars and Contacts Management" [ref=f19e175] [cursor=pointer]:
+                  - /url: calendar-contact-management/index.html
+                  - generic "Calendars and Contacts Management" [ref=f19e176]
+                  - generic [ref=f19e177]: Calendars and Contacts Management
+                - link "Email Disk Usage Email Disk Usage" [ref=f19e178] [cursor=pointer]:
+                  - /url: mail/manage_disk_usage/
+                  - generic "Email Disk Usage" [ref=f19e179]
+                  - generic [ref=f19e180]: Email Disk Usage
+            - group [ref=f19e183]:
+              - generic [ref=f19e184]:
+                - heading "Files" [level=3] [ref=f19e186]
+                - button "Expand or collapse “files” application group." [ref=f19e187] [cursor=pointer]: 
+              - generic [ref=f19e189]:
+                - link "File Manager File Manager" [ref=f19e190] [cursor=pointer]:
+                  - /url: filemanager/index.html
+                  - generic "File Manager" [ref=f19e191]
+                  - generic [ref=f19e192]: File Manager
+                - link "Images Images" [ref=f19e193] [cursor=pointer]:
+                  - /url: cpanelpro/images.html
+                  - generic "Images" [ref=f19e194]
+                  - generic [ref=f19e195]: Images
+                - link "Directory Privacy Directory Privacy" [ref=f19e196] [cursor=pointer]:
+                  - /url: htaccess/index.html
+                  - generic "Directory Privacy" [ref=f19e197]
+                  - generic [ref=f19e198]: Directory Privacy
+                - link "Disk Usage Disk Usage" [ref=f19e199] [cursor=pointer]:
+                  - /url: diskusage/index.html
+                  - generic "Disk Usage" [ref=f19e200]
+                  - generic [ref=f19e201]: Disk Usage
+                - link "Web Disk Web Disk" [ref=f19e202] [cursor=pointer]:
+                  - /url: webdav/accounts_webdav.html
+                  - generic "Web Disk" [ref=f19e203]
+                  - generic [ref=f19e204]: Web Disk
+                - link "FTP Accounts FTP Accounts" [ref=f19e205] [cursor=pointer]:
+                  - /url: ftp/accounts.html
+                  - generic "FTP Accounts" [ref=f19e206]
+                  - generic [ref=f19e207]: FTP Accounts
+                - link "Backup Backup" [ref=f19e208] [cursor=pointer]:
+                  - /url: backup/index.html
+                  - generic "Backup" [ref=f19e209]
+                  - generic [ref=f19e210]: Backup
+                - link "Backup Wizard Backup Wizard" [ref=f19e211] [cursor=pointer]:
+                  - /url: backup/wizard.html
+                  - generic "Backup Wizard" [ref=f19e212]
+                  - generic [ref=f19e213]: Backup Wizard
+                - link "Git™ Version Control Git™ Version Control" [ref=f19e214] [cursor=pointer]:
+                  - /url: version_control/index.html
+                  - generic "Git™ Version Control" [ref=f19e215]
+                  - generic [ref=f19e216]: Git™ Version Control
+                - link "File and Directory Restoration File and Directory Restoration" [ref=f19e217] [cursor=pointer]:
+                  - /url: file_and_directory_restoration/index.html
+                  - generic "File and Directory Restoration" [ref=f19e218]
+                  - generic [ref=f19e219]: File and Directory Restoration
+                - link "AI Blog Post Generator AI Blog Post Generator" [ref=f19e220] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/copymatic
+                  - generic "AI Blog Post Generator" [ref=f19e221]
+                  - generic [ref=f19e222]: AI Blog Post Generator
+                - link "JetBackup 5 JetBackup 5" [ref=f19e223] [cursor=pointer]:
+                  - /url: jetbackup5/index.html
+                  - generic "JetBackup 5" [ref=f19e224]
+                  - generic [ref=f19e225]: JetBackup 5
+            - group [ref=f19e228]:
+              - generic [ref=f19e229]:
+                - heading "SEO and Marketing Tools" [level=3] [ref=f19e231]
+                - button "Expand or collapse “attracta_seo” application group." [ref=f19e232] [cursor=pointer]: 
+              - generic [ref=f19e234]:
+                - link "Get In Google Get In Google" [ref=f19e235] [cursor=pointer]:
+                  - /url: /cpsess4935515435/frontend/jupiter/attracta/index.live.pl?id=31
+                  - generic "Get In Google" [ref=f19e236]
+                  - generic [ref=f19e237]: Get In Google
+                - link "SEO Tools SEO Tools" [ref=f19e238] [cursor=pointer]:
+                  - /url: /cpsess4935515435/frontend/jupiter/attracta/index.live.pl?id=32
+                  - generic "SEO Tools" [ref=f19e239]
+                  - generic [ref=f19e240]: SEO Tools
+                - link "Increase Website Traffic Increase Website Traffic" [ref=f19e241] [cursor=pointer]:
+                  - /url: /cpsess4935515435/frontend/jupiter/attracta/index.live.pl?id=33
+                  - generic "Increase Website Traffic" [ref=f19e242]
+                  - generic [ref=f19e243]: Increase Website Traffic
+                - link "Link Building Link Building" [ref=f19e244] [cursor=pointer]:
+                  - /url: /cpsess4935515435/frontend/jupiter/attracta/index.live.pl?id=35
+                  - generic "Link Building" [ref=f19e245]
+                  - generic [ref=f19e246]: Link Building
+                - link "SEO Optimized WordPress Themes SEO Optimized WordPress Themes" [ref=f19e247] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/wpthemes
+                  - generic "SEO Optimized WordPress Themes" [ref=f19e248]
+                  - generic [ref=f19e249]: SEO Optimized WordPress Themes
+                - link "WordPress Social Media Optimization WordPress Social Media Optimization" [ref=f19e250] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/wpsocial
+                  - generic "WordPress Social Media Optimization" [ref=f19e251]
+                  - generic [ref=f19e252]: WordPress Social Media Optimization
+                - link "Drag & Drop Visual Page Builder Drag & Drop Visual Page Builder" [ref=f19e253] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/wpvisual
+                  - generic "Drag & Drop Visual Page Builder" [ref=f19e254]
+                  - generic [ref=f19e255]: Drag & Drop Visual Page Builder
+                - link "Free Shopping Cart Free Shopping Cart" [ref=f19e256] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/shoppingcart
+                  - generic "Free Shopping Cart" [ref=f19e257]
+                  - generic [ref=f19e258]: Free Shopping Cart
+                - link "Free Email Marketing Tools Free Email Marketing Tools" [ref=f19e259] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/emailmarketing
+                  - generic "Free Email Marketing Tools" [ref=f19e260]
+                  - generic [ref=f19e261]: Free Email Marketing Tools
+                - link "Google Rank Checker Google Rank Checker" [ref=f19e262] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/semrushfree
+                  - generic "Google Rank Checker" [ref=f19e263]
+                  - generic [ref=f19e264]: Google Rank Checker
+                - link "Free AI Site Tools Free AI Site Tools" [ref=f19e265] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/copymatic
+                  - generic "Free AI Site Tools" [ref=f19e266]
+                  - generic [ref=f19e267]: Free AI Site Tools
+            - group [ref=f19e270]:
+              - generic [ref=f19e271]:
+                - heading "Databases" [level=3] [ref=f19e273]
+                - button "Expand or collapse “databases” application group." [ref=f19e274] [cursor=pointer]: 
+              - generic [ref=f19e276]:
+                - link "phpMyAdmin phpMyAdmin" [ref=f19e277] [cursor=pointer]:
+                  - /url: sql/PhpMyAdmin.html
+                  - generic "phpMyAdmin" [ref=f19e278]
+                  - generic [ref=f19e279]: phpMyAdmin
+                - link "Manage My Databases Manage My Databases" [ref=f19e280] [cursor=pointer]:
+                  - /url: sql/index.html
+                  - generic "Manage My Databases" [ref=f19e281]
+                  - generic [ref=f19e282]: Manage My Databases
+                - link "Database Wizard Database Wizard" [ref=f19e283] [cursor=pointer]:
+                  - /url: sql/wizard1.html
+                  - generic "Database Wizard" [ref=f19e284]
+                  - generic [ref=f19e285]: Database Wizard
+                - link "Remote Database Access Remote Database Access" [ref=f19e286] [cursor=pointer]:
+                  - /url: sql/managehost.html
+                  - generic "Remote Database Access" [ref=f19e287]
+                  - generic [ref=f19e288]: Remote Database Access
+                - link "PostgreSQL Databases PostgreSQL Databases" [ref=f19e289] [cursor=pointer]:
+                  - /url: psql/index.html
+                  - generic "PostgreSQL Databases" [ref=f19e290]
+                  - generic [ref=f19e291]: PostgreSQL Databases
+                - link "PostgreSQL Database Wizard PostgreSQL Database Wizard" [ref=f19e292] [cursor=pointer]:
+                  - /url: psql/wizard1.html
+                  - generic "PostgreSQL Database Wizard" [ref=f19e293]
+                  - generic [ref=f19e294]: PostgreSQL Database Wizard
+                - link "phpPgAdmin phpPgAdmin" [ref=f19e295] [cursor=pointer]:
+                  - /url: /cpsess4935515435/3rdparty/phpPgAdmin/index.php
+                  - generic "phpPgAdmin" [ref=f19e296]
+                  - generic [ref=f19e297]: phpPgAdmin
+            - group [ref=f19e300]:
+              - generic [ref=f19e301]:
+                - heading "Domains" [level=3] [ref=f19e303]
+                - button "Expand or collapse “domains” application group." [ref=f19e304] [cursor=pointer]: 
+              - generic [ref=f19e306]:
+                - link "WordPress Management WordPress Management" [ref=f19e307] [cursor=pointer]:
+                  - /url: wp-toolkit/index.live.php
+                  - generic "WordPress Management" [ref=f19e308]
+                  - generic [ref=f19e309]: WordPress Management
+                - link "Social Media Management Social Media Management" [ref=f19e310] [cursor=pointer]:
+                  - /url: socialbee/index.html
+                  - generic "Social Media Management" [ref=f19e311]
+                  - generic [ref=f19e312]: Social Media Management
+                - link "Domains Domains" [ref=f19e313] [cursor=pointer]:
+                  - /url: domains/index.html
+                  - generic "Domains" [ref=f19e314]
+                  - generic [ref=f19e315]: Domains
+                - link "Redirects Redirects" [ref=f19e316] [cursor=pointer]:
+                  - /url: mime/redirect.html
+                  - generic "Redirects" [ref=f19e317]
+                  - generic [ref=f19e318]: Redirects
+                - link "Zone Editor Zone Editor" [ref=f19e319] [cursor=pointer]:
+                  - /url: zone_editor/index.html
+                  - generic "Zone Editor" [ref=f19e320]
+                  - generic [ref=f19e321]: Zone Editor
+                - link "Dynamic DNS Dynamic DNS" [ref=f19e322] [cursor=pointer]:
+                  - /url: dynamic-dns/index.html
+                  - generic "Dynamic DNS" [ref=f19e323]
+                  - generic [ref=f19e324]: Dynamic DNS
+            - group [ref=f19e327]:
+              - generic [ref=f19e328]:
+                - heading "Metrics" [level=3] [ref=f19e330]
+                - button "Expand or collapse “metrics” application group." [ref=f19e331] [cursor=pointer]: 
+              - generic [ref=f19e333]:
+                - link "Visitors Visitors" [ref=f19e334] [cursor=pointer]:
+                  - /url: stats/lastvisitors_landing.html
+                  - generic "Visitors" [ref=f19e335]
+                  - generic [ref=f19e336]: Visitors
+                - link "Site Quality Monitoring Site Quality Monitoring" [ref=f19e337] [cursor=pointer]:
+                  - /url: koality/signup/index.html
+                  - generic "Site Quality Monitoring" [ref=f19e338]
+                  - generic [ref=f19e339]: Site Quality Monitoring
+                - link "Errors Errors" [ref=f19e340] [cursor=pointer]:
+                  - /url: stats/errlog.html
+                  - generic "Errors" [ref=f19e341]
+                  - generic [ref=f19e342]: Errors
+                - link "Bandwidth Bandwidth" [ref=f19e343] [cursor=pointer]:
+                  - /url: stats/bandwidth.html
+                  - generic "Bandwidth" [ref=f19e344]
+                  - generic [ref=f19e345]: Bandwidth
+                - link "Raw Access Raw Access" [ref=f19e346] [cursor=pointer]:
+                  - /url: raw/index.html
+                  - generic "Raw Access" [ref=f19e347]
+                  - generic [ref=f19e348]: Raw Access
+                - link "Awstats Awstats" [ref=f19e349] [cursor=pointer]:
+                  - /url: stats/awstats_landing.html
+                  - generic "Awstats" [ref=f19e350]
+                  - generic [ref=f19e351]: Awstats
+                - link "Analog Stats Analog Stats" [ref=f19e352] [cursor=pointer]:
+                  - /url: stats/analog_landing.html
+                  - generic "Analog Stats" [ref=f19e353]
+                  - generic [ref=f19e354]: Analog Stats
+                - link "Webalizer Webalizer" [ref=f19e355] [cursor=pointer]:
+                  - /url: stats/webalizer_landing.html
+                  - generic "Webalizer" [ref=f19e356]
+                  - generic [ref=f19e357]: Webalizer
+                - link "Webalizer FTP Webalizer FTP" [ref=f19e358] [cursor=pointer]:
+                  - /url: stats/webalizerftp_landing.html
+                  - generic "Webalizer FTP" [ref=f19e359]
+                  - generic [ref=f19e360]: Webalizer FTP
+                - link "Metrics Editor Metrics Editor" [ref=f19e361] [cursor=pointer]:
+                  - /url: statmanager/index.html
+                  - generic "Metrics Editor" [ref=f19e362]
+                  - generic [ref=f19e363]: Metrics Editor
+                - link "Google Rankings Google Rankings" [ref=f19e364] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/semrushfree
+                  - generic "Google Rankings" [ref=f19e365]
+                  - generic [ref=f19e366]: Google Rankings
+                - link "Resource Usage Resource Usage" [ref=f19e367] [cursor=pointer]:
+                  - /url: resource_usage/resource_usage.live.pl
+                  - generic "Resource Usage" [ref=f19e368]
+                  - generic [ref=f19e369]: Resource Usage
+            - group [ref=f19e372]:
+              - generic [ref=f19e373]:
+                - heading "Security" [level=3] [ref=f19e375]
+                - button "Expand or collapse “security” application group." [ref=f19e376] [cursor=pointer]: 
+              - generic [ref=f19e378]:
+                - link "SSH Access SSH Access" [ref=f19e379] [cursor=pointer]:
+                  - /url: telnet/index.html
+                  - generic "SSH Access" [ref=f19e380]
+                  - generic [ref=f19e381]: SSH Access
+                - link "IP Blocker IP Blocker" [ref=f19e382] [cursor=pointer]:
+                  - /url: denyip/index.html
+                  - generic "IP Blocker" [ref=f19e383]
+                  - generic [ref=f19e384]: IP Blocker
+                - link "SSL/TLS Certificates SSL/TLS Certificates" [ref=f19e385] [cursor=pointer]:
+                  - /url: security/tls_wizard/index.html
+                  - generic "SSL/TLS Certificates" [ref=f19e386]
+                  - generic [ref=f19e387]: SSL/TLS Certificates
+                - link "Manage API Tokens Manage API Tokens" [ref=f19e388] [cursor=pointer]:
+                  - /url: api_tokens/index.html
+                  - generic "Manage API Tokens" [ref=f19e389]
+                  - generic [ref=f19e390]: Manage API Tokens
+                - link "Hotlink Protection Hotlink Protection" [ref=f19e391] [cursor=pointer]:
+                  - /url: mime/hotlink.html
+                  - generic "Hotlink Protection" [ref=f19e392]
+                  - generic [ref=f19e393]: Hotlink Protection
+                - link "Leech Protection Leech Protection" [ref=f19e394] [cursor=pointer]:
+                  - /url: htaccess/leechprotect/leechprotect.html
+                  - generic "Leech Protection" [ref=f19e395]
+                  - generic [ref=f19e396]: Leech Protection
+                - link "ModSecurity ModSecurity" [ref=f19e397] [cursor=pointer]:
+                  - /url: security/mod_security/index.html
+                  - generic "ModSecurity" [ref=f19e398]
+                  - generic [ref=f19e399]: ModSecurity
+                - link "Two-Factor Authentication Two-Factor Authentication" [ref=f19e400] [cursor=pointer]:
+                  - /url: security/2fa/index.html
+                  - generic "Two-Factor Authentication" [ref=f19e401]
+                  - generic [ref=f19e402]: Two-Factor Authentication
+                - link "Imunify360 Imunify360" [ref=f19e403] [cursor=pointer]:
+                  - /url: imunify/imunify.live.pl
+                  - generic "Imunify360" [ref=f19e404]
+                  - generic [ref=f19e405]: Imunify360
+            - group [ref=f19e408]:
+              - generic [ref=f19e409]:
+                - heading "Software" [level=3] [ref=f19e411]
+                - button "Expand or collapse “software” application group." [ref=f19e412] [cursor=pointer]: 
+              - generic [ref=f19e414]:
+                - link "SitePad Website Builder SitePad Website Builder" [ref=f19e415] [cursor=pointer]:
+                  - /url: ../../3rdparty/sitepad/index.live.php
+                  - generic "SitePad Website Builder" [ref=f19e416]
+                  - generic [ref=f19e417]: SitePad Website Builder
+                - link "WordPress Manager by Softaculous WordPress Manager by Softaculous" [ref=f19e418] [cursor=pointer]:
+                  - /url: softaculous/index.live.php?act=wordpress
+                  - generic "WordPress Manager by Softaculous" [ref=f19e419]
+                  - generic [ref=f19e420]: WordPress Manager by Softaculous
+                - link "PHP PEAR Packages PHP PEAR Packages" [ref=f19e421] [cursor=pointer]:
+                  - /url: module_installers/index.html?lang=php-pear
+                  - generic "PHP PEAR Packages" [ref=f19e422]
+                  - generic [ref=f19e423]: PHP PEAR Packages
+                - link "Perl Modules Perl Modules" [ref=f19e424] [cursor=pointer]:
+                  - /url: module_installers/index.html?lang=perl
+                  - generic "Perl Modules" [ref=f19e425]
+                  - generic [ref=f19e426]: Perl Modules
+                - link "Optimize Website Optimize Website" [ref=f19e427] [cursor=pointer]:
+                  - /url: optimize/index.html
+                  - generic "Optimize Website" [ref=f19e428]
+                  - generic [ref=f19e429]: Optimize Website
+                - link "Application Manager Application Manager" [ref=f19e430] [cursor=pointer]:
+                  - /url: passenger/index.html
+                  - generic "Application Manager" [ref=f19e431]
+                  - generic [ref=f19e432]: Application Manager
+                - link "MultiPHP Manager MultiPHP Manager" [ref=f19e433] [cursor=pointer]:
+                  - /url: multiphp_manager/index.html
+                  - generic "MultiPHP Manager" [ref=f19e434]
+                  - generic [ref=f19e435]: MultiPHP Manager
+                - link "MultiPHP INI Editor MultiPHP INI Editor" [ref=f19e436] [cursor=pointer]:
+                  - /url: multiphp_ini_editor/index.html
+                  - generic "MultiPHP INI Editor" [ref=f19e437]
+                  - generic [ref=f19e438]: MultiPHP INI Editor
+                - link "Free Shopping Cart Free Shopping Cart" [ref=f19e439] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/shoppingcart
+                  - generic "Free Shopping Cart" [ref=f19e440]
+                  - generic [ref=f19e441]: Free Shopping Cart
+                - link "Free AI Site Generator Free AI Site Generator" [ref=f19e442] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/copymatic
+                  - generic "Free AI Site Generator" [ref=f19e443]
+                  - generic [ref=f19e444]: Free AI Site Generator
+                - link "WordPress Themes WordPress Themes" [ref=f19e445] [cursor=pointer]:
+                  - /url: https://www.attracta.com/extlinks/wpthemes
+                  - generic "WordPress Themes" [ref=f19e446]
+                  - generic [ref=f19e447]: WordPress Themes
+                - link "Softaculous Apps Installer Softaculous Apps Installer" [ref=f19e448] [cursor=pointer]:
+                  - /url: softaculous/index.live.php
+                  - generic "Softaculous Apps Installer" [ref=f19e449]
+                  - generic [ref=f19e450]: Softaculous Apps Installer
+                - link "Setup Node.js App Setup Node.js App" [ref=f19e451] [cursor=pointer]:
+                  - /url: lveversion/nodejs-selector.html.tt
+                  - generic "Setup Node.js App" [ref=f19e452]
+                  - generic [ref=f19e453]: Setup Node.js App
+                - link "Select PHP Version Select PHP Version" [ref=f19e454] [cursor=pointer]:
+                  - /url: lveversion/php_selector.live.pl
+                  - generic "Select PHP Version" [ref=f19e455]
+                  - generic [ref=f19e456]: Select PHP Version
+                - link "Setup Python App Setup Python App" [ref=f19e457] [cursor=pointer]:
+                  - /url: lveversion/python-selector.html.tt
+                  - generic "Setup Python App" [ref=f19e458]
+                  - generic [ref=f19e459]: Setup Python App
+                - link "Setup Ruby App Setup Ruby App" [ref=f19e460] [cursor=pointer]:
+                  - /url: lveversion/ruby-selector.html.tt
+                  - generic "Setup Ruby App" [ref=f19e461]
+                  - generic [ref=f19e462]: Setup Ruby App
+                - link "AccelerateWP AccelerateWP" [ref=f19e463] [cursor=pointer]:
+                  - /url: lveversion/wpos.live.pl
+                  - generic "AccelerateWP" [ref=f19e464]
+                  - generic [ref=f19e465]: AccelerateWP
+            - group [ref=f19e468]:
+              - generic [ref=f19e469]:
+                - heading "Advanced" [level=3] [ref=f19e471]
+                - button "Expand or collapse “advanced” application group." [ref=f19e472] [cursor=pointer]: 
+              - generic [ref=f19e474]:
+                - link "LiteSpeed Redis Cache Manager LiteSpeed Redis Cache Manager" [ref=f19e475] [cursor=pointer]:
+                  - /url: ls_redis_cache_manager.html.tt
+                  - generic "LiteSpeed Redis Cache Manager" [ref=f19e476]
+                  - generic [ref=f19e477]: LiteSpeed Redis Cache Manager
+                - link "LiteSpeed Web Cache Manager LiteSpeed Web Cache Manager" [ref=f19e478] [cursor=pointer]:
+                  - /url: ls_web_cache_manager.html.tt
+                  - generic "LiteSpeed Web Cache Manager" [ref=f19e479]
+                  - generic [ref=f19e480]: LiteSpeed Web Cache Manager
+                - link "Cron Jobs Cron Jobs" [ref=f19e481] [cursor=pointer]:
+                  - /url: cron/index.html
+                  - generic "Cron Jobs" [ref=f19e482]
+                  - generic [ref=f19e483]: Cron Jobs
+                - link "Track DNS Track DNS" [ref=f19e484] [cursor=pointer]:
+                  - /url: net/index.html
+                  - generic "Track DNS" [ref=f19e485]
+                  - generic [ref=f19e486]: Track DNS
+                - link "Indexes Indexes" [ref=f19e487] [cursor=pointer]:
+                  - /url: indexmanager/index.html
+                  - generic "Indexes" [ref=f19e488]
+                  - generic [ref=f19e489]: Indexes
+                - link "Error Pages Error Pages" [ref=f19e490] [cursor=pointer]:
+                  - /url: err/index.html
+                  - generic "Error Pages" [ref=f19e491]
+                  - generic [ref=f19e492]: Error Pages
+                - link "Apache Handlers Apache Handlers" [ref=f19e493] [cursor=pointer]:
+                  - /url: mime/handle.html
+                  - generic "Apache Handlers" [ref=f19e494]
+                  - generic [ref=f19e495]: Apache Handlers
+                - link "MIME Types MIME Types" [ref=f19e496] [cursor=pointer]:
+                  - /url: mime/mime.html
+                  - generic "MIME Types" [ref=f19e497]
+                  - generic [ref=f19e498]: MIME Types
+                - link "Virus Scanner Virus Scanner" [ref=f19e499] [cursor=pointer]:
+                  - /url: clam-av/index.html
+                  - generic "Virus Scanner" [ref=f19e500]
+                  - generic [ref=f19e501]: Virus Scanner
+            - group [ref=f19e504]:
+              - generic [ref=f19e505]:
+                - heading "Preferences" [level=3] [ref=f19e507]
+                - button "Expand or collapse “preferences” application group." [ref=f19e508] [cursor=pointer]: 
+              - generic [ref=f19e510]:
+                - link "Account Preferences Account Preferences" [ref=f19e511] [cursor=pointer]:
+                  - /url: account-preferences/index.html
+                  - generic "Account Preferences" [ref=f19e512]
+                  - generic [ref=f19e513]: Account Preferences
+                - link "Password & Security Password & Security" [ref=f19e514] [cursor=pointer]:
+                  - /url: passwd/index.html
+                  - generic "Password & Security" [ref=f19e515]
+                  - generic [ref=f19e516]: Password & Security
+                - link "Change Language Change Language" [ref=f19e517] [cursor=pointer]:
+                  - /url: setlang/index.html
+                  - generic "Change Language" [ref=f19e518]
+                  - generic [ref=f19e519]: Change Language
+                - link "Contact Information Contact Information" [ref=f19e520] [cursor=pointer]:
+                  - /url: contact/index.html
+                  - generic "Contact Information" [ref=f19e521]
+                  - generic [ref=f19e522]: Contact Information
+                - link "User Manager User Manager" [ref=f19e523] [cursor=pointer]:
+                  - /url: user_manager/index.html
+                  - generic "User Manager" [ref=f19e524]
+                  - generic [ref=f19e525]: User Manager
+                - link "Manage Team Manage Team" [ref=f19e526] [cursor=pointer]:
+                  - /url: team-manager/index.html
+                  - generic "Manage Team" [ref=f19e527]
+                  - generic [ref=f19e528]: Manage Team
+            - group [ref=f19e531]:
+              - generic [ref=f19e532]:
+                - heading "SitePad Website Builder - Themes" [level=3] [ref=f19e534]
+                - button "Expand or collapse “sitepad_div” application group." [ref=f19e535] [cursor=pointer]: 
+              - link "SitePad Website Builder - Themes SitePad Website Builder - Themes" [ref=f19e538] [cursor=pointer]:
+                - /url: ../../3rdparty/sitepad/index.live.php
+                - generic "SitePad Website Builder - Themes" [ref=f19e539]
+                - generic [ref=f19e540]: SitePad Website Builder - Themes
+            - group [ref=f19e543]:
+              - generic [ref=f19e544]:
+                - heading "Softaculous Apps Installer" [level=3] [ref=f19e546]
+                - button "Expand or collapse “soft_div” application group." [ref=f19e547] [cursor=pointer]: 
+              - link "Softaculous Apps Installer Softaculous Apps Installer" [ref=f19e550] [cursor=pointer]:
+                - /url: softaculous/index.live.php
+                - generic "Softaculous Apps Installer" [ref=f19e551]
+                - generic [ref=f19e552]: Softaculous Apps Installer
+          - generic [ref=f19e554]:
+            - generic [ref=f19e555]:
+              - heading "General Information" [level=3] [ref=f19e557]
+              - table [ref=f19e558]:
+                - rowgroup [ref=f19e559]:
+                  - row [ref=f19e560]:
+                    - cell "Current User nicmahco" [ref=f19e561]:
+                      - generic [ref=f19e562]: Current User
+                      - generic [ref=f19e563]: nicmahco
+                  - row [ref=f19e564]:
+                    - cell "Primary Domain nicmah.com" [ref=f19e565]:
+                      - generic [ref=f19e566]: Primary Domain
+                      - link "nicmah.com" [ref=f19e568] [cursor=pointer]:
+                        - /url: https://nicmah.com
+                        - text: nicmah.com
+                        - generic [aria-hidden] [ref=f19e569]: 
+                  - row [ref=f19e570]:
+                    - cell "SSL Certificate An SSL certificate allows visitors to communicate with your website over a secure connection. Active View SSL Certificate" [ref=f19e571]:
+                      - generic [ref=f19e572]:
+                        - generic [ref=f19e573]: SSL Certificate
+                        - generic [ref=f19e574]:
+                          - generic [aria-hidden] [ref=f19e575]: 
+                          - generic [ref=f19e576]: An SSL certificate allows visitors to communicate with your website over a secure connection.
+                      - generic [ref=f19e577]:
+                        - generic [ref=f19e578]:
+                          - generic [aria-hidden] [ref=f19e579]: 
+                          - text: Active
+                        - link "View SSL Certificate" [ref=f19e580] [cursor=pointer]:
+                          - /url: ssl/install.html
+                  - row [ref=f19e581]:
+                    - cell "Site Quality Monitoring - We’ll watch your site for you! × Start Monitoring" [ref=f19e582]:
+                      - generic [ref=f19e584]:
+                        - generic [ref=f19e585]:
+                          - generic [ref=f19e586]:
+                            - strong [ref=f19e587]: Site Quality Monitoring
+                            - text: "- We’ll watch your site for you!"
+                          - generic "Close" [ref=f19e588] [cursor=pointer]: ×
+                        - button "Start Monitoring" [ref=f19e589] [cursor=pointer]
+                  - row [ref=f19e590]:
+                    - cell "Shared IP Address 217.20.124.83" [ref=f19e591]:
+                      - generic [ref=f19e592]: Shared IP Address
+                      - generic [ref=f19e593]: 217.20.124.83
+                  - row [ref=f19e594]:
+                    - cell "Home Directory /home3/nicmahco" [ref=f19e595]:
+                      - generic [ref=f19e596]: Home Directory
+                      - generic [ref=f19e597]: /home3/nicmahco
+                  - row [ref=f19e598]:
+                    - cell "Last Login IP Address 196.207.191.117" [ref=f19e599]:
+                      - generic [ref=f19e600]: Last Login IP Address
+                      - generic [ref=f19e601]: 196.207.191.117
+                  - row [ref=f19e602]:
+                    - 'cell "User Analytics ID Analytics helps us understand how our customers use our products. Go to Account Preferences to update your enrollment. e4a8f8de-c191-42fb-978b-08d89fd3b575 User Analytics: Disabled" [ref=f19e603]':
+                      - generic [ref=f19e604]:
+                        - generic [ref=f19e605]: User Analytics ID
+                        - generic [ref=f19e606]:
+                          - generic [aria-hidden] [ref=f19e607]: 
+                          - generic [ref=f19e608]: Analytics helps us understand how our customers use our products. Go to Account Preferences to update your enrollment.
+                      - paragraph [ref=f19e610]:
+                        - generic [aria-hidden] [ref=f19e611]: 
+                        - link "e4a8f8de-c191-42fb-978b-08d89fd3b575" [ref=f19e612] [cursor=pointer]:
+                          - /url: javascript:void(0);
+                      - generic [ref=f19e614]:
+                        - text: "User Analytics:"
+                        - strong [ref=f19e616]: Disabled
+                  - row [ref=f19e617]:
+                    - cell "Theme " [ref=f19e618]:
+                      - generic [ref=f19e619]: Theme
+                      - generic "Loading …" [ref=f19e620]: 
+                  - row [ref=f19e621]:
+                    - cell [ref=f19e622]:
+                      - link "Server Information " [ref=f19e623] [cursor=pointer]:
+                        - /url: tools/status.html
+                        - generic [ref=f19e624]: Server Information
+                        - text: 
+            - text:  
+      - contentinfo [ref=f19e625]:
+        - generic [ref=f19e630]:
+          - generic [ref=f19e631]:
+            - link [ref=f19e635] [cursor=pointer]:
+              - /url: https://www.cpanel.net
+              - img "cPanel logo" [ref=f19e636]
+            - generic [ref=f19e637]: 138.0.7
+          - list [ref=f19e639]:
+            - listitem [ref=f19e640]:
+              - link "Home" [ref=f19e641] [cursor=pointer]:
+                - /url: index.html
+            - listitem [ref=f19e642]:
+              - link "Trademarks" [ref=f19e643] [cursor=pointer]:
+                - /url: trademarks.html
+            - listitem [ref=f19e644]:
+              - link "Privacy Policy" [ref=f19e645] [cursor=pointer]:
+                - /url: https://go.cpanel.net/privacy
+            - listitem [ref=f19e646]:
+              - link "Documentation" [ref=f19e647] [cursor=pointer]:
+                - /url: https://go.cpanel.net/cpaneldocsHome
+            - listitem [ref=f19e648]:
+              - link "Give Feedback" [ref=f19e649] [cursor=pointer]:
+                - /url: https://go.cpanel.net/give-feedback?utm_source=cpanel-feedback&cpanel_productversion=11.138.0.7&companyid=4973&cpanel_appkey=tools

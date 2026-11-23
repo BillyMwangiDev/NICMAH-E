@@ -4,10 +4,28 @@ Provides global template variables.
 """
 
 
+SITE_SETTINGS_CACHE_KEY = "site_settings_context"
+SITE_SETTINGS_CACHE_SECONDS = 300
+
+
 def site_settings(request):
     """
     Add site-wide settings to template context.
+
+    The SiteSettings row is read once and cached; SiteSettings.save() and delete
+    clear the cache so admin edits show up immediately.
     """
+    from django.core.cache import cache
+
+    cached = cache.get(SITE_SETTINGS_CACHE_KEY)
+    if cached is not None:
+        return cached
+    context = _load_site_settings()
+    cache.set(SITE_SETTINGS_CACHE_KEY, context, SITE_SETTINGS_CACHE_SECONDS)
+    return context
+
+
+def _load_site_settings():
     try:
         from .models import SiteSettings
 

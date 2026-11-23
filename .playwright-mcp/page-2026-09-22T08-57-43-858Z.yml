@@ -1,0 +1,73 @@
+- generic [active] [ref=f20e1]:
+  - link "Skip to main content" [ref=f20e2] [cursor=pointer]:
+    - /url: "#content"
+  - generic [ref=f20e3]:
+    - link "Skip to main content" [ref=f20e4] [cursor=pointer]:
+      - /url: "#content"
+    - complementary [ref=f20e5]:
+      - navigation [ref=f20e10]:
+        - generic [ref=f20e12]:
+          - link [ref=f20e17] [cursor=pointer]:
+            - /url: ../index.html
+            - img "cPanel logo" [ref=f20e18]
+          - list [ref=f20e19]:
+            - listitem [ref=f20e20]:
+              - link "Tools" [ref=f20e21] [cursor=pointer]:
+                - /url: ../index.html
+            - listitem [ref=f20e26]:
+              - link "Social Media Management" [ref=f20e27] [cursor=pointer]:
+                - /url: ../socialbee/index.html
+            - listitem [ref=f20e37]:
+              - link "WordPress Management" [ref=f20e38] [cursor=pointer]:
+                - /url: ../wp-toolkit/index.live.php
+            - listitem [ref=f20e46]:
+              - link "Manage Team" [ref=f20e47] [cursor=pointer]:
+                - /url: ../team-manager/index.html
+            - listitem [ref=f20e54]:
+              - link "Site Quality Monitoring" [ref=f20e55] [cursor=pointer]:
+                - /url: ../koality/signup/index.html
+            - listitem [ref=f20e61]:
+              - link "WordPress Manager by Softaculous" [ref=f20e62] [cursor=pointer]:
+                - /url: ../softaculous/index.live.php?act=wordpress
+    - generic [ref=f20e69]:
+      - banner [ref=f20e70]:
+        - generic [ref=f20e75]:
+          - text: 
+          - generic [ref=f20e76]:
+            - button "Try the new Meridian theme" [ref=f20e79] [cursor=pointer]
+            - text: 
+            - generic [ref=f20e85]:
+              - text: 
+              - combobox [ref=f20e87]:
+                - searchbox "Search Tools (/)" [ref=f20e88]
+                - text:  
+            - generic [ref=f20e90]:
+              - link "Notifications" [ref=f20e93] [cursor=pointer]:
+                - /url: ../notifications/index.html.tt
+                - generic [ref=f20e94]: 
+              - button "User Menu" [ref=f20e101] [cursor=pointer]:
+                - generic [ref=f20e102]: 
+      - img "Loader" [ref=f20e112]
+      - contentinfo [ref=f20e132]:
+        - generic [ref=f20e137]:
+          - generic [ref=f20e138]:
+            - link [ref=f20e142] [cursor=pointer]:
+              - /url: https://www.cpanel.net
+              - img "cPanel logo" [ref=f20e143]
+            - generic [ref=f20e144]: 138.0.7
+          - list [ref=f20e146]:
+            - listitem [ref=f20e147]:
+              - link "Home" [ref=f20e148] [cursor=pointer]:
+                - /url: ../index.html
+            - listitem [ref=f20e149]:
+              - link "Trademarks" [ref=f20e150] [cursor=pointer]:
+                - /url: ../trademarks.html
+            - listitem [ref=f20e151]:
+              - link "Privacy Policy" [ref=f20e152] [cursor=pointer]:
+                - /url: https://go.cpanel.net/privacy
+            - listitem [ref=f20e153]:
+              - link "Documentation" [ref=f20e154] [cursor=pointer]:
+                - /url: https://go.cpanel.net/cpaneldocsHome
+            - listitem [ref=f20e155]:
+              - link "Give Feedback" [ref=f20e156] [cursor=pointer]:
+                - /url: https://go.cpanel.net/give-feedback?utm_source=cpanel-feedback&cpanel_productversion=11.138.0.7&companyid=4973&cpanel_appkey=lvepythonsel

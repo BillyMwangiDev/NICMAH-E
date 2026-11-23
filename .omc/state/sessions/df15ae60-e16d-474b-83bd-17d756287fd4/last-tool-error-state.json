@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__playwright__browser_take_screenshot",
+  "tool_input_preview": "{\"scale\":\"css\",\"filename\":\"/private/tmp/claude-501/-Users-billy-WORK-NICMAH-E/df15ae60-e16d-474b-83bd-17d756287fd4/scratchpad/nicmah-home.png\"}",
+  "error": "### Error\nError: File access denied: /private/tmp/claude-501/-Users-billy-WORK-NICMAH-E/df15ae60-e16d-474b-83bd-17d756287fd4/scratchpad/nicmah-home.png is outside allowed roots. Allowed roots: /Users/billy/WORK/NICMAH-E/.playwright-mcp, /Users/billy/WORK/NICMAH-E",
+  "timestamp": "2026-10-05T08:22:00.848Z",
+  "retry_count": 1
+}

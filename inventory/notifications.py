@@ -3,7 +3,7 @@ Stock notification service for NICMAH application.
 Handles email, SMS, and in-app notifications for stock alerts.
 """
 
-from django.core.mail import send_mail
+from core.mail import send_mail_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -117,7 +117,7 @@ class StockNotificationService:
             plain_message = render_to_string("inventory/emails/stock_alert.txt", context)
 
             # Send email
-            send_mail(
+            send_mail_async(
                 subject=subject,
                 message=plain_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
@@ -216,7 +216,7 @@ class StockNotificationService:
             html_message = render_to_string("inventory/emails/daily_summary.html", context)
             plain_message = render_to_string("inventory/emails/daily_summary.txt", context)
 
-            send_mail(
+            send_mail_async(
                 subject=subject,
                 message=plain_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,

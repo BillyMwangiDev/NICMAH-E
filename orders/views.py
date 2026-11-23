@@ -6,6 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib import messages
+from django.db import transaction
 import json
 
 from .models import Cart, CartItem, Order, OrderItem
@@ -44,31 +45,30 @@ def checkout_view(request):
             messages.error(request, 'Please fill in all required fields.')
             return render(request, 'orders/checkout.html', {'cart': cart, 'cart_items': cart_items})
         
-        # Create order
-        order = Order.objects.create(
-            customer=request.user,
-            total_amount=cart.total_amount,
-            customer_name=customer_name,
-            customer_phone=customer_phone,
-            customer_email=customer_email,
-            shipping_address=shipping_address,
-            notes=notes
-        )
-        
-        # Create order items
-        for item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                product_name=item.product.name,
-                quantity=item.quantity,
-                unit_price=item.unit_price,
-                total_price=item.total_price
+        # Order, items and cart removal succeed or fail together.
+        with transaction.atomic():
+            order = Order.objects.create(
+                customer=request.user,
+                total_amount=cart.total_amount,
+                customer_name=customer_name,
+                customer_phone=customer_phone,
+                customer_email=customer_email,
+                shipping_address=shipping_address,
+                notes=notes
             )
-        
-        # Clear cart
-        cart.delete()
-        
+
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    product_name=item.product.name,
+                    quantity=item.quantity,
+                    unit_price=item.unit_price,
+                    total_price=item.total_price
+                )
+
+            cart.delete()
+
         messages.success(request, f'Order {order.order_number} created successfully!')
         return redirect('orders:order_detail', order_id=order.id)
     

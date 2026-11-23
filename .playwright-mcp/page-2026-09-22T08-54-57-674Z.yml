@@ -1,0 +1,22 @@
+- generic [active] [ref=f17e1]:
+  - generic [ref=f17e3]:
+    - link [ref=f17e4] [cursor=pointer]:
+      - /url: ../index.html
+      - img "cPanel" [ref=f17e5]
+    - text: File Upload
+  - generic [ref=f17e8]:
+    - heading "Select the file you want to upload to “/home3/nicmahco/api.nicmah.com”." [level=3] [ref=f17e9]
+    - generic [ref=f17e10]: "Maximum file size allowed for upload: 29.13 GB"
+    - generic [ref=f17e12]:
+      - generic [ref=f17e15] [cursor=pointer]:
+        - checkbox "Overwrite existing files" [ref=f17e16]
+        - text: Overwrite existing files
+      - generic [ref=f17e17]:
+        - generic [ref=f17e18]:
+          - paragraph [ref=f17e19]: Drop files here to start uploading
+          - paragraph [ref=f17e20]: or
+        - button "Select File" [ref=f17e22] [cursor=pointer]
+    - link " Go Back to “/home3/nicmahco/api.nicmah.com”" [ref=f17e25] [cursor=pointer]:
+      - /url: ./index.html?dir=%2fhome3%2fnicmahco%2fapi.nicmah.com
+      - generic [ref=f17e26]: 
+      - text: Go Back to “/home3/nicmahco/api.nicmah.com”

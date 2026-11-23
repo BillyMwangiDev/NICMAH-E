@@ -10,13 +10,21 @@ from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Case, When, Value, IntegerField, Exists, OuterRef, Prefetch
 from decimal import Decimal, InvalidOperation
 import json
+import logging
 import uuid
 
 from .models import POSSession, POSSale, POSSaleItem, Receipt, Barcode, TaxRate, Discount, OfflineTransaction
 from catalog.models import Product
+
+
+logger = logging.getLogger(__name__)
+
+
+class SaleValidationError(Exception):
+    """Raised inside the sale transaction so the whole sale rolls back."""
 
 
 @login_required
@@ -97,12 +105,8 @@ def pos_sale_create(request):
                 try:
                     active_session = POSSession.objects.get(cashier=request.user, status="open")
                 except POSSession.DoesNotExist:
-                    return JsonResponse({"success": False, "error": "No active POS session found. Please start a session first."}, status=400)
+                    raise SaleValidationError("No active POS session found. Please start a session first.")
                 
-                # Import settings for auto-print check
-                from core.models import SiteSettings
-                settings = SiteSettings.objects.first()
-
                 # Get tax rate if provided
                 tax_rate = None
                 if sale_data.get("tax_rate_id"):
@@ -125,34 +129,36 @@ def pos_sale_create(request):
                 for item_data in sale_data.get("items", []):
                     # Validate item data
                     if not item_data.get("product_id"):
-                        return JsonResponse({"success": False, "error": "Missing product_id in item"}, status=400)
+                        raise SaleValidationError("Missing product_id in item")
                     if not item_data.get("quantity"):
-                        return JsonResponse({"success": False, "error": "Missing quantity in item"}, status=400)
+                        raise SaleValidationError("Missing quantity in item")
                     if not item_data.get("unit_price"):
-                        return JsonResponse({"success": False, "error": "Missing unit_price in item"}, status=400)
+                        raise SaleValidationError("Missing unit_price in item")
                     
                     try:
-                        product = Product.objects.get(id=item_data["product_id"])
+                        # Lock the product row so the stock check below reads a
+                        # value no concurrent sale can change under us.
+                        product = Product.objects.select_for_update().get(id=item_data["product_id"])
                     except Product.DoesNotExist:
-                        return JsonResponse({"success": False, "error": f"Product with ID {item_data['product_id']} not found"}, status=400)
+                        raise SaleValidationError(f"Product with ID {item_data['product_id']} not found")
                     
                     try:
                         quantity = int(item_data["quantity"])
                         if quantity <= 0:
-                            return JsonResponse({"success": False, "error": f"Quantity must be greater than 0 for {product.name}"}, status=400)
+                            raise SaleValidationError(f"Quantity must be greater than 0 for {product.name}")
                     except (ValueError, TypeError):
-                        return JsonResponse({"success": False, "error": f"Invalid quantity for {product.name}"}, status=400)
+                        raise SaleValidationError(f"Invalid quantity for {product.name}")
                     
                     try:
                         unit_price = Decimal(str(item_data["unit_price"]))
                         if unit_price < 0:
-                            return JsonResponse({"success": False, "error": f"Unit price cannot be negative for {product.name}"}, status=400)
+                            raise SaleValidationError(f"Unit price cannot be negative for {product.name}")
                     except (ValueError, TypeError, InvalidOperation):
-                        return JsonResponse({"success": False, "error": f"Invalid unit_price for {product.name}"}, status=400)
+                        raise SaleValidationError(f"Invalid unit_price for {product.name}")
 
                     # Check stock
                     if product.stock_quantity < quantity:
-                        return JsonResponse({"success": False, "error": f"Insufficient stock for {product.name}. Available: {product.stock_quantity}, Requested: {quantity}"}, status=400)
+                        raise SaleValidationError(f"Insufficient stock for {product.name}. Available: {product.stock_quantity}, Requested: {quantity}")
 
                     # Create sale item
                     sale_item = POSSaleItem.objects.create(
@@ -213,56 +219,58 @@ def pos_sale_create(request):
                     sale=sale,
                     content=f"Receipt for sale {sale.sale_number}",
                 )
-                
-                # Auto-print receipt if enabled
-                print_status = None
-                if settings.printer_enabled and settings.auto_print_receipts:
-                    try:
-                        from .printer import ReceiptPrinter
-                        from core.models import SiteSettings as PrinterSettings
-                        
-                        printer_settings = PrinterSettings.objects.first()
-                        if printer_settings:
-                            connection_params = {}
-                            if printer_settings.printer_type == 'network':
-                                connection_params = {
-                                    'host': printer_settings.printer_host,
-                                    'port': printer_settings.printer_port,
-                                    'timeout': 5
-                                }
-                                printer_name = None
-                            elif printer_settings.printer_type == 'serial':
-                                connection_params = {
-                                    'port': printer_settings.printer_serial_port,
-                                    'baudrate': printer_settings.printer_baudrate,
-                                    'timeout': 5
-                                }
-                                printer_name = None
-                            else:
-                                printer_name = printer_settings.printer_name
-                            
-                            printer = ReceiptPrinter(
-                                printer_type=printer_settings.printer_type,
-                                printer_name=printer_name,
-                                connection_params=connection_params
-                            )
-                            printer.print_receipt(sale)
-                            print_status = "sent"
-                    except Exception as e:
-                        logger.warning(f"Auto-print failed: {str(e)}")
-                        print_status = "failed"
 
-                return JsonResponse(
-                    {
-                        "success": True,
-                        "sale_id": sale.id,
-                        "sale_number": sale.sale_number,
-                        "total_amount": str(sale.total_amount),
-                        "receipt_number": receipt.receipt_number,
-                        "print_status": print_status,
-                    }
-                )
+            # The sale is committed. Printing does network/serial I/O (up to 5 s) and
+            # must never hold the database transaction open.
+            print_status = None
+            from core.models import SiteSettings
+            site_settings = SiteSettings.objects.first()
+            if site_settings and site_settings.printer_enabled and site_settings.auto_print_receipts:
+                try:
+                    from .printer import ReceiptPrinter
 
+                    connection_params = {}
+                    if site_settings.printer_type == 'network':
+                        connection_params = {
+                            'host': site_settings.printer_host,
+                            'port': site_settings.printer_port,
+                            'timeout': 5
+                        }
+                        printer_name = None
+                    elif site_settings.printer_type == 'serial':
+                        connection_params = {
+                            'port': site_settings.printer_serial_port,
+                            'baudrate': site_settings.printer_baudrate,
+                            'timeout': 5
+                        }
+                        printer_name = None
+                    else:
+                        printer_name = site_settings.printer_name
+
+                    printer = ReceiptPrinter(
+                        printer_type=site_settings.printer_type,
+                        printer_name=printer_name,
+                        connection_params=connection_params
+                    )
+                    printer.print_receipt(sale)
+                    print_status = "sent"
+                except Exception as e:
+                    logger.warning(f"Auto-print failed: {str(e)}")
+                    print_status = "failed"
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "sale_id": sale.id,
+                    "sale_number": sale.sale_number,
+                    "total_amount": str(sale.total_amount),
+                    "receipt_number": receipt.receipt_number,
+                    "print_status": print_status,
+                }
+            )
+
+        except SaleValidationError as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
         except Exception as e:
             import logging
             import traceback
@@ -278,7 +286,6 @@ def pos_sale_create(request):
     # GET request - show sale form
     active_session = get_object_or_404(POSSession, cashier=request.user, status="open")
 
-    products = Product.objects.filter(is_active=True, stock_quantity__gt=0)
     tax_rates = TaxRate.objects.filter(is_active=True)
     active_discounts = Discount.objects.filter(is_active=True).filter(
         start_date__lte=timezone.now(), end_date__gte=timezone.now()
@@ -286,7 +293,6 @@ def pos_sale_create(request):
 
     context = {
         "active_session": active_session,
-        "products": products,
         "tax_rates": tax_rates,
         "active_discounts": active_discounts,
     }
@@ -495,50 +501,39 @@ def pos_product_search(request):
     if category_id:
         products = products.filter(category_id=category_id)
 
-    # Limit results for autocomplete
-    limit = int(request.GET.get("limit", 10))
-    
-    # Get all matching products first
-    all_products = list(products.select_related('category').prefetch_related('barcodes')[:limit * 2])
-    
-    # Rank products by relevance
-    def calculate_relevance(product):
-        score = 0
-        query_lower = query.lower()
-        name_lower = product.name.lower()
-        sku_lower = product.sku.lower() if product.sku else ""
-        
-        # Exact matches get highest score
-        if name_lower == query_lower:
-            score += 1000
-        elif name_lower.startswith(query_lower):
-            score += 500
-        elif query_lower in name_lower:
-            score += 200
-        
-        # SKU matches
-        if sku_lower == query_lower:
-            score += 800
-        elif sku_lower.startswith(query_lower):
-            score += 400
-        elif query_lower in sku_lower:
-            score += 150
-        
-        # Barcode exact match
-        if any(b.barcode.lower() == query_lower for b in product.barcodes.filter(is_active=True)):
-            score += 900
-        
-        # Stock status bonus (in stock products ranked higher)
-        if product.stock_quantity > 10:
-            score += 100
-        elif product.stock_quantity > 0:
-            score += 50
-        
-        return score
-    
-    # Sort by relevance score (descending), then by stock quantity, then by name
-    all_products.sort(key=lambda p: (-calculate_relevance(p), -p.stock_quantity, p.name))
-    products = all_products[:limit]
+    # Limit results for autocomplete (clamped so a client cannot request the whole catalog)
+    try:
+        limit = int(request.GET.get("limit", 10))
+    except (TypeError, ValueError):
+        limit = 10
+    limit = max(1, min(limit, 50))
+
+    # Rank in SQL. Scores mirror the previous Python ranking: exact name, barcode,
+    # exact SKU, name prefix, SKU prefix, name contains, SKU contains, then the rest.
+    barcode_hit = Exists(
+        Barcode.objects.filter(product=OuterRef("pk"), barcode__iexact=query, is_active=True)
+    )
+    relevance = Case(
+        When(name__iexact=query, then=Value(1000)),
+        When(barcode_hit=True, then=Value(900)),
+        When(sku__iexact=query, then=Value(800)),
+        When(name__istartswith=query, then=Value(500)),
+        When(sku__istartswith=query, then=Value(400)),
+        When(name__icontains=query, then=Value(200)),
+        When(sku__icontains=query, then=Value(150)),
+        default=Value(50),
+        output_field=IntegerField(),
+    )
+    active_barcodes = Prefetch(
+        "barcodes", queryset=Barcode.objects.filter(is_active=True), to_attr="active_barcodes"
+    )
+    products = (
+        products.annotate(barcode_hit=barcode_hit)
+        .annotate(relevance=relevance)
+        .select_related("category")
+        .prefetch_related(active_barcodes)
+        .order_by("-relevance", "-stock_quantity", "name")[:limit]
+    )
 
     results = []
     for product in products:
@@ -564,7 +559,7 @@ def pos_product_search(request):
                 "sku": product.sku,
                 "category": product.category.name if product.category else "Uncategorized",
                 "image_url": product.main_image.url if product.main_image else None,
-                "barcodes": [b.barcode for b in product.barcodes.filter(is_active=True)],
+                "barcodes": [b.barcode for b in product.active_barcodes],
             }
         )
 

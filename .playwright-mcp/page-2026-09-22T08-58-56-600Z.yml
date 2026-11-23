@@ -1,0 +1,207 @@
+- generic [active] [ref=f20e1]:
+  - link "Skip to main content" [ref=f20e2] [cursor=pointer]:
+    - /url: "#content"
+  - generic [ref=f20e3]:
+    - link "Skip to main content" [ref=f20e4] [cursor=pointer]:
+      - /url: "#content"
+    - complementary [ref=f20e5]:
+      - navigation [ref=f20e10]:
+        - generic [ref=f20e12]:
+          - link [ref=f20e17] [cursor=pointer]:
+            - /url: ../index.html
+            - img "cPanel logo" [ref=f20e18]
+          - list [ref=f20e19]:
+            - listitem [ref=f20e20]:
+              - link "Tools" [ref=f20e21] [cursor=pointer]:
+                - /url: ../index.html
+            - listitem [ref=f20e26]:
+              - link "Social Media Management" [ref=f20e27] [cursor=pointer]:
+                - /url: ../socialbee/index.html
+            - listitem [ref=f20e37]:
+              - link "WordPress Management" [ref=f20e38] [cursor=pointer]:
+                - /url: ../wp-toolkit/index.live.php
+            - listitem [ref=f20e46]:
+              - link "Manage Team" [ref=f20e47] [cursor=pointer]:
+                - /url: ../team-manager/index.html
+            - listitem [ref=f20e54]:
+              - link "Site Quality Monitoring" [ref=f20e55] [cursor=pointer]:
+                - /url: ../koality/signup/index.html
+            - listitem [ref=f20e61]:
+              - link "WordPress Manager by Softaculous" [ref=f20e62] [cursor=pointer]:
+                - /url: ../softaculous/index.live.php?act=wordpress
+    - generic [ref=f20e69]:
+      - banner [ref=f20e70]:
+        - generic [ref=f20e75]:
+          - text: 
+          - generic [ref=f20e76]:
+            - button "Try the new Meridian theme" [ref=f20e79] [cursor=pointer]
+            - text: 
+            - generic [ref=f20e85]:
+              - text: 
+              - combobox [ref=f20e87]:
+                - searchbox "Search Tools (/)" [ref=f20e88]
+                - text:  
+            - generic [ref=f20e90]:
+              - link "Notifications" [ref=f20e93] [cursor=pointer]:
+                - /url: ../notifications/index.html.tt
+                - generic [ref=f20e94]: 
+              - button "User Menu" [ref=f20e101] [cursor=pointer]:
+                - generic [ref=f20e102]: 
+      - generic [ref=f20e109]:
+        - heading "Python" [level=2] [ref=f20e157]
+        - list [ref=f20e160]:
+          - listitem [ref=f20e218] [cursor=pointer]:
+            - generic [ref=f20e219]: Web applications
+          - listitem [ref=f20e220] [cursor=pointer]:
+            - generic [ref=f20e222]: api.nicmah.com/
+          - listitem [ref=f20e223] [cursor=pointer]:
+            - group [ref=f20e226]:
+              - button "delete" [ref=f20e227]: Destroy
+            - group [ref=f20e230]:
+              - button "Cancel" [ref=f20e231]
+            - group [ref=f20e234]:
+              - button "Save" [disabled]
+        - list [ref=f20e388]:
+          - listitem [ref=f20e389] [cursor=pointer]:
+            - generic [ref=f20e390]: Web applications
+          - listitem [ref=f20e391] [cursor=pointer]:
+            - generic [ref=f20e393]: api.nicmah.com/
+          - listitem [ref=f20e394] [cursor=pointer]:
+            - group [ref=f20e397]:
+              - button "delete" [ref=f20e398]: Destroy
+            - group [ref=f20e401]:
+              - button "Cancel" [ref=f20e402]
+            - group [ref=f20e405]:
+              - button "Save" [disabled]
+        - generic [ref=f20e236]:
+          - generic [ref=f20e242]:
+            - paragraph
+            - paragraph [ref=f20e243]: Enter to the virtual environment.
+            - paragraph [ref=f20e244]:
+              - text: "To enter to virtual environment, run the command:"
+              - code [ref=f20e245] [cursor=pointer]: source /home3/nicmahco/virtualenv/api.nicmah.com/3.11/bin/activate && cd /home3/nicmahco/api.nicmah.com
+          - generic [ref=f20e246]:
+            - generic [ref=f20e249]:
+              - generic [ref=f20e250]: Python
+              - generic [ref=f20e252]:
+                - group [ref=f20e255]:
+                  - button "stop" [ref=f20e256] [cursor=pointer]: Stop app
+                - group [ref=f20e259]:
+                  - button "reset" [ref=f20e260] [cursor=pointer]: Restart
+            - separator [ref=f20e261]
+            - generic [ref=f20e262]:
+              - generic [ref=f20e265]:
+                - generic [ref=f20e266]: Python version
+                - button "3.11.16" [ref=f20e271] [cursor=pointer]
+              - generic [ref=f20e275]:
+                - generic [ref=f20e276]:
+                  - generic [ref=f20e277]: Application root
+                  - generic [ref=f20e278]: It is a physical address to your application on a server that corresponds with its URI. Upload your application files here.
+                - textbox "Application root" [ref=f20e281]:
+                  - /placeholder: ""
+                  - text: api.nicmah.com
+              - generic [ref=f20e283]:
+                - generic [ref=f20e284]:
+                  - generic [ref=f20e285]: Application URL
+                  - generic [ref=f20e286]: It is an HTTP/HTTPS link to your application
+                - generic [ref=f20e287]:
+                  - generic [ref=f20e288]:
+                    - button "api.nicmah.com" [ref=f20e291] [cursor=pointer]
+                    - textbox [ref=f20e294]
+                  - group [ref=f20e297]:
+                    - button "open" [ref=f20e298] [cursor=pointer]: Open
+              - generic [ref=f20e301]:
+                - generic [ref=f20e302]: Application startup file
+                - textbox "Application startup file" [ref=f20e306]:
+                  - /placeholder: ""
+                  - text: passenger_wsgi.py
+              - generic [ref=f20e309]:
+                - generic [ref=f20e310]:
+                  - generic [ref=f20e311]: Application Entry point
+                  - generic [ref=f20e312]: Setup wsgi callable object for your application
+                - textbox "Application Entry point" [ref=f20e315]:
+                  - /placeholder: ""
+                  - text: application
+              - generic [ref=f20e318]:
+                - generic [ref=f20e319]:
+                  - generic [ref=f20e320]: Passenger log file
+                  - generic [ref=f20e321]:
+                    - text: You can define the path along with the filename (e.g.
+                    - code [ref=f20e322] [cursor=pointer]: /home3/nicmahco/logs/passenger.log)
+                - generic [ref=f20e324]:
+                  - generic [ref=f20e325]: /home3/nicmahco/
+                  - textbox "Passenger log file" [ref=f20e326]:
+                    - /placeholder: ""
+            - separator [ref=f20e327]
+            - generic [ref=f20e328]:
+              - generic [ref=f20e331]:
+                - generic [ref=f20e332]: Configuration files
+                - generic [ref=f20e334]:
+                  - group [ref=f20e337]:
+                    - button "start" [ref=f20e338] [cursor=pointer]: Run Pip Install
+                  - generic [ref=f20e343] [cursor=pointer]
+              - generic [ref=f20e347]:
+                - textbox "Add another file and press enter" [ref=f20e349]
+                - group [ref=f20e352]:
+                  - button "add" [disabled]: Add
+              - generic [ref=f20e354]:
+                - generic [ref=f20e355]: backend/requirements.txt
+                - generic [ref=f20e357]:
+                  - button " Edit" [ref=f20e358] [cursor=pointer]:
+                    - generic [ref=f20e359]: 
+                    - text: Edit
+                  - button " Delete" [ref=f20e360] [cursor=pointer]:
+                    - generic [ref=f20e361]: 
+                    - text: Delete
+              - generic [ref=f20e363]:
+                - generic [ref=f20e364]:
+                  - generic [ref=f20e365]: Execute python script
+                  - generic [ref=f20e366]:
+                    - text: You can also enter a command to execute (e.g
+                    - code [ref=f20e367] [cursor=pointer]: /path/to/manage.py
+                    - text: migrate). Note, only python scripts allowed.
+                - generic [ref=f20e368]:
+                  - textbox "Enter the path to the script file" [ref=f20e407]: backend/manage.py migrate --settings=agrovet.settings.production
+                  - group [ref=f20e410]:
+                    - button "start" [ref=f20e411] [cursor=pointer]: Run Script
+              - generic [ref=f20e412]: "returncode: -2 stdout: stderr: /home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.4.3)/charset_normalizer (3.4.7) doesn't match a supported version! warnings.warn( OpenBLAS blas_thread_init: pthread_create failed for thread 34 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 35 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 36 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 37 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 38 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 39 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 40 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 41 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 42 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 43 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 44 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 45 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 46 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 47 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 48 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 49 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 50 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 51 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 52 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 53 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 54 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 55 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 56 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 57 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 58 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 59 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 60 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 61 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 62 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max OpenBLAS blas_thread_init: pthread_create failed for thread 63 of 64: Resource temporarily unavailable OpenBLAS blas_thread_init: ensure that your address space and process count limits are big enough (ulimit -a) OpenBLAS blas_thread_init: or set a smaller OPENBLAS_NUM_THREADS to fit into what you have available OpenBLAS blas_thread_init: RLIMIT_NPROC -1 current, -1 max Traceback (most recent call last): File \"/home3/nicmahco/api.nicmah.com/backend/manage.py\", line 24, in <module> main() File \"/home3/nicmahco/api.nicmah.com/backend/manage.py\", line 20, in main execute_from_command_line(sys.argv) File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/__init__.py\", line 442, in execute_from_command_line utility.execute() File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/__init__.py\", line 436, in execute self.fetch_command(subcommand).run_from_argv(self.argv) File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/base.py\", line 413, in run_from_argv self.execute(*args, **cmd_options) File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/base.py\", line 459, in execute output = self.handle(*args, **options) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/base.py\", line 107, in wrapper res = handle_func(*args, **kwargs) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/commands/migrate.py\", line 101, in handle self.check(databases=[database]) File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/management/base.py\", line 486, in check all_issues = checks.run_checks( ^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/checks/registry.py\", line 88, in run_checks new_errors = check(app_configs=app_configs, databases=databases) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/core/checks/urls.py\", line 136, in check_custom_error_handlers handler = resolver.resolve_error_handler(status_code) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/urls/resolvers.py\", line 732, in resolve_error_handler callback = getattr(self.urlconf_module, \"handler%s\" % view_type, None) ^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/utils/functional.py\", line 47, in __get__ res = instance.__dict__[self.name] = self.func(instance) ^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/urls/resolvers.py\", line 711, in urlconf_module return import_module(self.urlconf_name) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/opt/alt/python311/lib64/python3.11/importlib/__init__.py\", line 126, in import_module return _bootstrap._gcd_import(name[level:], package, level) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"<frozen importlib._bootstrap>\", line 1204, in _gcd_import File \"<frozen importlib._bootstrap>\", line 1176, in _find_and_load File \"<frozen importlib._bootstrap>\", line 1147, in _find_and_load_unlocked File \"<frozen importlib._bootstrap>\", line 690, in _load_unlocked File \"<frozen importlib._bootstrap_external>\", line 940, in exec_module File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed File \"/home3/nicmahco/api.nicmah.com/backend/agrovet/urls.py\", line 11, in <module> path(\"api/\", include(\"inventory.urls\")), ^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib/python3.11/site-packages/django/urls/conf.py\", line 39, in include urlconf_module = import_module(urlconf_module) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"/opt/alt/python311/lib64/python3.11/importlib/__init__.py\", line 126, in import_module return _bootstrap._gcd_import(name[level:], package, level) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File \"<frozen importlib._bootstrap>\", line 1204, in _gcd_import File \"<frozen importlib._bootstrap>\", line 1176, in _find_and_load File \"<frozen importlib._bootstrap>\", line 1147, in _find_and_load_unlocked File \"<frozen importlib._bootstrap>\", line 690, in _load_unlocked File \"<frozen importlib._bootstrap_external>\", line 940, in exec_module File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed File \"/home3/nicmahco/api.nicmah.com/backend/inventory/urls.py\", line 2, in <module> from .views import ( File \"/home3/nicmahco/api.nicmah.com/backend/inventory/views.py\", line 28, in <module> from .services.excel_import import import_products_from_excel File \"/home3/nicmahco/api.nicmah.com/backend/inventory/services/excel_import.py\", line 10, in <module> import pandas as pd File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib64/python3.11/site-packages/pandas/__init__.py\", line 14, in <module> __import__(_dependency) File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib64/python3.11/site-packages/numpy/__init__.py\", line 112, in <module> from numpy.__config__ import show_config File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib64/python3.11/site-packages/numpy/__config__.py\", line 4, in <module> from numpy._core._multiarray_umath import ( File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib64/python3.11/site-packages/numpy/_core/__init__.py\", line 24, in <module> from . import multiarray File \"/home3/nicmahco/virtualenv/api.nicmah.com/3.11/lib64/python3.11/site-packages/numpy/_core/multiarray.py\", line 11, in <module> from . import _multiarray_umath, overrides KeyboardInterrupt"
+            - separator [ref=f20e374]
+            - generic [ref=f20e375]:
+              - generic [ref=f20e377]:
+                - heading "Environment variables" [level=2] [ref=f20e379]
+                - group [ref=f20e383]:
+                  - button "add" [ref=f20e384] [cursor=pointer]: Add variable
+              - generic [ref=f20e385]: NO RESULT FOUND
+      - contentinfo [ref=f20e132]:
+        - generic [ref=f20e137]:
+          - generic [ref=f20e138]:
+            - link [ref=f20e142] [cursor=pointer]:
+              - /url: https://www.cpanel.net
+              - img "cPanel logo" [ref=f20e143]
+            - generic [ref=f20e144]: 138.0.7
+          - list [ref=f20e146]:
+            - listitem [ref=f20e147]:
+              - link "Home" [ref=f20e148] [cursor=pointer]:
+                - /url: ../index.html
+            - listitem [ref=f20e149]:
+              - link "Trademarks" [ref=f20e150] [cursor=pointer]:
+                - /url: ../trademarks.html
+            - listitem [ref=f20e151]:
+              - link "Privacy Policy" [ref=f20e152] [cursor=pointer]:
+                - /url: https://go.cpanel.net/privacy
+            - listitem [ref=f20e153]:
+              - link "Documentation" [ref=f20e154] [cursor=pointer]:
+                - /url: https://go.cpanel.net/cpaneldocsHome
+            - listitem [ref=f20e155]:
+              - link "Give Feedback" [ref=f20e156] [cursor=pointer]:
+                - /url: https://go.cpanel.net/give-feedback?utm_source=cpanel-feedback&cpanel_productversion=11.138.0.7&companyid=4973&cpanel_appkey=lvepythonsel
+  - generic:
+    - generic:
+      - generic [ref=f20e416]:
+        - button [ref=f20e417] [cursor=pointer]
+        - generic [ref=f20e419]: Run script
+        - generic [ref=f20e420] [cursor=pointer]: Script completed successfully.
+      - generic [ref=f20e421]:
+        - button [ref=f20e422] [cursor=pointer]
+        - generic [ref=f20e424]: Warning
+        - generic [ref=f20e425] [cursor=pointer]: "Script exit code: -2"

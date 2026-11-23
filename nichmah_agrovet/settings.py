@@ -19,11 +19,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-change-me")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", default=True, cast=bool)
+# Defaults to False so a missing .env never boots the site in debug mode.
+DEBUG = config("DEBUG", default=False, cast=bool)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# No production default: refuse to start without a real key when DEBUG is off.
+SECRET_KEY = config("SECRET_KEY", default="")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-dev-only-key"
+    else:
+        from django.core.exceptions import ImproperlyConfigured
+
+        raise ImproperlyConfigured("SECRET_KEY must be set in the environment when DEBUG is False.")
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
@@ -59,6 +68,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -107,13 +117,12 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", default=""),
         "HOST": config("DB_HOST", default=""),
         "PORT": config("DB_PORT", default=""),
-        # SQLite-specific options
-        "OPTIONS": {
-            # Disable JSONField validation for SQLite (it stores as TEXT anyway)
-            # This is handled by our TextField conversion
-        },
+        "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
+        "OPTIONS": {},
     }
 }
+if DATABASES["default"]["ENGINE"].endswith("mysql"):
+    DATABASES["default"]["OPTIONS"] = {"charset": "utf8mb4"}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -152,6 +161,20 @@ STATICFILES_DIRS = [
     BASE_DIR / "core" / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Hashed, gzip/brotli-compressed static files in production (served by WhiteNoise).
+# In DEBUG the plain storage is used so dev and tests do not need collectstatic.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": (
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if DEBUG
+            else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        )
+    },
+}
+WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365
 
 # Media files
 MEDIA_URL = "/media/"
@@ -235,15 +258,16 @@ RATE_LIMIT_WINDOW = config("RATE_LIMIT_WINDOW", default=60, cast=int)  # seconds
 API_RATE_LIMIT = config("API_RATE_LIMIT", default=60, cast=int)  # requests per minute
 
 # ========== CACHING CONFIGURATION ==========
-# Use Redis for caching in production, local memory in development
+# Production default is the file-based cache, which needs no extra service and
+# works on shared cPanel hosting. Set CACHE_BACKEND / CACHE_LOCATION to use
+# Redis or memcached where they exist. Development uses local memory.
 if not DEBUG:
     CACHES = {
         "default": {
-            "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            },
+            "BACKEND": config(
+                "CACHE_BACKEND", default="django.core.cache.backends.filebased.FileBasedCache"
+            ),
+            "LOCATION": config("CACHE_LOCATION", default=str(BASE_DIR / "cache")),
             "KEY_PREFIX": "nichmah_agrovet",
             "TIMEOUT": 300,  # 5 minutes default
         }
@@ -255,6 +279,26 @@ else:
             "LOCATION": "unique-snowflake",
         }
     }
+
+# ========== EMAIL CONFIGURATION ==========
+# Console backend in development; SMTP (cPanel mail account) in production.
+EMAIL_BACKEND = config(
+    "EMAIL_BACKEND",
+    default=(
+        "django.core.mail.backends.console.EmailBackend"
+        if DEBUG
+        else "django.core.mail.backends.smtp.EmailBackend"
+    ),
+)
+EMAIL_HOST = config("EMAIL_HOST", default="localhost")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="NICMAH <no-reply@localhost>")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # Cache specific settings
 CACHE_MIDDLEWARE_ALIAS = "default"
@@ -362,14 +406,18 @@ LOGGING = {
     "handlers": {
         "file": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": BASE_DIR / "logs" / "django.log",
+            "maxBytes": 5 * 1024 * 1024,
+            "backupCount": 5,
             "formatter": "verbose",
         },
         "security_file": {
             "level": "WARNING",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": BASE_DIR / "logs" / "security.log",
+            "maxBytes": 5 * 1024 * 1024,
+            "backupCount": 5,
             "formatter": "security",
         },
         "console": {

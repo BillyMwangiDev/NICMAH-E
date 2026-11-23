@@ -1,0 +1,266 @@
+- generic [ref=e2]:
+  - region "Notifications alt+T"
+  - generic [ref=e3]:
+    - navigation "Main navigation" [ref=e4]:
+      - link "Skip to content" [ref=e5] [cursor=pointer]:
+        - /url: "#main-content"
+      - generic [ref=e7]:
+        - button "Nicmah Agrovet — go to homepage" [ref=e8] [cursor=pointer]:
+          - img "Nicmah Agrovet logo" [ref=e10]
+          - generic [ref=e11]:
+            - generic [ref=e12]: Nicmah Agrovet
+            - generic [ref=e13]: Naromoru, Nyeri County
+        - generic [ref=e14]:
+          - button "Shop" [ref=e15] [cursor=pointer]
+          - button "Learn" [ref=e19] [cursor=pointer]
+          - link "Call Us" [ref=e23] [cursor=pointer]:
+            - /url: tel:+254726476128
+          - button "View cart" [ref=e26] [cursor=pointer]
+          - button "Login" [ref=e31] [cursor=pointer]
+    - main [ref=e32]:
+      - generic [ref=e33]:
+        - img "Cows grazing in green fields at a Kenyan farm" [ref=e34]
+        - generic [ref=e38]:
+          - generic [ref=e39]: Kenya's Trusted Agrovet Partner
+          - heading "Walking the Farming Journey with You" [level=1] [ref=e41]: Walking the FarmingJourney with You
+          - paragraph [ref=e42]: Livestock Health, Quality Genetics & Crop Solutions — Over Two Decades Serving Farmers Across Nyeri County
+          - generic [ref=e43]:
+            - button "Browse Products" [ref=e44] [cursor=pointer]
+            - link "Order via WhatsApp" [ref=e47] [cursor=pointer]:
+              - /url: https://wa.me/254740368581
+          - generic "Trust indicators" [ref=e50]:
+            - generic [ref=e51]: 20+ Years Experience
+            - generic [ref=e55]: Trusted by 500+ Farmers
+            - generic [ref=e59]: Naromoru, Nyeri County
+        - generic "Key statistics" [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]: 20+
+            - generic [ref=e66]: Years of Service
+          - generic [ref=e67]:
+            - generic [ref=e68]: 500+
+            - generic [ref=e69]: Farmers Served
+          - generic [ref=e70]:
+            - generic [ref=e71]: "4"
+            - generic [ref=e72]: Service Lines
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]: What We Offer
+          - heading "Our Services" [level=2] [ref=e80]
+          - paragraph [ref=e81]: Comprehensive agricultural solutions for modern Kenyan farming
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - heading "Artificial Insemination" [level=3] [ref=e99]
+            - paragraph [ref=e100]: Top-quality semen from local and international breeders, administered by our expert AI team to thousands of cattle across the region.
+          - generic [ref=e101]:
+            - heading "Livestock Nutrition & Health" [level=3] [ref=e109]
+            - paragraph [ref=e110]: Vaccines, medicines, dewormers, acaricides, supplements and quality feeds to keep your herd healthy and thriving.
+          - generic [ref=e111]:
+            - heading "Crop Farming Solutions" [level=3] [ref=e119]
+            - paragraph [ref=e120]: Quality seeds, foliar fertilizers and pest control products to ensure maximum yields for crop farmers.
+          - generic [ref=e121]:
+            - heading "Animal Disease Solutions" [level=3] [ref=e131]
+            - paragraph [ref=e132]: Expert solutions for animal diseases and nutrition — we walk the journey with you to ensure your farming goals are achieved.
+      - generic [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e136]: Trending Now
+          - heading "Our Best Sellers" [level=2] [ref=e140]
+          - paragraph [ref=e141]: The products our farmers reach for most
+        - link "Browse All Products" [ref=e208] [cursor=pointer]:
+          - /url: /catalog
+      - generic [ref=e212]:
+        - generic [ref=e213]:
+          - generic [ref=e214]: Why Nicmah
+          - heading "Built for farmers." [level=2] [ref=e218]
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - heading "Over Two Decades of Trust" [level=3] [ref=e224]
+            - paragraph [ref=e225]: Since our founding, we have been the go-to partner for farmers across the Naromoru region — sourcing certified products and delivering proven results season after season.
+          - generic [ref=e226]:
+            - heading "Local & International Genetics" [level=3] [ref=e234]
+            - paragraph [ref=e235]: We source top-quality semen from both local and international breeders, bringing the best genetics to your herd to improve milk production, meat yield and disease resistance.
+          - generic [ref=e236]:
+            - heading "We Walk with Farmers" [level=3] [ref=e243]
+            - paragraph [ref=e244]: We don't just sell products — we walk the farming journey alongside you. Our vet and AI team educates and supports farmers to ensure lasting prosperity.
+      - generic [ref=e247]:
+        - img "Fresh produce basket" [ref=e249]
+        - generic [ref=e251]:
+          - generic [ref=e252]: Our Mission
+          - heading "More than a shop — your farming partner." [level=2] [ref=e255]
+          - paragraph [ref=e256]: For over two decades, Nicmah Agrovet has helped thousands of livestock and crop farmers achieve their goals. We offer solutions to animal diseases, nutrition, breeding and crop production — educating farmers and ensuring the prosperity of their journey.
+          - list [ref=e257]:
+            - listitem [ref=e258]:
+              - generic [ref=e262]: Vaccines, dewormers & acaricides for healthy herds
+            - listitem [ref=e263]:
+              - generic [ref=e267]: Quality seeds, foliar fertilizers & crop pest solutions
+            - listitem [ref=e268]:
+              - generic [ref=e272]: Supporting thousands of farmers across our region
+          - button "Get in touch" [ref=e273] [cursor=pointer]
+      - generic [ref=e276]:
+        - generic [ref=e277]:
+          - generic [ref=e278]: Artificial Insemination
+          - heading "Quality genetics, stronger herds." [level=2] [ref=e281]: Quality genetics,stronger herds.
+          - paragraph [ref=e282]: "Our AI team has administered semen to thousands of cattle across the region, sourcing the best genetics from local and international breeders. The result: hardy, disease-resistant breeds with increased milk and meat production for our farmers."
+          - generic [ref=e283]:
+            - generic [ref=e284]: Local & international semen
+            - generic [ref=e288]: Hardy, resistant breeds
+            - generic [ref=e292]: Improved milk & meat yield
+          - link [ref=e296] [cursor=pointer]:
+            - /url: https://wa.me/254740368581?text=Hello%2C%20I%20would%20like%20to%20book%20AI%20services
+            - button "Book a service" [ref=e297]
+        - generic [ref=e298]:
+          - img "AI Breeding Services" [ref=e299]
+          - generic [ref=e301]:
+            - generic [ref=e302]:
+              - paragraph [ref=e303]: 1000s
+              - paragraph [ref=e304]: Cattle Served
+            - generic [ref=e305]:
+              - paragraph [ref=e306]: 20+
+              - paragraph [ref=e307]: Years of AI
+            - generic [ref=e308]:
+              - paragraph [ref=e309]: Intl
+              - paragraph [ref=e310]: Genetics
+      - generic [ref=e313]:
+        - generic [ref=e314]:
+          - img "Seasonal Planting" [ref=e315]
+          - generic [ref=e316]: Short Rains Season
+        - generic [ref=e317]:
+          - generic [ref=e318]: Seasonal Advisory
+          - heading "What to plant now." [level=2] [ref=e321]
+          - paragraph [ref=e322]: "Short rains are here. Our top picks: fast-maturing maize, drought-tolerant beans, and leafy vegetables with strong market demand."
+          - list [ref=e323]:
+            - listitem [ref=e324]:
+              - generic [ref=e328]: Soil prep checklist
+            - listitem [ref=e329]:
+              - generic [ref=e333]: Fertilizer timing
+            - listitem [ref=e334]:
+              - generic [ref=e338]: Pest early warning
+          - button "Download planting calendar" [ref=e339] [cursor=pointer]
+      - generic [ref=e342]:
+        - blockquote [ref=e348]: "\"Nicmah doesn't just supply—they follow up. When we switched feeds, they visited, checked growth, and adjusted the ration. That's partnership.\""
+        - generic [ref=e349]:
+          - img "Grace Muthoni" [ref=e351]
+          - generic [ref=e352]:
+            - paragraph [ref=e353]: Grace Muthoni
+            - paragraph [ref=e354]: Poultry Farmer, Nanyuki
+      - generic [ref=e357]:
+        - generic [ref=e358]:
+          - heading "Ready to grow?" [level=2] [ref=e359]
+          - paragraph [ref=e360]: Order feeds, book an AI service, or ask about your animals — our vet team and shop are here for you.
+        - generic [ref=e361]:
+          - link [ref=e362] [cursor=pointer]:
+            - /url: https://wa.me/254740368581
+            - button "Order on WhatsApp" [ref=e363]
+          - link [ref=e364] [cursor=pointer]:
+            - /url: tel:+254726476128
+            - button "Call the shop" [ref=e365]
+      - generic [ref=e368]:
+        - img "Location Map" [ref=e370]
+        - generic [ref=e378]:
+          - generic [ref=e379]: Visit the Shop
+          - heading "Find us in Naromoru." [level=2] [ref=e382]
+          - generic [ref=e383]:
+            - generic [ref=e389]:
+              - paragraph [ref=e390]: Address
+              - paragraph [ref=e391]: Timberland Building, Naromoru Town(Near KFA), Nyeri County, Kenya
+            - generic [ref=e397]:
+              - paragraph [ref=e398]: Opening Hours
+              - paragraph [ref=e399]: "Mon–Sat: 07:30–18:00"
+              - paragraph [ref=e400]: "Sun: 08:00–13:00"
+            - generic [ref=e405]:
+              - paragraph [ref=e406]: Phone
+              - paragraph [ref=e407]: "Vet: +254 721 908 023"
+              - paragraph [ref=e408]: "Shop: +254 726 476 128"
+              - paragraph [ref=e409]: "WhatsApp: +254 740 368 581"
+          - link [ref=e410] [cursor=pointer]:
+            - /url: https://maps.google.com/?q=Naromoru+Kenya
+            - button "Get directions" [ref=e411]
+      - generic [ref=e414]:
+        - generic [ref=e415]:
+          - heading "Send us a message." [level=2] [ref=e416]
+          - paragraph [ref=e417]: We usually reply within a few hours.
+          - generic [ref=e418]:
+            - generic [ref=e424]:
+              - paragraph [ref=e425]: Email
+              - paragraph [ref=e426]: nicmahagrovet@gmail.com
+            - generic [ref=e431]:
+              - paragraph [ref=e432]: Phone
+              - paragraph [ref=e433]: "Vet: +254 721 908 023"
+              - paragraph [ref=e434]: "Shop: +254 726 476 128"
+              - paragraph [ref=e435]: "WhatsApp: +254 740 368 581"
+            - generic [ref=e441]:
+              - paragraph [ref=e442]: Location
+              - paragraph [ref=e443]: Timberland Building, Naromoru Town (Near KFA)
+          - generic [ref=e444]:
+            - paragraph [ref=e445]: Follow us on TikTok & Facebook for tips.
+            - generic [ref=e446]:
+              - link [ref=e447] [cursor=pointer]:
+                - /url: "#"
+              - link [ref=e450] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e454]:
+          - generic [ref=e455]:
+            - generic [ref=e456]: Name
+            - textbox "Your name" [ref=e457]
+          - generic [ref=e458]:
+            - generic [ref=e459]: Phone
+            - textbox "+254 7XX XXX XXX" [ref=e460]
+          - generic [ref=e461]:
+            - generic [ref=e462]: Email (optional)
+            - textbox "your@email.com" [ref=e463]
+          - generic [ref=e464]:
+            - generic [ref=e465]: Message
+            - textbox "How can we help you?" [ref=e466]
+          - button "Send message" [ref=e467] [cursor=pointer]
+    - contentinfo [ref=e468]:
+      - generic [ref=e470]:
+        - generic [ref=e471]:
+          - generic [ref=e472]:
+            - img "Nicmah Agrovet" [ref=e473]
+            - generic [ref=e474]:
+              - heading "Nicmah Agrovet" [level=3] [ref=e475]
+              - paragraph [ref=e476]: Naromoru, Nyeri County
+          - paragraph [ref=e477]: Farmers-focused agrovet with over two decades of experience. We walk the journey with you — livestock health, AI breeding, and crop farming solutions.
+          - paragraph [ref=e482]: nicmahagrovet@gmail.com
+        - generic [ref=e483]:
+          - heading "Quick Links" [level=3] [ref=e484]
+          - list [ref=e486]:
+            - listitem [ref=e487]:
+              - button "Home" [ref=e488] [cursor=pointer]
+            - listitem [ref=e490]:
+              - button "Shop" [ref=e491] [cursor=pointer]
+            - listitem [ref=e493]:
+              - button "Learn" [ref=e494] [cursor=pointer]
+            - listitem [ref=e496]:
+              - button "Cart" [ref=e497] [cursor=pointer]
+            - listitem [ref=e499]:
+              - button "Login" [ref=e500] [cursor=pointer]
+        - generic [ref=e502]:
+          - heading "Contact Us" [level=3] [ref=e503]
+          - list [ref=e505]:
+            - listitem [ref=e506]:
+              - generic [ref=e510]: Timberland Building, Naromoru Town(Near KFA), Nyeri County, Kenya
+            - listitem [ref=e511]:
+              - generic [ref=e514]:
+                - 'link "Vet: +254 721 908 023" [ref=e515] [cursor=pointer]':
+                  - /url: tel:+254721908023
+                - 'link "Shop: +254 726 476 128" [ref=e516] [cursor=pointer]':
+                  - /url: tel:+254726476128
+            - listitem [ref=e517]:
+              - link "WhatsApp Us" [ref=e520] [cursor=pointer]:
+                - /url: https://wa.me/254740368581
+        - generic [ref=e521]:
+          - heading "Follow Us" [level=3] [ref=e522]
+          - generic [ref=e524]:
+            - link "Nicmah Agrovet on Facebook (coming soon)" [ref=e525] [cursor=pointer]:
+              - /url: "#"
+            - link "Nicmah Agrovet on TikTok (coming soon)" [ref=e528] [cursor=pointer]:
+              - /url: "#"
+          - paragraph [ref=e531]: Social pages coming soon
+          - generic [ref=e532]:
+            - paragraph [ref=e533]: Hours
+            - paragraph [ref=e534]: "Mon–Fri: 8:00 AM – 6:00 PMSaturday: 8:00 AM – 4:00 PM"
+      - generic [ref=e535]:
+        - paragraph [ref=e536]: © 2026 Nicmah Agrovet. All rights reserved.
+        - button "Scroll back to top" [ref=e537] [cursor=pointer]: Back to top
+    - link "Order via WhatsApp" [ref=e540] [cursor=pointer]:
+      - /url: https://wa.me/254740368581

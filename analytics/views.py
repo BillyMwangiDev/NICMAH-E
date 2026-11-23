@@ -19,6 +19,29 @@ from users.models import CustomUser
 from analytics.models import Sales, SalesItem
 
 
+def daily_series(queryset, date_field, end_date, days=7, aggregate=None):
+    """One value per day for the `days` days ending on end_date's day, in ONE query.
+
+    Days with no rows are filled with 0. `aggregate` defaults to a row count;
+    pass Sum("total_amount") and similar for totals. Decimals come back as floats
+    so the result can go straight into a chart.
+    """
+    window_start = (end_date - timedelta(days=days - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    rows = (
+        queryset.filter(**{f"{date_field}__gte": window_start, f"{date_field}__lte": end_date})
+        .annotate(day=TruncDate(date_field))
+        .values("day")
+        .annotate(value=aggregate or Count("pk"))
+        .order_by("day")
+    )
+    by_day = {row["day"]: row["value"] or 0 for row in rows}
+    series = []
+    for offset in range(days):
+        value = by_day.get((window_start + timedelta(days=offset)).date(), 0)
+        series.append(float(value) if isinstance(value, Decimal) else value)
+    return series
+
+
 class AdminRequiredMixin(UserPassesTestMixin):
     """Mixin to ensure only admin users can access analytics."""
 
@@ -91,16 +114,9 @@ def dashboard(request):
     )
     
     # Weekly sales trend (last 7 days for mini chart)
-    weekly_trend = []
-    for i in range(7):
-        day = end_date - timedelta(days=6-i)
-        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
-        day_sales = Sales.objects.filter(
-            created_at__range=[day_start, day_end],
-            status="completed"
-        ).aggregate(total=Sum("total_amount"))["total"] or Decimal("0.00")
-        weekly_trend.append(float(day_sales))
+    weekly_trend = daily_series(
+        Sales.objects.filter(status="completed"), "created_at", end_date, aggregate=Sum("total_amount")
+    )
 
     # ========== METRIC 2: NEW USERS/CUSTOMERS ==========
     new_users_current = CustomUser.objects.filter(
@@ -118,15 +134,7 @@ def dashboard(request):
     )
     
     # New users trend (last 7 days)
-    new_users_trend = []
-    for i in range(7):
-        day = end_date - timedelta(days=6-i)
-        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
-        day_users = CustomUser.objects.filter(
-            date_joined__range=[day_start, day_end]
-        ).count()
-        new_users_trend.append(day_users)
+    new_users_trend = daily_series(CustomUser.objects.all(), "date_joined", end_date)
 
     # ========== METRIC 3: PURCHASE ORDERS (TRANSACTIONS) ==========
     # Use unified Sales model to track ALL sales transactions
@@ -147,16 +155,7 @@ def dashboard(request):
     )
     
     # Orders trend (last 7 days)
-    orders_trend = []
-    for i in range(7):
-        day = end_date - timedelta(days=6-i)
-        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
-        day_orders = Sales.objects.filter(
-            created_at__range=[day_start, day_end],
-            status="completed"
-        ).count()
-        orders_trend.append(day_orders)
+    orders_trend = daily_series(Sales.objects.filter(status="completed"), "created_at", end_date)
 
     # ========== METRIC 4: PRODUCTS SOLD ==========
     # Use unified SalesItem model to track ALL products sold
@@ -176,17 +175,11 @@ def dashboard(request):
         else 0
     )
     
-    # Products sold trend (last 7 days) - OPTIMIZED with select_related
-    products_trend = []
-    for i in range(7):
-        day = end_date - timedelta(days=6-i)
-        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
-        day_products = SalesItem.objects.filter(
-            sale__created_at__range=[day_start, day_end],
-            sale__status="completed"
-        ).select_related("sale", "product").aggregate(total=Sum("quantity"))["total"] or 0
-        products_trend.append(day_products)
+    # Products sold trend (last 7 days)
+    products_trend = daily_series(
+        SalesItem.objects.filter(sale__status="completed"), "sale__created_at", end_date,
+        aggregate=Sum("quantity"),
+    )
 
     # ========== PIE CHART: SALES BY CATEGORY ==========
     # OPTIMIZED: Using select_related for product and category - ALL sales

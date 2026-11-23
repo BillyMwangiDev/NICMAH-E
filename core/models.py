@@ -144,3 +144,16 @@ class SiteSettings(models.Model):
         if not self.pk and SiteSettings.objects.exists():
             return
         super().save(*args, **kwargs)
+        self.clear_context_cache()
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        self.clear_context_cache()
+        return result
+
+    @staticmethod
+    def clear_context_cache():
+        from django.core.cache import cache
+        from .context_processors import SITE_SETTINGS_CACHE_KEY
+
+        cache.delete(SITE_SETTINGS_CACHE_KEY)
